@@ -398,3 +398,38 @@ flex布局设置父元素：display:flex;justify-content:center;
 
 五、table-cell（全能）
 
+
+
+
+
+
+
+## 一个元素高度为百分比%的文字垂直居中
+
+如果一个元素有固定高度，我们可以用`line-height`等于高度，让文字垂直居中，但是如果高度是100%则无法用`line-height`
+
+
+
+方法：
+
+html代码：
+
+```html
+<div>垂直居中</div>
+```
+
+css代码：
+
+```css
+div {
+  height: 100%
+}
+//添加以下伪元素
+div::before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
+}
+```
+

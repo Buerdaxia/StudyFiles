@@ -565,6 +565,57 @@ methods: {
 }
 ```
 
+
+
+### 编程式导航的小问题
+
+问题一：编程式导航，进行多次路由跳转(参数不改变)，多次执行会抛出NavigationDuplicated异常
+
+解决方式：在push传递参数时，后面跟两个处理函数(一个成功回调，一个失败的回调)
+
+```js
+      this.$router.push({
+        name: `search`,
+        params: {
+          keyword: '' || undefined
+        },
+        query: {
+          k: this.keyword
+        }
+      }, () => { }, () => { })
+      // 就是在push末尾添加俩函数
+```
+
+还有个根本解决方式，重写以下VueRouter的push方法
+
+在路由文件下写入以下代码：
+
+```js
+// 备份一份VueRouter的push方法
+let originPush = VueRouter.prototype.push
+
+// 重写以下push方法
+VueRouter.prototype.push = function(location, resolve, reject) {
+    // 如果传了resolve和rejecte就调用
+	if (resolve && reject) {
+		originPush.call(this, location, resolve, reject)
+	} else {
+        // 如果没传，我们自己传递俩函数
+		originPush.call(
+			this,
+			() => {},
+			() => {}
+		)
+	}
+}
+
+// replace方法重写和push一致，就是把push改为replace
+```
+
+
+
+
+
 ## 缓存路由组件keep-alive组件
 
 1）作用：让不展示的路由组件**保持挂载，不被销毁**，避免重新被渲染
