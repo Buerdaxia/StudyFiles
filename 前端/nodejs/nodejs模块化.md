@@ -1,0 +1,75 @@
+## CommonJS的Modules规范：
+
+这种规范在nodeJs中使用的
+
+commonjs中一个模块的内容是私有的，每一个模块都有自己的作用域。只能通过暴露手段向外导出
+
+### 方式一：
+
+导入：require关键字
+
+```nodejs
+const m1 = require("./modules/m1.js");
+
+//m1是一个对象
+```
+
+导出：export.xxx = 变量
+
+把exports看作是一个对象，给他添加属性
+
+```nodejs
+//将num暴露出去,前面名称自定义，后面为要到处的数据
+// 方式一：
+exports.num = num;
+exports.sum = sum;
+exports.Animal = Animal;
+```
+
+### 方式二：用的比较多
+
+导入一致，导出不同
+
+第二种导出方式：
+
+```js
+module.exports = sum;//导出一个
+// 方式二：导出多个
+module.exports = {
+//这里面用到是简写属性名
+    num,
+    sum,
+    Animal
+}
+//防止exports跟丢了
+exports = module.exports;
+```
+
+在js文件模块中，this是指向这个模块导出的对象
+
+exports和module.exports关系？
+
+**exports是module.exports的引用，只有文件中才有exports，交互模式下没有exports**
+
+
+
+# nodejs常用的内置模块
+
+1）fs：文件操作
+
+2）http：网络操作
+
+3）path：路径操作
+
+4）querystring：查询参数解析(解析get传来的params或者？后的参数)
+
+5）url：url解析
+
+```js
+const fs = require("fs");
+const http = require("http");
+const path = require("path");
+const querystring = require("querystring");
+const url = require("url");
+```
+
