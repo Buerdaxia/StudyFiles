@@ -47,6 +47,29 @@ isCollapse: false
 
 然后从sessionStorage取值放到default-active="xxx"中，点击时赋值
 
+```js
+// 如果子路由需要修改状态，可以绑定一个自定义事件，然后让子路由去触发从而修改状态    
+/*例如：
+<router-link @saveState="aveNavState"></router-link>
+然后在子路由中：this.$emit('saveState', '参数')即可
+
+*/
+
+
+// 保存激活连接
+    saveNavState(activePath) {
+      window.sessionStorage.setItem('activePath', activePath);
+      this.activePath = activePath;
+      console.log(this.activePath);
+    },
+    // 获取侧边栏路径
+    getNavState() {
+      this.activePath = window.sessionStorage.getItem('activePath');
+    }
+```
+
+
+
 ### element-ui中自定义校验规则的使用
 
 先定义一个函数

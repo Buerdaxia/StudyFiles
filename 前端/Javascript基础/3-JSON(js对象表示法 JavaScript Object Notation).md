@@ -33,7 +33,34 @@ json字符串：var obj = '{"name": "钱不二"}';**(name必须加引号)**
 
 
 
+注意：JSON字符串也可能是一个空串例如
+
+```js
+JSON.parse('""')
+//传递的就是一个空串
+```
+
+
+
 ### JSON.sringify(参数1)将一个js对象转换为json字符串
 
 语法：`JSON.stringify(内容);`
+
+
+
+## 判断一个字符串是否能转换
+
+```js
+function transform(str) {
+  try{
+    if(typeof JSON.parse(str) == 'object') {
+      return true;
+    }
+  }catch() {
+  }
+  return false;
+}
+```
+
+
 
