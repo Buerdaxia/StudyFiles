@@ -866,3 +866,106 @@ Object.defineProperty(person, 'age', {
 2. 代码复用
 3. 高维护性
 
+## async
+
+1. async函数的返回值是一个promise对象
+2. promise对象的结果由async函数执行的返回值决定（就是由return语句决定）
+
+```
+async function fn() {
+      // 
+      return '嘻嘻嘻'
+}
+
+```
+
+三种情况：
+1：如果返回的不是一个promise对象
+
+则async函数返回的是一个成功的`promise`对象
+
+2: 如果抛出错误`throw new Error('出错了')`
+
+```js
+async function fn() {
+      throw new Error('出错了');
+}
+const result = fn();
+console.log(result);//返回失败的promise对象 rejected
+```
+
+
+
+则async函数返回一个失败的promise对象
+
+3：如果返回了一个promise对象
+
+则asyce函数返回的promise状态和`return new Promise(...)`的这个对象状态一致
+
+```js
+//成功的promise
+async function fn() {
+      return new Promise((resolve, reject) => {
+        resolve('成功了');
+      })
+}
+const result = fn();
+console.log(result);//返回成功的promise对象值为成功了
+```
+
+```js
+//失败的promise
+async function fn() {
+      return new Promise((resolve, reject) => {
+        reject('失败了');
+      })
+}
+const result = fn();
+console.log(result);//返回失败的promise对象值为失败了
+```
+
+
+
+## await
+
+1. await必须写在async函数中（“单相思”,async不是必须要await）
+2. **await右边的表达式一般为一个promise对象**
+3. await返回的是promise成功的**值**（注意！是值）
+4. await的promise失败了，就会抛出异用`try...catch`捕获处理
+
+```js
+// 成功的promise
+const p = new Promise((resolve, reject) => {
+      resolve('成功了');
+    })
+
+    async function fn() {
+      let result = await p;
+      console.log(result); //返回的是值：成功了
+    }
+	//调用fn
+    fn();
+```
+
+
+
+```js
+// 失败的promise   
+   const p = new Promise((resolve, reject) => {
+      // resolve('成功了');
+      reject('失败了');
+    })
+
+    async function fn() {
+      // 失败的用try...catch
+      try {
+        let result = await p;
+        console.log(result);
+      } catch (e) {
+        console.log(e);// 返回失败了
+      }
+    }
+
+    fn();
+```
+

@@ -141,6 +141,7 @@ const p = new Promise((resolve, reject)=>{
     },1999)
 });
 // then方法里面放置成功后要执行的回调，或失败时要执行的回调
+// value是上面的res和err
 p.then((value)=>{},(reason)=>{});
 //then有两个参数，第一个为成功的回调函数，
 //第二个时失败的回调函数
