@@ -643,11 +643,14 @@ function Phone(brand, price) {
         console.log(xiaomi);
 ```
 
-继承中的注意点：
+### 继承中的注意点（写法要求）：
 
-1. 在继承这个子类中，如果子类出现和父类方法名一样的方法，就是重写，重写以子类为准
-2. 因为子类中构造函数中`constructor`没有自己的this对象，而是继承父类的this对象，然后对其进行加工。如果步调用`super()`方法，子类就得不到this对象
-3. 子类构造方法中，this要在super()方法之后（否则会报错）
+1. **在继承这个子类中，如果子类出现和父类方法名一样的方法，就是重写，重写以子类为准**
+2. 因为子类中构造函数中`constructor`没有自己的this对象，而是继承父类的this对象，然后对其进行加工。如果不调用`super()`方法，子类就得不到this对象，使用this就会报错
+3. **子类构造方法中，this要在super()方法之后（否则会报错）**
+4. 如果子类中也有`constructor`则会重写父类的`constructor`方法，则父类的`constructor`属性全部失效，如果想要得到就必须使用`super()`方法
+
+所以：**如果子类中有constructor，则必须调用super方法（还要支持上面条件3），如果子类constructor需要传递参数，则super也要传**
 
 
 

@@ -20,11 +20,11 @@ JavaScript有一个特殊的对象，成为全局对象(Global Object)，它及�
 
 **在浏览器JavaScript中，通常windows是全局对象，**
 
-**而在node.js中全局对象时global**
+**而在node.js中全局对象是global**
 
 
 
-全局对象的问题：
+### 全局对象的问题：
 
 1、nodejs里没有window对象，有的是global对象，之前使用过的console，setTimeou等
 
@@ -42,6 +42,10 @@ console.log(window);//报错
 ```nodejs
 var a = 30;
 console.log(global.a);//undefined
+
+//在浏览器端，就会挂在到window上
+var b = 30;
+console.log(window.b);//30
 ```
 
 
@@ -55,7 +59,7 @@ global.a = 60;//这个a可以在其他模块中直接使用
 console.log(a);//60
 ```
 
-4、在nodejs中执行该文件06-全局对象，里面的this指向谁？
+4、在nodejs的一个执行文件中，里面的this指向谁？
 
 **this，在文件中其实指向的是这个模块导出的对象（这个js文件）**
 
