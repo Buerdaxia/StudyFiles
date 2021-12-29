@@ -30,11 +30,13 @@ json-server启动：npx json-server --watch **db.json**(最后这个是文件名
 //axios的二次封装
 import axios from 'axios'
 
-// 1.利用axios对象的方法create，去创建一个axios实例
+// 该选项能够判断是开发环境还是生产环境
+let isDev = process.env.NODE_ENV === 'development'
 
+// 1.利用axios对象的方法create，去创建一个axios实例
 const requests = axios.create({
 	// 基础路径
-	baseURL: '/api',
+	baseURL: isDev ? '开发环境api' : '生产环境api',
 	// 请求超时时间5s
 	timeout: 5000
 	// 请求头

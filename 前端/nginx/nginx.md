@@ -156,6 +156,28 @@ ps -ef | grep nginx
 
 
 
+指定想要nginx配置文件位置
+
+```
+./nginx -c 想要指定的nginx.conf位置
+```
+
+如果遇到`nginx: [error] open() ＂/usr/local/nginx/logs/nginx.pid＂ failed`问题就可以使用以上命令指定一下nginx.conf位置
+
+
+
+检查配置文件是否出错
+
+```
+./nginx -t nginx.conf配置文件位置
+```
+
+
+
+
+
+
+
 ## nginx 配置文件
 
 nginx的配置文件一般在`/usr/local/nginx/conf/nginx.conf`中（安装成功的前提）

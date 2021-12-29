@@ -590,10 +590,12 @@ function Phone(brand, price) {
             	console.log('吃饭了');
        		}
         }
-
+		// Shouji的静态属性 size
+		Shouji.size = '200g';
         let onePlus = new Shouji('1+', "2999");
 		onePlus.call();
 		Shouji.eat();//调用静态方法，通过类名调用
+		console.log(Shouji.size);//调用静态属性也需要通过类调用
         console.log(onePlus);
 ```
 
@@ -601,7 +603,8 @@ function Phone(brand, price) {
 
 1. 实例属性和实例方法都是给实例对象取调用的
 2. 每一个实例对象在内存中都是独立的，各自拥有自己的属性和方法。
-3. 静态方法是通过类名来调用的
+3. 静态方法,静态属性都是通过类名来调用的
+4. 一般会把没有`this`关键字的方法定义为`static`方法
 
 
 
@@ -638,7 +641,11 @@ function Phone(brand, price) {
                 console.log("我能拍相片");
             }
         }
-
+		// 执行这条语句的步骤：
+		/*1.创建一个空对象
+		  2.执行constructor方法
+		  3.让xiaomi指向该对象
+		*/
         let xiaomi = new smartPhone("xiaomi", 1999, "black", "4.7inch");//实参和构造方法形参一一对应
         console.log(xiaomi);
 ```

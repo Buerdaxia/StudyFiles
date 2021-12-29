@@ -1,8 +1,14 @@
 ## CommonJS的Modules规范：
 
+一个js文件即使一个模块，模块里的内容想给别人用，那就需要暴露出去，别人就需要引入进来。
+
 这种规范在nodeJs中使用的
 
-commonjs中一个模块的内容是私有的，每一个模块都有自己的作用域。只能通过暴露手段向外导出
+commonjs中一个模块的内容是私有的，每一个模块都有自己的作用域。只能通过暴露手段向外导出。
+
+
+
+导出：实际上就是一个对象去添加属性，然后将这个对象暴露出去。
 
 ### 方式一：
 
@@ -12,6 +18,12 @@ commonjs中一个模块的内容是私有的，每一个模块都有自己的作
 const m1 = require("./modules/m1.js");
 
 //m1是一个对象
+//使用
+m1.xxx
+m1.xxx
+m1.sum() {
+ xxx
+}
 ```
 
 导出：export.xxx = 变量
@@ -41,11 +53,13 @@ module.exports = {
     sum,
     Animal
 }
-//防止exports跟丢了
+//防止exports跟丢了 如果使用第二个又需要exports就写以下代码
 exports = module.exports;
 ```
 
-在js文件模块中，this是指向这个模块导出的对象
+在js文件模块中，`this`是指向这个模块导出的对象`module.exports`
+
+交互模式下`this`指向`global`
 
 exports和module.exports关系？
 
