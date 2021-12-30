@@ -521,10 +521,12 @@ vm.$watch('isHot',function(newValue, oldValue) {
     <br> <br>
 
     <!-- 绑定class样式--- 对象写法，适用于个数确定，名字也确定，需要动态切换 -->
+	<!-- :class="{cur: boolean}" 当boolean为true，就添加cur类名，否则不添加 -->
     <div class="basic" :class='classObj' @click="changeMood" >{{name}}</div>
 
     <br> <br>
     <!-- 绑定style样式--- 对象写法 -->
+	 <!-- :style="{display: boolean ? 'block' : 'none'}" -->
     <div class="basic" :style="styleObj" >{{name}}</div>
 
     <!-- 绑定style样式--- 数组写法 -->

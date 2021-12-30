@@ -1,6 +1,6 @@
 # vuex
 
-概念：专门在Vue中实现集中式状态（数据）管理的一个Vue插件儿(Vue.use())，对vue应用中多个组件的共享状态进行集中式的管理(读/写)，也是一种组件间通信的方式，且适用于任意组件间通信。![vuex](../../前端图片/vue/vuex.png)
+概念：专门在Vue中**实现集中式状态（数据）管理**（**就是将一些共用数据集中式管理**）的一个Vue插件儿(Vue.use())，对vue应用中多个组件的共享状态进行集中式的管理(读/写)，也是一种组件间通信的方式，且适用于任意组件间通信。![vuex](../../前端图片/vue/vuex.png)
 
 **Actions**：一般用来进行网络请求，或者一些业务逻辑，进行操作之前的准备工作。
 
@@ -96,6 +96,7 @@ const actions = {
     //     console.log('actions的jian被调用了',context,value);
     //     context.commit('JIAN',value);
     // },
+    
     jiaOdd: function(context,value) {
         console.log('actions的jiaOdd被调用了',context,value);
         if(context.state.sum % 2) {
@@ -199,7 +200,7 @@ $store.getters.bigSum//bigSum是getters下创建的
 computed:{
     
     //这是mapState帮我们写的，从state中读取数据（对象写法） 
-    ...mapState({sum:'sum',school:'school',subject:'subject'}),
+  	/*sum就是计算属性，直接使用*/ ...mapState({sum:'sum',school:'school',subject:'subject'}),
 
     // 数组写法，条件是计算属性名和state中的属性名是一致的
    ...mapState(['sum','school','subject']),
@@ -254,6 +255,10 @@ methods: {
 ## 五：模块化+命名空间(重要)
 
 1）目的：让代码更好维护，让多种数据分类更加明确。
+
+就是有很多模块，每个模块有自己的数据，我们就把大仓库拆分成每个小仓库
+
+一个模块对应一个小仓库。
 
 2.）修改`store.js`
 
@@ -331,3 +336,121 @@ this.$store.commit('personAbout/ADD_PERSON',person);
 ```
 
 注意：所有的方法二中：就是首先要开启命名空间，然后再原有map方法基础上，添加一个参数，参数是对应模块的命名空间
+
+
+
+## 六：拆分模块化开发
+
+将仓库`store`拆分成每个小仓库，每个小仓库中存取自己拥有的数据。
+
+![vuex模块化开发](../../前端图片/vue/vuex模块化开发.PNG)
+
+例如图上：拆分成两个模块，一个`home`,一个`search`
+
+他俩每人拥有一套`state,actions,mutations,getters`
+
+```js
+// search模块的小仓库
+/*
+  state: 仓库存储数据的地方
+  mutations: 修改state的唯一手段
+  actions: 处理action，可以书写自己的业务逻辑，也可以处理异步
+  getters: 可以理解为state的计算属性，能够简化仓库数据，让组件获取仓库更加方便
+*/
+const state = {};
+const mutations = {};
+const actions = {};
+const getters = {};
+
+exports.default = {
+	state,
+	mutations,
+	actions,
+	getters
+};
+```
+
+
+
+**然后在大模块`store`中引入小模块**
+
+```js
+import Vue from 'vue';
+import Vuex from 'vuex';
+
+// 需要使用一下
+Vue.use(Vuex);
+
+// 引入入小仓库
+import home from './home';
+import search from './search';
+
+
+export default new Vuex.Store({
+	modules: {
+		home,
+		search
+	}
+});
+
+```
+
+## 分装例子
+
+home的仓库数据
+
+```js
+// 引入封装好的接口
+import { reqCategoryList } from '@/api';
+// search模块的小仓库
+const actions = {
+	// 通过API里面的接口函数调用，向服务器发送请求，获取服务器数据
+	// 这里直接解构出context中的commit
+	async categoryList({ commit }) {
+		let result = await reqCategoryList();
+		if (result.code === 200) {
+			commit('CATEGORYLIST', result.data);
+		}
+	}
+};
+const mutations = {
+	CATEGORYLIST(state, categoryList) {
+		// 赋值操作，将数据修改进state
+		state.categoryList = categoryList;
+	}
+};
+const getters = {};
+const state = {
+	/* 起始值，要根据接口的返回值确定
+     如果返回服务器返回数组，那起始值为空数组
+     如果返回数据为对象，那起始值就空对象
+  */
+	categoryList: []
+};
+export default {
+	state,
+	mutations,
+	actions,
+	getters
+};
+
+```
+
+组件调用数据：
+
+```js
+  // 当组件挂载完毕就可以向服务器发送请求
+  mounted() {
+    // 发送的home下的categoryList
+    this.$store.dispatch('categoryList');
+  },
+  computed: {
+    ...mapState({
+      // 对象写法，右侧是一个函数，state参数中有想要的数据
+      categoryList: state => state.home.categoryList
+    })
+  }
+
+// 然后这个categoryList就可以使用啦
+```
+
