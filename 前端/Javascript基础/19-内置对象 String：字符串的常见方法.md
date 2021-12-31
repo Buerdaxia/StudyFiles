@@ -690,10 +690,21 @@ for (var i = 0; i < str2.length; i++) {
 
 ![](http://img.smyhvae.com/20180202_1540.png)
 
-## 我的公众号
+## 新方法
 
-想学习**更多技能**？不妨关注我的微信公众号：**千古壹号**。
+## padStart()
 
-扫一扫，你将发现另一个全新的世界，而这将是一场美丽的意外：
+格式：`str.padStart(参数1, 参数2)`
 
-![](http://img.smyhvae.com/20190101.png)
+会在指定字符串之前插入字符。参数1(number)是，指定字符串`str`的满足长度，参数2(string)是要插入的字符串
+
+代码举例：
+
+```js
+let str = 'qian';
+str.padStart(5, '0');
+
+console.log(str);// 0qian
+```
+
+上述代码是:`str`长度是否满足5位，不满足则在前面插入`0`直至长度满足5位
