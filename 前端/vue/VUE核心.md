@@ -470,6 +470,38 @@ vm.$watch('isHot',function(newValue, oldValue) {
 1. 所被Vue管理的函数，最好写成普通函数，这样this的指向才是vm或者组件实例对象
 2. 所有不被Vue所管理的函数（定时器函数，ajax回调函数，promise等）最好写成箭头函数，这样this的指向才能是vm或者组件实例对象。
 
+## 自定义属性
+
+**首先，html允许用户自定义属性，以"data-"开头的即为自定义属性。**
+
+vue中添加自定义属性：
+
+```vue
+<a :data-categoryName="c1.categoryName" refs="myA">{{c2.categoryName}}</a>
+```
+
+**vue中获取自定义属性名和属性值**：
+
+方式一：通过event.target中的dataset属性获取属性名及属性值
+
+```
+getAttribute(event) {
+ console.log(event.target.dataset);
+}
+```
+
+方式二：通过refs获取，需要添加一个属性refs
+
+```
+this.$refs.myA.dataset
+```
+
+
+
+**注意只有火狐和chrome中有datase属性**
+
+
+
 
 
 ## Vue中绑定样式

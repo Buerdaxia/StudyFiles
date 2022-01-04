@@ -603,6 +603,7 @@ VueRouter.prototype.push = function(location, resolve, reject) {
         // 如果没传，我们自己传递俩函数
 		originPush.call(
 			this,
+            location,
 			() => {},
 			() => {}
 		)

@@ -30,3 +30,49 @@ server.listen(port, error => {
 
 ```
 
+
+
+## 获取请求路径
+
+`request.url`通过该属性可以获取请求路径
+
+```js
+// 这里只截取server部分代码
+const server = http.createServer((request, response) => {
+	// 获取请求路径 请求报文第一行的第二个信息
+	let reqUrl = request.url;
+	console.log(reqUrl);
+
+	response.write('hello Im writer');
+	response.end('hello world.'); //该行代码后，不要在做响应操作了，会报错
+});
+```
+
+
+
+## 获取请求方式
+
+`request.method`通过该属性获取请求方式
+
+```js
+const server = http.createServer((request, response) => {
+	// 获取请求路径 请求报文第一行的第二个信息
+	let reqUrl = request.url;
+
+	// 获取请求方式
+	let reqMethod = request.method;
+	console.log(reqUrl, reqMethod);
+
+	response.write('hello Im writer');
+	response.end('hello world.'); //该行代码后，不要在做响应操作了，会报错
+});
+```
+
+
+
+## 小细节
+
+`response.end()`表示响应结束，该函数后，不要再进行响应操作了，会报错。记住`response.end()`永远放在最后即可。
+
+
+
