@@ -186,6 +186,48 @@ p2
 
 
 
+## then()方法的链式调用
+
+then()方法返回的值
+
+1）简单表达：由then()指定的回调函数执行结果决定。
+
+2）详细表达：
+
+1. 如果抛出异常，新promise变为rejected,，reason为抛出的异常
+2. 如果返回的是非promise的**任意值**(包括undefined，null等等等...)，新promise为resolved/fullfilled，value为返回结果的值
+3. 如果返回的是一个新promise，此promise的结果就会成为新promise的结果(**是这个新promise的resolve(data)的这个data或者reject(err)的这个err**)
+
+就是这个data，会作为下一个`then()`回调的参数
+
+例子：node.js的
+
+```js
+let p1 = new Promise((resolve, reject) => {
+	fs.readFile(filePath1, 'utf-8', (err, data) => {
+		if (err) {
+			reject(err);
+		}
+		resolve(data);
+	});
+});
+
+p1.then(
+	data => {
+		console.log('成功了', data);
+		return p1;
+		// 如果返回一个promise对象，会将成功的结果值
+		// 或者失败的结果值进行返回，作为下一个then回调的参数
+	},
+	err => {
+		console.log('失败了', err);
+	}
+).then(value => {
+	console.log('第二个then', value);
+	// 这个value是p1成功的结果值data
+});
+```
+
 
 
 
