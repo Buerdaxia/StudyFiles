@@ -97,7 +97,26 @@ script：下边的命令可以执行，执行方式npm run 命令名
 
 ![babel转换](../../前端图片/npm与yarn/babel转换.png)
 
-## 项目共享
+## npm管理的项目共享
 
-一般npm管理的项目想要共享给别人时，会将项目下的`node_modules`文件夹删除，在别人得到你的项目之后，优先执行`npm install`，`npm`会自动执行在`package.json`下的`dependences`字段下所对应的包继续安装，然后想要启动，就看`package.json`下`script`字段下对应的启动命令（一般是start）,`npm run start`
+一般npm管理的项目想要共享给别人时，会将项目下的`node_modules`文件夹删除。
+
+在别人得到你的项目之后，**优先执行`npm install`**。
+
+`npm`会自动执行在`package.json`下的`dependences`字段下所对应的包继续安装。
+
+然后想要启动，就看`package.json`下`script`字段下对应的启动命令（一般是start）,`npm run start`
+
+```
+// 在package.json中添加以下 代码
+"scripts": {
+	// 后面写的是node启动文件的命令，前面名字自己起
+	"start": "node app.js"
+}
+
+
+// 之后启动时直接，npm run start 就行了
+```
+
+
 

@@ -143,7 +143,54 @@ const p = Promise.all([p1, p2, p3]);
 
 （1）只有`p1`、`p2`、`p3`的状态都变成`fulfilled`，`p`的状态才会变成`fulfilled`，此时`p1`、`p2`、`p3`的返回值组成一个数组，传递给`p`的回调函数。
 
+```js
+Promise.all([p1, p2, p3]).then(res=> {
+  console.log(res);
+  //res是一个数组，是p1，p2，p3各自成功的返回值
+});
+```
+
+
+
 （2）只要`p1`、`p2`、`p3`之中有一个被`rejected`，`p`的状态就变成`rejected`，此时第一个被`reject`的实例的返回值，会传递给`p`的回调函数。
+
+代码举例：(nodejs)**读取文件并写入**
+
+```js
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
+
+let filePath1 = path.join(__dirname, 'files', 'my.txt');
+let filePath2 = path.join(__dirname, 'files', 'love.txt');
+let filePath3 = path.join(__dirname, 'files', 'nodejs.txt');
+let filePath4 = path.join(__dirname, 'files', 'data.txt');
+
+let readFilePromise = util.promisify(fs.readFile);
+let writeFilePromise = util.promisify(fs.writeFile);
+
+let p1 = readFilePromise(filePath1, 'utf-8');
+let p2 = readFilePromise(filePath2, 'utf-8');
+let p3 = readFilePromise(filePath3, 'utf-8');
+/* Promise.all([Promise对象1, Promise对象2, Promise对象3...])
+   .then(data=> {
+     data各个Promise对象成功的返回值所组成的数组
+   })
+*/
+let str = '';
+Promise.all([p1, p2, p3])
+	.then(data => {
+		console.log(data); // ['我']
+		str = data.join('');
+		writeFilePromise(filePath4, str); //写入到filePath4中
+		console.log(str); // 我爱node.js
+	})
+	.catch(err => {
+		// 从p1,p2,p3中捕获第一个变为rejected的对象
+		console.log(err);
+	});
+
+```
 
 
 
@@ -175,6 +222,14 @@ p
 .catch(console.error);
 // 如果fetch在5s之内还没有结果(成功或者失败),那么就返回的是第二个promise失败的状态
 ```
+
+race与all方法的区别：
+
+all是全部成功，则成功并且返回一个成功的值组成的数组，否则失败
+
+race是谁先成功，则返回那个率先成功的值
+
+相同点：**都是传递一个由`Promise`对象组成的数组**
 
 ## 5 Promise.any()方法
 

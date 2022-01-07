@@ -12,24 +12,20 @@ Ajax（Asynchronous JavaScript and XML）
 
 JS 要发起一个http请求，首先要**new**一个 XHR对象
 
-![20200502213515](C:\Users\10854\Desktop\前端图片\Ajax\20200502213515.png)
+![20200502213515](../../前端图片/Ajax/20200502213515.png)
 
-有了XHR对象，需要调用open方法‘打开’XHR对象：
-
-![20200502213525](C:\Users\10854\Desktop\前端图片\Ajax\20200502213525.png)
+有了XHR对象，需要调用open方法‘打开’XHR对象：![20200502213525](../../前端图片/Ajax/20200502213525.png)
 
 open方法接收两个个参数：
 
 1. method 表示http请求类型
 2. url 表示http请求地址
 
-如果想在url中放参数和内容格式：在url后加一个问号？，参数用&分割
+如果想在url中放参数和内容格式）：在url后加一个问号？，参数用&分割
 
 语法`url?a=100&b=200&c=300`
 
-和http中的请求报文中的请求行类似
-
-![20200502212338](C:\Users\10854\Desktop\前端图片\http协议\20200502212338.png)
+和http中的请求报文中的请求行类似![20200502212338](../../前端图片/http协议/20200502212338.png)
 
 注意：**调用了open方法之后并不会真正的发出请求，而是启动了一个请求以备发送**
 
@@ -37,7 +33,7 @@ open方法第一个参数最常见的方法是**get**请求，其次是**post**�
 
 他们的主要区别是：
 
-1. get请求直接通过URL给服务端发消息，也就是将消息一并拼接在URL里![QQ截图20210712091234](C:\Users\10854\Desktop\前端图片\Ajax\QQ截图20210712091234.png)
+1. get请求直接通过URL给服务端发消息，也就是将消息一并拼接在URL里![QQ截图20210712091234](../../前端图片/Ajax/QQ截图20210712091234.png)
 2. post请求，约定通过body来传递信息，也就是用xhr.send(传递内容)
 
 post数据放在：请求体
@@ -57,6 +53,26 @@ get数据放在：请求行
 参数二：设置请求体内容字符串
 
 例如：`xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');`
+
+### 设置请求头避免缓存问题
+
+1. 在URL后面加上一个随机数：Math.random()
+
+   ```js
+   xhr.open("get", "/url"+Math.random()
+   ```
+
+2. 在URL后面加上时间戳：new Date().getTime()
+
+   
+
+3. 在使用AJAX发送请求头加上
+
+   ````js
+   xhr.setRequestHeader('Cache-Control','no-cache');
+   ````
+
+   
 
 
 
@@ -120,23 +136,17 @@ xhr.onerror = function() {
 
 1. **responseText**：保存了服务器返回的数据
 2. **status**：服务器响应报文的状态码200，404，....
-3. **readyState**：表示当前XHR对象请求/响应过程的当前活动阶段，这个属性有一下取值：![20200502213642](C:\Users\10854\Desktop\前端图片\Ajax\20200502213642.png)
+3. **readyState**：表示当前XHR对象请求/响应过程的当前活动阶段，这个属性有一下取值：![20200502213642](../../前端图片/Ajax/20200502213642.png)
 
-一个完整的请求过程：
-
-![InkedQQ截图20210711102845_LI](C:\Users\10854\Desktop\前端图片\Ajax\InkedQQ截图20210711102845_LI.jpg)
+一个完整的请求过程：![InkedQQ截图20210711102845_LI](../../前端图片/Ajax/InkedQQ截图20210711102845_LI.jpg)
 
 其中红线部分**onreadystatechange** 就是决定能否获得到服务器数据的关键所在，每当XHR对象的readyState属性发生改变时，如果onreadystatechange属性是一个函数，那么浏览器都会运行这个函数。
 
-为了确保浏览器完全接受到了服务器发来的数据要在函数中增加判断条件：
-
-![QQ截图20210711103535](C:\Users\10854\Desktop\前端图片\Ajax\QQ截图20210711103535.png)
+为了确保浏览器完全接受到了服务器发来的数据要在函数中增加判断条件：![QQ截图20210711103535](../../前端图片/Ajax/QQ截图20210711103535.png)
 
 上文说到之后**readyState===4**时表示**完成**完全接受数据，然后为了确保这次请求没有错误，还需要判断http的状态码必须在200-300之间，或者等于304
 
-code：`if（200 <= xhr.status <300 || xhr.status == 304）`
-
-![QQ截图20210711104225](C:\Users\10854\Desktop\前端图片\Ajax\QQ截图20210711104225.png)
+code：`if（200 <= xhr.status <300 || xhr.status == 304）`![QQ截图20210711104225](../../前端图片/Ajax/QQ截图20210711104225.png)
 
 ### 4取消请求
 
@@ -155,7 +165,24 @@ x.abort();//取消请求
 
 # AJAX 内容
 
-![20200503114713](C:\Users\10854\Desktop\前端图片\Ajax\20200503114713.png)
 
 
+![20200503114713](../../前端图片/Ajax/20200503114713.png)
+
+
+
+## 解决AJAX兼容性问题
+
+```js
+function createAjax() {
+  var xhr;
+  try {
+    xhr = new XMLHttpRequest();
+  }
+  catch (e) { // 兼容IE
+    xhr = new ActiveXObject('Microsoft.XMLHTTP');
+  }
+  return xhr;
+}
+```
 
