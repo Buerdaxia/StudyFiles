@@ -2,7 +2,7 @@
 
 利用body-parser可以更方便快捷的获取到参数。
 
-**现在不需要引入body-parser了，已经有官方中间件了**
+**现在不需要引入body-parser了，已经拆成官方中间件了**
 
 安装：
 
@@ -38,5 +38,25 @@ app.use(express.json()); // 解析json格式
 	console.log(email);
 	console.log(password);
 	console.log(repwd);
+```
+
+完整的post请求
+
+```js
+app.post('/register', (req, res) => {
+	// 一般post提交过来，需要获取到请求参数
+
+	// 2.获取参数 通过req.body获取参数是一个对象
+	console.log(req.body);
+
+	// 结构一下，并打印
+	let { username, email, password, repwd } = req.body;
+	console.log(username);
+	console.log(email);
+	console.log(password);
+	console.log(repwd);
+
+	res.send('post');
+});
 ```
 

@@ -147,6 +147,25 @@ while (index !== -1) {
 console.log('a 出现的次数是: ' + num);
 ```
 
+查找指定字符串字符出现的位置。
+
+```js
+let str = 'hello world';
+let position = [];
+let pos = str.indexOf('l');
+while (pos !== -1) {
+  position.push(pos);
+  pos = str.indexOf('l', pos + 1);//这里为什么+1？
+  /*
+  因为 indexOf要从上一次找到位置的后一个开始寻找
+  */
+}
+console.log(position);//[2, 3, 9]
+```
+
+
+
+
 
 ### 2、search()：获取字符串中指定内容的索引（参数里一般是正则）
 
@@ -240,8 +259,14 @@ console.log(name.startsWith('c',3)); // 打印结果：false
 **参数中的position**：
 
 - 如果不指定，则默认为 str.length。
-
 - 如果指定，则规定了**检索的结束位置**。检索的范围包括：从第一个字符串开始，直到这个指定的位置。即：[0, position)
+
+```js
+//例如：
+let message = 'foobarbaz';
+console.log(message.endsWith('bar', 6));
+// 这里指定message结尾位置为6 即message现在为'foorbar'
+```
 
 - 或者你可以这样简单理解：endsWith() 方法里的position，表示**检索的长度**。
 
@@ -263,6 +288,81 @@ console.log(name.endsWith('d', 3)); // 打印结果：false
 注意看上方的注释。
 
 参考链接：[JavaScript endsWith()介绍](https://www.softwhy.com/article-2885-1.html)
+
+
+
+### 6、padStart()根据条件添加开头指定字符
+
+语法：
+
+```
+新字符串 = 旧字符串.padStart(字符数, '字符');
+```
+
+解释：旧字符串个数是否满足字符数，如果不满足，在旧字符串上重复添加第二个参数指定的字符
+
+注意：
+
+* 第二个参数是可选字符，如果不填，默认为空格
+* 第二个参数不限于一个字符，如果是多个字符的字符串，则会将其拼接并截断以匹配 指定长度。
+* 第一个参数如果小于或等于旧字符串，则返回整个原始旧字符串
+
+代码示例:
+
+```js
+let str = 'foo';
+// 不填第二个参数，默认为空
+console.log(str.padStart(6));//   foo
+console.log(str.padStart(6, '.'));//...foo
+```
+
+
+
+```JS
+let str = 'foo';
+
+// 不满足8位，需要添加5位，bar三位加上ba 总共5位
+console.log(str.padStart(8, 'bar'));//  barbafoo
+
+// 会将第二个参数截取添加
+```
+
+
+
+
+
+### 7、padEnd()根据条件添加结尾指定字符
+
+语法：
+
+```
+新字符串 = 旧字符串.padEnd(字符数, '字符');
+```
+
+解释：和上面padStart一致，如果旧字符串个数长度不满足字符数，则在旧字符串末尾添加第二个参数指定的字符
+
+* 第二个参数是可选字符，如果不填，默认为空格
+* 第二个参数不限于一个字符，如果是多个字符的字符串，则会将其拼接并截断以匹配 指定长度。
+* 第一个参数如果小于或等于旧字符串，则返回整个原始旧字符串
+
+代码示例：
+
+```js
+let str = 'foo';
+// 不填第二个参数，默认为空
+console.log(str.padEnd(6)); // foo   这后面有空格 这个字符长度为6
+console.log(str.padEnd(6, '.'));// foo...
+```
+
+
+
+```js
+let str = 'foo';
+// 在后面截取添加
+console.log(str.padEnd(8, 'bar'));//  foobarba
+```
+
+
 
 ## 获取指定位置的字符
 
@@ -400,8 +500,15 @@ for (var i = 0; i < str.length; i++) {
 `substring()`和`slice()`是类似的。但不同之处在于：
 
 - `substring()`不能接受负值作为参数。如果传递了一个**负值**，则默认使用 0。
+- `substring()`还会自动调整参数的位置，如果第二个参数小于第一个，**则自动交换**。比如说， `substring(1, 0)`相当于截取的是第一个字符。
 
-- `substring()`还会自动调整参数的位置，如果第二个参数小于第一个，则自动交换。比如说， `substring(1, 0)`相当于截取的是第一个字符。
+```js
+str.substring(3, 0);
+//等同于
+str.substring(0, 3);
+```
+
+
 
 ### 3、substr()
 
@@ -424,6 +531,14 @@ for (var i = 0; i < str.length; i++) {
 - `(-3)` 从倒数第几个开始，截取到最后。
 
 备注：ECMAscript 没有对 `substr()` 方法进行标准化，因此不建议使用它。
+
+注意：如果第二个参数传入为负数，则会转换为0，则会返回空字符
+
+```
+str.substr(2, -3);
+// 会转换为 str.substr(2, 0);
+// 意思是，从2开始截取，截取0位，则位空字符 ''
+```
 
 
 
@@ -451,7 +566,7 @@ console.log(result2); // 打印结果：中
 
 解释：字符串的连接。
 
-这种方法基本不用，直接把两个字符串相加就好。
+这种方法基本不用，直接把两个字符串相加就好。(用+号)
 
 是的，你会发现，数组中也有`concat()`方法，用于数组的连接。这个方法在数组中用得挺多的。
 
@@ -568,6 +683,8 @@ console.log(mix_telephone); // 打印结果：1308888****
 ## trim()
 
 `trim()`：去除字符串前后的空白。
+
+该方法不会影响原字符串。
 
 代码举例：
 
@@ -690,22 +807,5 @@ for (var i = 0; i < str2.length; i++) {
 
 ![](http://img.smyhvae.com/20180202_1540.png)
 
-## 新方法
-
-## padStart()
-
-格式：`str.padStart(参数1, 参数2)`
-
-会在指定字符串之前插入字符。参数1(number)是，指定字符串`str`的满足长度，参数2(string)是要插入的字符串
-
-代码举例：
-
-```js
-let str = 'qian';
-str.padStart(5, '0');
-
-console.log(str);// 0qian
-```
-
-上述代码是:`str`长度是否满足5位，不满足则在前面插入`0`直至长度满足5位
+# 
 

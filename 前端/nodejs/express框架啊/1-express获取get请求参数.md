@@ -2,6 +2,8 @@
 
 利用`get`回调参数中的`req.query`可以获得url后跟随的参数
 
+关键：**req.query**
+
 ```js
 const express = require('express');
 
