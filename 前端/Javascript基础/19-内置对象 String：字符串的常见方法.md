@@ -592,6 +592,22 @@ console.log(result); // 打印结果：qianguyihao
 
 备注：`split()`这个方法在实际开发中用得非常多。一般来说，从接口拿到的 json 数据中，经常会收到类似于`"q, i, a, n"`这样的字符串，前端需要将这个字符串拆分成`['q', 'i', 'a', 'n']`数组，这个时候`split()`方法就派上用场了。
 
+
+
+该方法话可以传递第二个参数，用来限制想要展示的数组个数。
+
+代码举例：
+
+```js
+let color = 'yellow, blue, red';
+console.log(color.split(',', 2));
+// ['yellow', 'blue']
+```
+
+
+
+
+
 **代码举例 1**：
 
 ```javascript
@@ -646,6 +662,20 @@ console.log(str2);
 console.log(str2.replace('today', 'tomorrow')); //只能替换第一个today
 console.log(str2.replace(/today/gi, 'tomorrow')); //这里用到了正则，才能替换所有的today
 ```
+
+
+
+全局替换：(1.必须使用正则。2.必须要带全局标记)
+
+```js
+let text = 'cat, bat, sat, fat';
+let result = text.replace(/at/g, 'ond');
+cconsole.log(text);// 'cond, bond, sond, fond'
+```
+
+
+
+
 
 ## repeat()：重复字符串
 
