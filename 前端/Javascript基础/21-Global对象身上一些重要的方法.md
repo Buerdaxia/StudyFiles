@@ -6,6 +6,20 @@ ECMA-262 规定 Global 对象为一种兜底对象，它所针对的是不属于
 
 
 
+**虽然没有规定直接访问Global的方式，但是它有代理人，那就是window对象**
+
+## 一种简单获取Global对象的方式
+
+```js
+let global = function() {
+  return this;
+}()
+```
+
+
+
+
+
 ## URL编码方法
 
 ### encodeURI()和 encodeURIComponent()方法
@@ -94,3 +108,41 @@ console.log(decodeURIComponent(uri));
 decodeURI()只能处理被encodeURI()编码过的字符。其余的字符编码不会解码。
 
 而decodeURIComponent()方法会解码所有的特殊字符
+
+
+
+## eval()方法
+
+这个方法就是一个完 整的 ECMAScript 解释器，它接收一个参数，即一个要执行的 ECMAScript（JavaScript）字符串。
+
+语法：
+
+```
+eval("语句");
+```
+
+当解释器发现`eval()`函数时，会将参数解释为实际的JavaScript语句并插入到该位置。
+
+**通过 eval()执行的代码属于该调用所在上下文，被执行的代码与该上下文拥有相同的作用域链。这意 味着定义在包含上下文中的变量可以在 eval()调用内部被引用**
+
+代码实例：
+
+```js
+let msg = "hello world"; 
+eval("console.log(msg)"); // "hello world" 
+
+//这里的’console.log('msg')‘会直接解析为console语句
+```
+
+
+
+也可以写成一个函数：
+
+```js
+eval('function sayHi() { console.log('h1')} ');
+sayHi();
+```
+
+注意：**通过eval()定义的任何变量和函数都不会被提升**，因为在解析代码时，它们是被包裹在一个字符串中的。它只有在`eval()`执行的时候才会被创建。
+
+严格模式下，`eval()`函数内部变量无法被访问。会报错

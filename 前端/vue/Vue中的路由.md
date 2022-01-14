@@ -818,3 +818,38 @@ const routes = [
 ]
 ```
 
+## 路由懒加载
+
+使用路由懒加载原因：当打包构建应用时，JavaScript包会变得非大，影响页面加载，如果能把不同路由对应的组件分割成不同的代码块，然后路由被访问时才加载对应的组件，这样可以优化效率。
+
+当打包构建应用时
+
+方式：`Promise`配合webpack的动态引入`import`
+
+使用方式：
+
+```js
+// 原来路由中引入组件方式
+import Foo from './Foo.vue';
+
+// 路由懒加载方式
+const Foo = () => import('./Foo.vue')
+
+
+// 使用时 一致
+
+const routes = [
+{
+	path: '/foo',
+	component: Foo
+}
+]
+const router = new VueRouter({
+  routes: 
+})
+    
+export default router;
+```
+
+**注意（官网原话）**：**如果您使用的是 Babel，你将需要添加 [`syntax-dynamic-import`](https://babeljs.io/docs/plugins/syntax-dynamic-import/)插件，才能使 Babel 可以正确地解析语法。**
+
