@@ -342,9 +342,11 @@ const vm = new Vue({
 ```javascript
 const vm = new Vue({
     el: '#root',
-    data: {
-        firstName: '张',
-        lastName: '三'
+    data(){
+        return {
+            firstName: '张',
+        	lastName: '三'
+        }
     },
     computed: {
         // 完全体
