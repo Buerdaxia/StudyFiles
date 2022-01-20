@@ -33,7 +33,7 @@ app.engine('html', require('express-art-template'));
 app.set('view options', {
 	debug: process.env.NODE_ENV !== 'production'
 });
-// 设置在哪一个目录下查找HTML文件
+// 设置在哪一个目录下查找HTML文件，设置模板存放目录
 app.set('views', path.join(__dirname, 'views'));
 
 // 设置模板后缀名为html
