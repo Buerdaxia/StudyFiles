@@ -168,7 +168,7 @@ const app = express();
 app.use(
 	/*
     name：session名
-    keys: 为内部加密所需要的keys，随机字符串
+    keys: 为内部加密所需要的keys，随机字符串（越乱越好）
     maxAge: 过期时间，单位是毫秒
   */
 	cookieSession({
