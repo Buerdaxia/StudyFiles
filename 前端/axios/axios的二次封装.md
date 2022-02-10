@@ -75,3 +75,82 @@ export default requests
 
 ```
 
+## 关于axios传递超大数字问题
+
+JavaScript能够处理数字的最大范围是：-2^53到 2^53之间（不含两个端点）
+
+反正就：如果数字大小超过16位了，就注意了数字就不精确了
+
+前后端数据传递过程中，后端返回的数据一般都是`JSON`格式的，`axios`在内部会帮助我们自动调用了以下`JSON.parse()`帮助我们将数据转换为了JavaScript对象来方便我们使用。但是在转换**大数字**时就会出现精度问题。
+
+解决方案：
+
+**使用第三方包`json-bigint`来解决**
+
+安装json-bigint
+
+```
+npm install json-bigint
+```
+
+
+
+第二步，再封装的`axios`中配置一下
+
+```js
+// axios二次封装
+import axios from 'axios';
+// 解决特大数字传递问题
+import JSONBig from 'json-bigint';
+
+const isDev = process.env.NODE_ENV === 'development';
+const requests = axios.create({
+    // 配置基础url
+	baseURL: isDev ? 'http://localhost:8080/api' : 'http://192.168.13.5:8689',
+    // 超时时间
+	timeout: 5000,
+    // 解决大数字问题
+	transformResponse: [
+		function (data) {
+			try {
+                // 遇到大数字，如果能转换则转换后返回
+				return JSONBig.parse(data);
+			} catch (err) {
+                // 否则直接返回
+				return data;
+			}
+		}
+	]
+});
+
+requests.interceptors.request.use(
+	config => {
+		// Do something before request is sent
+		return config;
+	},
+	error => {
+		// Do something with request error
+		return Promise.reject(error);
+	}
+);
+
+requests.interceptors.response.use(
+	res => {
+		// Do something before response is sent
+		return res;
+	},
+	error => {
+		// Do something with response error
+		return Promise.reject(error);
+	}
+);
+
+export default requests;
+
+```
+
+
+
+最后：
+
+**使用时，只需要调用一下`toString()`就能够得到大数字的字符串形式，可以直接使用**
