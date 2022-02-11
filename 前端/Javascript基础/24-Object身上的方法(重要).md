@@ -122,3 +122,35 @@ const copy = Object.assign({}, obj);
 console.log(copy); // { a: 1 }
 ```
 
+
+
+## 方法6：**hasOwnProperty()**
+
+语法：`obj.hasOwnProperty(prop)`
+
+所有继承了 [`Object`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object) 的对象都会继承到 `hasOwnProperty` 方法。这个方法可以用来检测一个对象是否含有特定的自身属性；和 [`in`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/in) 运算符不同，**该方法会忽略掉那些从原型链上继承到的属性**。返回一个**布尔值**
+
+注意：**即使属性的值是 `null` 或 `undefined`，只要属性存在，`hasOwnProperty` 依旧会返回 `true`。**
+
+示例：
+
+```js
+let obj2 = {
+  a: '1',
+  b: '2',
+  123: '3'
+  d: null
+}
+console.log('obj2', Object.keys(obj2));
+
+console.log('hasOwnProperty', obj2.hasOwnProperty('c'));// false
+console.log('hasOwnProperty', obj2.hasOwnProperty('a'));// true
+console.log('hasOwnProperty', obj2.hasOwnProperty('d'));// true
+
+o = new Object();
+o.hasOwnProperty('prop'); // 返回 false
+o.prop = 'exists';
+o.hasOwnProperty('prop'); // 返回 true
+delete o.prop;
+o.hasOwnProperty('prop'); // 返回 false
+```
