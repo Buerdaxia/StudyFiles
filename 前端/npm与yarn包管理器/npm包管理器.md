@@ -33,6 +33,14 @@ npm install md5
 
 ## npm的使用指令
 
+npx xxx：**npx指令比较特殊，npx指令首先会在当前node_modules文件夹下寻找xxx，如果没有就执行全局安装的xxx，如果还没有就需要安装**
+
+例如：
+
+```
+npx nodemon
+```
+
 npm -v：查看版本，判断npm是否安装成功
 
 npm install <Module Name@版本号>：使用npm命令安装模块（不加版本号直接安装最新版本）
