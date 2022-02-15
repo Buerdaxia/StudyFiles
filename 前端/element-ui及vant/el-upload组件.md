@@ -2,7 +2,7 @@
 
 首先看官网el-upload组件的介绍
 
-![el-upload组件](C:\Users\UM0103677\Desktop\笔记\StudyFiles\前端图片\ElementUI\el-upload组件.png)
+![el-upload组件](../../前端图片/ElementUI/el-upload/el-upload组件.png)
 
 注意:在data中绑定的这个fileList，暂时访问不到数据，就是在以下的阶段，如果你初始化为`fileList: []`则之后的阶段一直是空的。
 
@@ -37,9 +37,7 @@ this.$refs.upload.uploadFiles
 
 可以在upload自带的`beforeUpload`钩子中进行类型判断。该钩子会传递一个`file参数`里面有上传文件的信息
 
-![before-upload](C:\Users\UM0103677\Desktop\笔记\StudyFiles\前端图片\ElementUI\before-upload.png)
-
-
+![before-upload](../../前端图片/ElementUI/el-upload/before-upload.png)
 
 例如：
 
@@ -65,4 +63,46 @@ this.$refs.upload.uploadFiles
 ## 清除列表
 
 清除列表可以使用`upload`组件自带的函数`clearFiles`进行清除
+
+
+
+## 获取上传的文件
+
+原始的获取上传文件方法：(VUE中)
+
+html部分：
+
+```html
+<inpt type="file" @change="uploadConfig">
+<!-- type要改成file表示要上传文件 上传文件还有一些参数可以限制上传类型-->
+```
+
+js部分：
+
+```js
+uploadConfig(e) {
+    // 整个文件会放在这个e.target.files这个数组中
+	console.log(e.target.files)
+    // 获取第一个文件就e.target.file[0]
+}
+```
+
+
+
+
+
+
+
+上传的文件信息放在`this.$refs.upload.uploadFiles`
+
+![upload上传文件](../../前端图片/ElementUI/el-upload/upload上传文件.PNG)
+
+注意：**其中raw属性中放着文件**
+
+我们获取这个文件就可以
+
+```
+this.$refs.upload.uploadFiles[0].raw
+// 获取这个上传文件
+```
 

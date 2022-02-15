@@ -154,3 +154,52 @@ export default requests;
 最后：
 
 **使用时，只需要调用一下`toString()`就能够得到大数字的字符串形式，可以直接使用**
+
+
+
+## 关于解决调用接口415问题
+
+有时候要注意请求头上的`Content-Type: application/json;charset=UTF-8`配置项有时候，响应头上的`Content-Type`要求和请求头一致
+
+一般我们可以修改我们二次分装的`axios`修改以下请求头
+
+上代码：
+
+```js
+// axios二次封装
+import axios from 'axios';
+
+const isDev = process.env.NODE_ENV === 'development';
+const requests = axios.create({
+	baseURL: isDev ? 'http://localhost:8080/api' : 'http://192.168.13.5:8689',
+	timeout: 5000,
+    // 关键在这一行，修改了以下请求头上的Content-Type属性
+	headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+});
+
+requests.interceptors.request.use(
+	config => {
+		// Do something before request is sent
+		return config;
+	},
+	error => {
+		// Do something with request error
+		return Promise.reject(error);
+	}
+);
+
+requests.interceptors.response.use(
+	res => {
+		// Do something before response is sent
+		return res;
+	},
+	error => {
+		// Do something with response error
+		return Promise.reject(error);
+	}
+);
+
+export default requests;
+
+```
+
