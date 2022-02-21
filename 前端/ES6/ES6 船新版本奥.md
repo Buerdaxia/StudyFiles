@@ -942,7 +942,7 @@ console.log(result);//返回失败的promise对象值为失败了
 1. await必须写在async函数中（“单相思”,async不是必须要await）
 2. **await右边的表达式一般为一个promise对象**
 3. await返回的是promise成功的**值**（注意！是值）
-4. await的promise失败了，就会抛出异用`try...catch`捕获处理
+4. await的promise失败了，就会抛出异常用`try...catch`捕获处理
 
 ```js
 // 成功的promise
@@ -974,6 +974,7 @@ const p = new Promise((resolve, reject) => {
         let result = await p;
         console.log(result);
       } catch (e) {
+        // e是await抛出的失败的值
         console.log(e);// 返回失败了
       }
     }
