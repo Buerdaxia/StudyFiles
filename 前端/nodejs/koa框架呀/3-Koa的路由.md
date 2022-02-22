@@ -158,3 +158,29 @@ app.listen(3000, () => {
 
 ```
 
+### 多重中间件
+
+koa-router允许在请求写**多个中间件**可以写很多个
+
+例如：(官网案例)
+
+```js
+router.get(
+  '/users/:id',
+  (ctx, next) => {
+    // 先执行
+    return User.findOne(ctx.params.id).then(function(user) {
+      ctx.user = user;
+      // 跳转至下一个中间件
+      next();
+    });
+  },
+  ctx => {
+    console.log(ctx.user);
+    // => { id: 17, name: "Alex" }
+  }
+);
+```
+
+多个中间件按顺序执行，`next()`跳转到下一个中间件
+
