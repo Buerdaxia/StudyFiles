@@ -2,11 +2,13 @@
 
 ## async
 
+async包裹的函数将会成为一个异步函数
+
 1. async函数的返回值是一个promise对象
 2. promise对象的结果由async函数执行的返回值决定（就是由return语句决定）
 3. 如果async函数状态没有改变，则返回一个`pending`状态`Promise`对象为（例如函数中有`await`，因为`await`会阻塞代码哟）
 
-```
+```js
 async function fn() {
       // 
       return '嘻嘻嘻'
@@ -17,7 +19,16 @@ async function fn() {
 三种情况：
 1：如果返回的不是一个promise对象
 
-则async函数返回的是一个成功的`promise`对象
+则async函数返回的是一个成功的`promise`对象，成功的值是这一个**返回的值**
+
+```js
+async function fn() {
+	return null;
+}
+// fn 返回的是 成功promise，成功的值为 null
+```
+
+
 
 2: 如果抛出错误`throw new Error('出错了')`
 
@@ -62,6 +73,8 @@ console.log(result);//返回失败的promise对象值为失败了
 
 
 ## await
+
+注意点：**await会阻塞后续代码执行**
 
 1. await必须写在async函数中（“单相思”,async不是必须要await）
 2. **await右边的表达式一般为一个promise对象**
@@ -132,7 +145,7 @@ let ret = func();
 console.log('ret:', ret);
 ```
 
-二：await会阻塞后续的代码
+二：**await会阻塞后续的代码**
 
 ```js
 async function func() {
