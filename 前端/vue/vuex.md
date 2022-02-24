@@ -17,6 +17,14 @@
 
 安装：npm i vuex
 
+
+
+## 关键
+
+**vuex是和界面一起有关联的，当界面一刷新就会刷新vuex中的数据**
+
+当有一些长时间数据保持，一般会和sessionStorage或者localStorage配合使用
+
 ## 一:搭建vuex环境
 
 1）创建文件：src/store/index.js
