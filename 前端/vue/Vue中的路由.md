@@ -853,3 +853,75 @@ export default router;
 
 **注意（官网原话）**：**如果您使用的是 Babel，你将需要添加 [`syntax-dynamic-import`](https://babeljs.io/docs/plugins/syntax-dynamic-import/)插件，才能使 Babel 可以正确地解析语法。**
 
+
+
+## router.currentRoute
+
+这是router身上的一个方法，可以通过该方法获得当前页面的**路由规则**
+
+```js
+const router = new VueRouter({
+  routes
+});
+
+router.currentRoute
+```
+
+
+
+## path: "*"
+
+在路由中，这个路径`path:"*"`表示除了已有路径之外的其他所有路径，一般都是将这条路径用作错误处理页面上
+
+```js
+
+// 静态路由
+const routes = [
+  {
+    path: "/home",
+    name: "Home",
+    component: Home,
+    // redirect: "/login",
+    children: [
+      // {
+      //   path: "/menu/one",
+      //   component: () => import("@/views/Page1.vue")
+      // },
+    ]
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login
+  },
+  {
+    // 错误处理 跳转到NotFound界面
+    path: "*",
+    name: "NotFound",
+    component: NotFound
+  }
+];
+```
+
+
+
+## 动态添加路由
+
+动态添加路由的一个关键是`router`身上的一个方法，可以动态添加路由规则
+
+`router.addRoutes(currentRoutes);`
+
+参数：`currentRoutes`的格式需要和`routes`一致
+
+```js
+const routes = [
+  {
+    path: "/home",
+    name: "Home",
+    component: Home,
+    children: []
+  }
+]
+```
+
+详细操作可以看一看权限控制哪里

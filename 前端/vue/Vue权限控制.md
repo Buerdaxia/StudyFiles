@@ -431,4 +431,352 @@ export default {
 
 不同用户，在相同界面上的权限是不同的，因此我们需要根据用户的权限来对按钮进行控制，用户不具备权限时，我们就需要将按钮隐藏或者禁用。
 
-解决建议：**将逻辑放到自定义指令之中**
+解决建议：**将逻辑放到自定义指令之中**,然后给需要控制的按钮，添加自定义指令即可
+
+解决前提：任然需要后端人员进行接口配合
+
+首先后端数据格式：(登录接口返回的数据)
+
+```js
+{
+  id: 1,
+  username: "普通用户",
+  password: "normal",
+  token: "abcdefghijklmnopqrstuvwxyz",
+  rights: [
+    {
+      id: 1,
+      authName: "一级菜单",
+      icon: "icon-menu",
+      children: [
+        {
+          id: 11,
+          authName: "一级项目1",
+          path: "/menu/one",
+          rights: ["view", "edit", "add", "delete"]// 关键在这里 
+        },
+        {
+          id: 11,
+          authName: "一级项目2",
+          path: "/menu/two",
+          rights: ["view"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+
+
+第一步：首先先在需要控制的按钮上添加自定义指令
+
+```vue
+<!-- action: 'edit'是标识这个是修改按钮，只有用户权限rights中有edit的才会考虑是否显示 -->
+<!-- effect: 'disabled'是标识这个按钮是否会被禁用，如果权限中没有edit，则会被经用 -->
+<!-- 主要逻辑在下面第三步中，自定义指令哪里-->
+<el-button v-permission="{action:'edit', effect: 'disabled'}"
+  type="primary"
+  @click="handleUpdate(scope)">
+  <i class="el-icon-edit"></i>
+</el-button>
+```
+
+第二步：控制路由身上的元信息`meta`
+
+首先要思考一下，我们是根据后端返回的数据中的`rights: ["view", "edit", "add", "delete"]`这条键值对来配合，而每个页面上都是需要独立控制按钮，所以比较方便的一种绑定方式，就是让它和路由的元信息进行捆绑
+
+router文件
+
+```js
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Home from "../views/Home.vue";
+import Login from "../views/Login.vue";
+import NotFound from "../views/NotFound.vue";
+
+import store from "../store";
+
+Vue.use(VueRouter);
+
+// 动态路由
+const menuOne = {
+  path: "/menu/one",
+  component: () => import("@/views/Page1.vue")
+};
+const menuTwe = {
+  path: "/menu/two",
+  component: () => import("@/views/Page1.vue")
+};
+
+const menuThree = {
+  path: "/menu/three",
+  component: () => import("@/views/Page1.vue")
+};
+const menuFour = {
+  path: "/menu/four",
+  component: () => import("@/views/Page1.vue")
+};
+
+const menuFive = {
+  path: "/menu/five",
+  component: () => import("@/views/Page1.vue")
+};
+
+// 动态路由与数据字段映射
+const ruleMapping = {
+  "/menu/one": menuOne,
+  "/menu/two": menuTwe,
+  "/menu/three": menuThree,
+  "/menu/four": menuFour,
+  "/menu/five": menuFive
+};
+
+// 静态路由
+const routes = [
+  {
+    path: "/home",
+    name: "Home",
+    component: Home,
+    children: []
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login
+  },
+  {
+    path: "*",
+    name: "NotFound",
+    component: NotFound
+  }
+];
+
+const router = new VueRouter({
+  routes
+});
+
+export function initDynamicRoute() {
+  // 根据二级权限，对router进行控制
+  console.log(router);
+  const currentRoutes = router.options.routes;
+  store.state.rightList.forEach(item => {
+    item.children.forEach(item => {
+      // 映射动态路由
+      const temp = ruleMapping[item.path];
+			// 绑定元信息（给每个页面绑定不同的元信息）
+      temp.meta = item.rights;
+      // 然后将对应的路由推到 home页面子路由中
+      currentRoutes[0].children.push(temp);
+    });
+  }); // 设置路由规则
+  router.addRoutes(currentRoutes);
+}
+
+export default router;
+
+```
+
+
+
+
+
+第三步：编写自定义指令
+
+之后，我们可以通过判断自定义指令存储的数据，和该页面路由身上的元信息(`meta`属性)进行比对，如果有那就展示，**否则进行隐藏或禁用**
+
+注意：**这是我们分装好的自定义指令，还是需要到main.js中引入一下否则不会加载**
+
+创建`src/utils/permission.js`
+
+```js
+import Vue from "vue";
+import router from "../router";
+Vue.directive("permission", {
+  // inserted当元素被插入到dom节点时调用
+  /*  
+    el:当前指令绑定元素
+    binding：当前指令绑定的值
+  */
+  inserted(el, binding) {
+    // console.log(el);
+    // console.log(binding);
+    // console.log(router.currentRoute);
+    // 得到自定义指定绑定的值 （add）
+    const action = binding.value.action;
+    // 得到自定义指令绑定的值(disabled)
+    const effect = binding.value.effect;
+    // 判断，当前的路由所对应的组件中，判断用户是否具备action的权限
+    if (router.currentRoute.meta.indexOf(action) == -1) {
+      // 当在meta元数据中找不到这个参数时
+      if (effect === "disabled") {
+        // 将按钮进行禁用操作
+        el.disabled = true;
+        // 这个是element-ui禁用时特定的类，需要加上
+        el.classList.add("is-disabled");
+      } else {
+        // 如果不禁用，那就直接将这个按钮删除
+        // 找到当前节点的父节点，然后删除当前元素（我杀我自己）
+        el.parentNode.removeChild(el);
+      }
+    }
+  }
+});
+
+```
+
+### 3.4 请求和响应控制
+
+这部分的控制，我们需要用到`axios`自带的请求拦截器
+
+**请求控制**
+
+1. 除了登录请求之外，所有的请求都必须携带者`token`，这样服务器才能验证你的身份
+
+```js
+axios.interceptors.request.use(
+  config => {
+    // Do something before request is sent
+    console.log(config.url);
+    console.log(config.method);
+    if (config.url !== "login") {
+      // 如果不是登录请求，我们就应该在请求头中，加入token数据
+      config.headers.Authorization = sessionStorage.getItem("token");
+    }
+  return config;
+)}
+```
+
+
+
+2. 如果发出了非权限内的请求，应该直接在前端访问时就阻止（减轻后端服务器压力，没有必要的请求就别发送了，发送返回的失败），
+
+这一部分操作:
+
+* 必须要让后端配合，必须要采用restful风格参数
+* 还要结合之前使用的路由元信息`meta`才能实现，否则实现不了（寄）
+
+```js
+import Axios from "axios";
+import router from "../router";
+
+const axios = Axios.create({
+  // baseURL: process.env.NODE_ENV === 'development' ? '' : '',
+});
+
+const actionMapping = {
+  get: "view",
+  post: "add",
+  put: "edit",
+  delete: "delete"
+};
+axios.interceptors.request.use(
+  config => {
+    // Do something before request is sent
+    console.log(config.url);
+    console.log(config.method);
+    if (config.url !== "login") {
+      // 如果不是登录请求，我们就应该在请求头中，加入token数据
+      config.headers.Authorization = sessionStorage.getItem("token");
+
+      // 根据请求方式映射 行为方式
+      const action = actionMapping[config.method];
+      // 判断非权限内容的请求 应该直接阻止
+      const currentRight = router.currentRoute.meta;
+      // 判断当前请求行为
+      if (currentRight && !currentRight.includes(action)) {
+        alert("没有权限");
+        // 直接返回失败的promise 阻止请求发起
+        return Promise.reject(new Error("没有权限"));
+      }
+      // 后端数据有要求，必须是restful风格
+      /*
+        get请求     view
+        post请求    add
+        put请求     edit
+        delete请求  delete
+      */
+      // add view edit delete
+    }
+    return config;
+  },
+  error => {
+    // Do something with request error
+    return Promise.reject(error);
+  }
+);
+export default (url, method = "get", data = {}) => {
+  return axios({
+    url,
+    method,
+    data
+  });
+};
+
+```
+
+
+
+**响应控制**
+
+**状态码需要和后端规定一个**
+
+* 得到了服务器返回状态码401，代表token超时，或者被篡改了，此时应该强制跳转到登录界面
+
+```js
+axios.interceptors.response.use(
+  response => {
+    if (response.status === 401) {
+      router.push("/login");
+      // 把session清空
+      sessionStorage.clear();
+      // 把vuex清空
+      window.location.reload();
+    }
+    // Do something before response is sent
+    return response;
+  },
+  error => {
+    // Do something with response error
+    return Promise.reject(error);
+  }
+);
+```
+
+
+
+## 总结
+
+前端权限的实现，必须要后端提供数据支持，否则无法实现，寄！
+
+返回的权限数据的结构，需要前后端沟通协商，怎样的数据使用起来最方便
+
+
+
+### 菜单控制
+
+* 权限的数据需要在多组件之间共享，因此采用vuex
+* 放置界面刷新，权限数据丢失，所以需要纯在sessionStorage中，并且需要两者同步
+
+
+
+### 界面控制
+
+* 路由的导航守卫可以防止跳过登录界面
+* 动态路由可以让不具备权限的界面的路由规则直接存在(display: none)
+
+
+
+### 按钮控制
+
+* 路由规则中可以增加路由元数据meta
+* 通过路由对象可以得到当前的路由规则，以及存储在此规则中的meta数据
+* 自定义指令可以很方便的实现按钮控制
+
+
+
+### 请求和响应控制
+
+* 请求拦截器和响应拦截器的使用
+* 请求数据返回格式，最好约定好，例如restful风格
+
