@@ -186,6 +186,23 @@ data:function(){
 
 5）**@click="demo"和@click="demo($event)"效果一致，但是后者可以传递参数**
 
+## $event
+
+`$event`表示当前触发的是什么事件(鼠标事件？键盘事件等等)，
+
+`$event.target`则是事件触发的目标，就是直接获取当前元素的`dom`，有了当前元素的`dom`那不就能干的事情就非常多了！（例如获取类名呀，name呀，style呀，等等）
+
+获取`$event`方法
+
+```js
+//如果传入参数
+<button v-on:click="showInfo(要传参数,$event)">点我提示信息</button>
+
+//如果要传入参数，还想要传入event参数 必须在后面小括号中写上$event
+```
+
+
+
 ### 事件修饰符
 
 1. prevent：可以阻止默认事件（常用）
