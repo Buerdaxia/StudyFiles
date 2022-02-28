@@ -453,7 +453,37 @@ export default {
           id: 11,
           authName: "一级项目1",
           path: "/menu/one",
-          rights: ["view", "edit", "add", "delete"]// 关键在这里 
+          rights: ["view", "edit", "add", "delete","register"]// 关键在这里 
+        },
+        {
+          id: 11,
+          authName: "一级项目2",
+          path: "/menu/two",
+          rights: ["view"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+```js
+{
+  id: 1,
+  username: "普通用户",
+  password: "normal",
+  token: "abcdefghijklmnopqrstuvwxyz",
+  rights: [
+    {
+      id: 1,
+      authName: "一级菜单",
+      icon: "icon-menu",
+      children: [
+        {
+          id: 11,
+          authName: "一级项目1",
+          path: "/menu/one",
+          rights: ["view", "edit", "addmodel", "delete","register"]// 关键在这里 
         },
         {
           id: 11,

@@ -15,7 +15,11 @@
 1. 多个组件依赖同一状态(数据)。
 2. 来自不同组件的行为需要变更同一状态(数据)。
 
+## 安装
+
+```
 安装：npm i vuex
+```
 
 
 
@@ -201,6 +205,17 @@ $store.getters.bigSum//bigSum是getters下创建的
 
 
 ## 四：四个map方法的使用
+
+这四个方法在使用的时候记得进行引用
+
+```js
+import {mapState,mapGetters,mapMutations,mapActions} from 'vuex';
+export default {
+  ...
+}
+```
+
+
 
 1）**mapState**方法：用于帮助我们映射`state`中的数据为计算属性
 
