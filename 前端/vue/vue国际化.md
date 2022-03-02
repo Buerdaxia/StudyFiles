@@ -139,12 +139,20 @@ new Vue({
 
 ### 4、对应的使用方法
 
+小技巧：**可以配合模板字符串**
+
 在标签中作为正文使用
 
 ```html
 <div>
   <!-- 第一个search是语言列表里的对象，第二个model是search对象下的属性 -->
   {{$t('search.model')}}
+</div>
+
+<!-- 当遇到循环时，需要改变循环遍历对应的语言，可以使用模板字符串 -->
+<div v-for="(item, index) in arr" :key="index">
+  {{$t(`search.${item.model}`)}}
+  <!-- item.model解析出来是 model -->
 </div>
 ```
 
@@ -178,6 +186,7 @@ export default {
 
 ```js
 tabEn: function() {
+  // 调用locale方法
   this.$i18n.locale = 'en'
 },
   
