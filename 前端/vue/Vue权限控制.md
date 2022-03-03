@@ -754,6 +754,7 @@ export default (url, method = "get", data = {}) => {
 * 得到了服务器返回状态码401，代表token超时，或者被篡改了，此时应该强制跳转到登录界面
 
 ```js
+import router from '@/router';
 axios.interceptors.response.use(
   response => {
     if (response.status === 401) {
