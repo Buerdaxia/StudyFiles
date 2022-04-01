@@ -805,6 +805,12 @@ select gender, count(*) from students group by gender having count(*) > 2;
 
 注意：**`limit`一般放在最后**
 
+`start`:是跳过多少条记录
+
+`count`:是每页显示个数
+
+仔细想想是不是这个道理，再看看公式(●'◡'●)
+
 **公式**：`limit (要显示第几页-1) * 每页分多少个, 每页业分多少个`（**很重要**）
 
 示例:
