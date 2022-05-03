@@ -153,7 +153,9 @@ export default  new Vuex.Store({
 
 2) 组件中读取vuex中的数据:`$store.state.sum`(前面有没有this,跟位置有关)
 
-3) 组件中修改vuex的数据:
+>**当在template标签中时，不需要this，当在script标签中时，需要this**
+
+2) 组件中修改vuex的数据:
 
 方法一:
 
@@ -343,7 +345,7 @@ this.$store.getters['personAbout/firstPersonName'];
 5）开启命名空间后，组件中调用dispatch
 
 ```javascript
-//方式一：自己直接读取
+//方式一：自己直接读取(前面是命名空间/actions中的函数)
 this.$store.dispatch('personAbout/addPersonWang',person);
 //方式二：利用mapAction
 ...mapAction('personAbout',{incrementOdd:'jiaOdd',incrementWait:'jiaWait'});

@@ -198,6 +198,53 @@ npm run dev
    -  ref定义的数据：操作数据<strong style="color:#DD5145">需要</strong>```.value```，读取数据时模板中直接读取<strong style="color:#DD5145">不需要</strong>```.value```。
    -  reactive定义的数据：操作数据与读取数据：<strong style="color:#DD5145">均不需要</strong>```.value```。
 
+**ref和reactive的一个小问题**
+
+<strong style="color:#DD5145">reactive制造出来的响应式数组，不能直接赋值替代，否则会丢失响应</strong>
+
+例如：
+
+```js
+const arr = reactive([]);
+const load = () => {
+	const res = [1, 2, 3, 4];
+  // 方式一：丢失响应性
+  // arr = res
+  // 方式二：仍然失败
+  // arr.concat(res)
+}
+/*
+失败原因：
+方法1：arr = res 时，直接把一个 res 新数组赋值给了 arr。reactive 声明的响应式对象被 arr 代理，操作代理对象需要有代理对象的前缀，此时的 res 直接把值赋值给了 arr ，使得 arr 失去了响应式。在vue3使用proxy，对于对象或数组都不能直接将整个数据赋值。
+
+使用方法2时，把 arr 直接当成一个数组，经过 reactive 包装之后，arr 已经不是普通的数组了，所以方法2也失效。
+*/
+```
+
+解决方式：
+
+```js
+// 方法一，定义一个响应对象，对象的值是一个数组
+const obj = reactice({
+  list: []
+})
+const load = () => {
+  let arr = [1, 2, 3];
+  obj.list = arr;
+}
+
+// 方式二， 使用ref
+const arr = ref([]);
+arr.value = [1, 2, 3];
+
+// 方法三：使用数组的push方法
+let list = reactive([]);
+let arr = [1, 2, 3];
+list.push(...arr);
+```
+
+
+
 ## 6.setup的两个注意点
 
 - setup执行的时机

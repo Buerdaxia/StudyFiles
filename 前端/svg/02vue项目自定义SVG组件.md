@@ -1,5 +1,13 @@
 # vue项目自定义SVG组件
 
+webpack下使用svg首先安装`loader`
+
+```
+npm i --save-dev svg-sprite-loader@6.0.9
+```
+
+
+
 ## 一、创建svg组件
 
 >在`components`下新键`SvgIcon/index.vue`
@@ -39,7 +47,14 @@ const iconName = computed(() => {
 }
 </style>
 
+
 ```
+
+### 讲解fill：currentColor属性
+
+这个是svg的一个属性，表示填充颜色，设置成`fill: currentColor;`表示如果当前css元素没有设置color，则会继承父元素的`color`
+
+注意：**如果要使这个元素生效，还有一点要删除svg文件中的所有fill:xxx属性，有两个要删除**
 
 
 
@@ -56,7 +71,7 @@ const svgRequired = require.context('./svg', false, /\.svg$/)
 svgRequired.keys().forEach(item => {
   svgRequired(item)
 })
-
+// 注意这里，不同版本注册组件方式不同，vue2是Vue.component()
 export default app => {
   app.component('svg-icon', SvgIcon)
 }

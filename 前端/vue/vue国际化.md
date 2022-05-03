@@ -120,6 +120,52 @@ export default i18n;
 
 ```
 
+#### 2.1 vue3中的配置
+
+创建一个`src/i18n/index.js`
+
+>使用的`"vue-i18n": "^9.2.0-beta.35"`版本
+>
+>如果需要让element-ui也跟着改变，可以看一下上面的配置
+
+```js
+import { createI18n } from 'vue-i18n'
+import EN from './en'
+import ZH from './zh'
+const messages = {
+  en: {
+    ...EN
+  },
+  zh: {
+    ...ZH
+  }
+}
+
+const getCurrentLanguage = () => {
+  // 1.一开始并不知道语言，可以利用浏览器语言来获取一下
+  const UAlang = navigator.language // zh-CN
+  // 2.判断如果浏览器用的中文，那我们就用中文语言包否则用英文的
+  const langCode = UAlang.indexOf('zh') === -1 ? 'en' : 'zh'
+  localStorage.setItem('lang', langCode)
+  return langCode
+}
+
+// 创建
+const i18n = createI18n({
+  legacy: false,
+  globalInjection: true,
+  locale: getCurrentLanguage() || 'zh',
+  messages: messages
+})
+
+export default i18n
+
+```
+
+
+
+
+
 
 
 ### 3、在main.js中引入
@@ -177,6 +223,31 @@ export default {
 }
 }
 ```
+
+
+
+**vue3中使用**
+
+```vue
+<script setup>
+  // 组合式api ,和vue2的$t一致
+import { useI18n } from 'vue-i18n'
+const i18n = useI18n()
+
+// 使用
+const changeState = async info => {
+  console.log(info)
+  await changeUserState(info.id, info.mg_state)
+  ElMessage({
+    // 在这里i18n.t
+    message: i18n.t('message.updeteSuccess'),
+    type: 'success'
+  })
+}
+</script>
+```
+
+
 
 
 

@@ -545,3 +545,178 @@ this.$nextTick(_ => {
 </template>
 ```
 
+
+
+## 组件的is属性
+
+什么时候要用到`is`属性呢，
+
+**第一种**：当解析`DOM`模板时，有一些元素内部，不能够使用自定义标签，或者自定义标签内不能放某些特殊的标签，这时就需要`is`来替代一下。
+
+**官网原文如下**
+
+![is属性](../../前端图片/vue/is属性.png)
+
+
+
+**第二种**：动态组件的实现，在同一个标签中，希望能够切换组件
+
+**官网介绍**
+
+![image-20220501153727567](../../../../../AppData/Roaming/Typora/typora-user-images/image-20220501153727567.png)
+
+## 关于自定义组件的双向绑定v-model
+
+比如现在有一个自定义组件`<Dialog>`
+
+```html
+<Dialog v-model="value"></Dialog>
+```
+
+在上述自定义组件中使用`v-model`后，vue会帮助我们修改为以下内容
+
+```html
+<Dialog :model-value="value" @update:model-value="value = $event"></Dialog>
+// 注意这里的update:model-value是可以传递参数的，
+```
+
+具体的使用：(**vue2版本**)
+
+父组件：
+
+```vue
+<template>
+	<Dialog v-model="value"></Dialog>
+</template>
+<script>
+	import Dialog from 'xxx',
+  export default {
+  	name: 'APP',
+    components: {
+      Dialog
+    },
+    data() {
+      return {
+        value: '123'
+      }
+    }
+  }
+</script>
+```
+
+子组件：
+
+```vue
+<template>
+	<input type="text" :value="modelValue" @input="inputChange($event)"/>
+</template>
+<script>
+export default {
+  name: 'Dialog',
+  props: ['modelValue'],
+  emits: ['update:modelValue'],// 绑定父组件的触发方法，格式必须写成这样
+  methods: {
+    inputChange(e) {
+      this.$emit('update:modelValue', e.target.value)
+    }
+  }
+}
+</script>
+```
+
+
+
+更优秀的写法利用计算属性
+
+```vue
+<template>
+	<input v-model="modelValue" />
+</template>
+<script>
+export default {
+  name: 'Dialog',
+  props: ['modelValue'],
+  emits: ['update:modelValue'],// 绑定父组件的触发方法，格式必须写成这样
+  computed: {
+    modelValue: {
+      get() {
+        return this.modelValue
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
+      }
+    }
+  }
+  }
+}
+</script>
+```
+
+
+
+**vue3.0加上element-plus版本**
+
+父组件：
+
+```vue
+<template>
+<Dialog v-model="dialogVisible"></Dialog>
+</template>
+<script setup>
+  import { ref } from 'vue'
+  import Dialog from './components/dialog'
+  const dialogVisible = ref(false)
+</script>
+```
+
+
+
+子组件
+
+```vue
+<template>
+<!-- 千万要注意这里的:model-value,如果使用v-model就会报错，说不允许修改-->
+  <el-dialog
+    :model-value="dialogVisible"
+    title="Tips"
+    width="30%"
+    @close="handleClose"
+  >
+    <span>This is a message</span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="handleClose">Cancel</el-button>
+        <el-button type="primary" @click="handleClose">Confirm</el-button>
+      </span>
+    </template>
+  </el-dialog>
+</template>
+
+<script setup>
+import { defineEmits, defineProps, computed } from 'vue'
+const emits = defineEmits(['update:modelValue'])
+const prop = defineProps({
+  dialogVisible: Boolean
+})
+// 创建了一个计算属性
+const dialogVisible = computed({
+  // 获取时，就直接返回props中的数据
+  get() {
+    return prop.dialogVisible
+  },
+  // 修改时，我们调用父组件方法
+  set(val) {
+    emits('update:modelValue', false)
+  }
+})
+
+// 关闭时，就直接修改值，妙啊！！(●'◡'●)
+const handleClose = () => {
+  dialogVisible.value = false
+}
+</script>
+
+<style></style>
+
+```
+

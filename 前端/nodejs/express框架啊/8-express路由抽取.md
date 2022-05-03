@@ -93,6 +93,8 @@ app.use(express.json()); // 解析json格式
 // 将路由对象注册到app下
 app.use(passportRouter);
 app.use(indexRouter);
+// 也可以给他起一个子路由名儿
+// app.use('/indexRouter', indexRouter) -> 之后的所有indexRouter下的路由都以/indexRouter开头
 
 app.listen(3000, err => {
 	if (err) {

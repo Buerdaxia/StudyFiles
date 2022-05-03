@@ -962,6 +962,15 @@ Vue.directive(指令名, 回调函数)
 Vue.directive('min', ()=>{})
 ```
 
+使用：
+
+```
+定义自定义指令：
+Vue.directive(permission, {...});
+
+<div v-permission="xxx" ></div>
+```
+
 二、**配置对象**中常用的三个回调：
 
 1）bind：指令与元素绑定时调用。
@@ -969,6 +978,43 @@ Vue.directive('min', ()=>{})
 2）inserted：指令所在的元素被插入页面时调用
 
 3）update：指令所在的模板结构被重新解构时调用
+
+```js
+Vue.directive("permission", {
+  // inserted当元素被插入到dom节点时调用
+  /*  
+    el:当前指令绑定元素
+    binding：当前指令绑定的值
+  */
+  inserted(el, binding) {
+    // console.log(el);
+    // console.log(binding);
+    // console.log(router.currentRoute);
+    // 得到自定义指定绑定的值 （add）
+    const action = binding.value.action;
+    // 得到自定义指令绑定的值(disabled)
+    const effect = binding.value.effect;
+    // 判断，当前的路由所对应的组件中，判断用户是否具备action的权限
+    if (router.currentRoute.meta.indexOf(action) == -1) {
+      // 当在meta元数据中找不到这个参数时
+      if (effect === "disabled") {
+        // 将按钮进行禁用操作
+        el.disabled = true;
+        // 这个是element-ui禁用时特定的类，需要加上
+        el.classList.add("is-disabled");
+      } else {
+        // 如果不禁用，那就直接将这个按钮删除
+        // 找到当前节点的父节点，然后删除当前元素（我杀我自己）
+        el.parentNode.removeChild(el);
+      }
+    }
+  }
+});
+```
+
+
+
+
 
 三、备注：
 

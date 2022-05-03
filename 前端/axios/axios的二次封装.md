@@ -29,7 +29,9 @@ json-server启动：npx json-server --watch **db.json**(最后这个是文件名
 ```js
 //axios的二次封装
 import axios from 'axios'
-
+import { ElMessage } from 'element-plus'
+import { diffTokenTime } from '@/utils/auth'
+import store from '@/store'
 // 该选项能够判断是开发环境还是生产环境
 let isDev = process.env.NODE_ENV === 'development'
 
@@ -49,7 +51,16 @@ requests.interceptors.request.use(
 	config => {
 		//config：配置对象，对象里有一个属性很重要，headers请求头
 		// Do something before request is sent
-		return config
+    // 进行token判断
+    if (localStorage.getItem('token')) {
+      if (diffTokenTime()) {
+        // store下的appmodules中放了一个logout方法
+        store.dispatch('app/logout')
+        return Promise.reject(new Error('token 失效了'))
+      }
+    }
+    config.headers.Authorization = localStorage.getItem('token')
+    return config
 	},
 	error => {
 		// Do something with request error
@@ -61,12 +72,24 @@ requests.interceptors.request.use(
 axios.interceptors.response.use(
 	res => {
 		// 成功的回调函数
+    // 我们可以自己封装一下统一的错误处理
+    const {data, meta} = res.data; 
+    if(meta.status === 200 || meta.status === 201) {
+      return data;
+    }else {
+      // 这里还可以封装一下304，301等token相关的错误处理
+      // 这里用的是element-plus的message组件进行错误处理
+      ElMessage.error(meta.msg)
+      return Promise.reject(new Error(meta.msg))
+    }
 		return res.data
 	},
 	error => {
 		// 响应失败的回调
 		// Do something with response error
-		return Promise.reject(error)
+    // 直接进行错误判断并处理，如果有错就直接打印了
+		error.response && ElMessage.error(error.response.data)
+    return Promise.reject(new Error(error.response.data))
 	}
 )
 
@@ -74,6 +97,48 @@ axios.interceptors.response.use(
 export default requests
 
 ```
+
+
+
+在`utils/auth.js`下的代码
+
+```js
+import { TOKEN_TIME, TOKEN_TIME_VALUE } from './constant'
+
+// 登录时设置时间
+export const setTokenTime = () => {
+  localStorage.setItem(TOKEN_TIME, Date.now())
+}
+
+// 获取登录时间
+export const getTokenTime = () => {
+  return localStorage.getItem(TOKEN_TIME)
+}
+
+// 是否已经过期
+export const diffTokenTime = () => {
+  // 1.获取现在时间
+  const currentTime = Date.now()
+  // 2.获取登录时的时间
+  const tokenTime = getTokenTime()
+ 	// 3.返回比较结果
+  return currentTime - tokenTime > TOKEN_TIME_VALUE
+}
+
+```
+
+`/constant`代码
+
+```js
+export const TOKEN_TIME = 'tokenTime'
+// 由于时间是毫秒所以乘以1000
+export const TOKEN_TIME_VALUE = 2 * 60 * 60 * 1000
+
+```
+
+
+
+
 
 ## 关于axios传递超大数字问题
 

@@ -359,11 +359,33 @@ export function initDynamicRoute() {
       // 对应的动态路由
       const temp = ruleMapping[item.path];
       // 然后将对应的路由推到 home页面子路由中
+      // 这里注意要记得看看home页面是数组的第几个，这里是第0个所以currentRoutes[0]
       currentRoutes[0].children.push(temp);
     });
   }); 
   // 重新设置路由规则(将动态路由添加)
   router.addRoutes(currentRoutes);
+}
+
+// 新版 router.4x的写法
+
+// 引入vuex
+import store from "../store";
+export function initDynamicRoute() {
+  // 根据二级权限，对router进行控制
+  console.log(router);
+  // 获取当前 router管理的所有路由
+  const currentRoutes = router.options.routes;
+  // 根据登录返回的数据中的path属性，来动态添加路由
+  store.state.rightList.forEach(item => {
+    item.children.forEach(item => {
+      // 对应的动态路由
+      const temp = ruleMapping[item.path];
+      // 需要给home界面写一个name='home'才行
+			router.addRoute('home', temp);
+    });
+  }); 
+
 }
 ```
 
@@ -405,9 +427,11 @@ const ruleMapping = {
 
 
 
-第三步：考虑`initDynamicRoute()`方法的调用时机！，该方法是给指定用户添加指定的路由，所以肯定实在登录过后才能调用，但是这样又有一个小bug，当登录到平台后，刷新一下界面，`router`文件会自动加载一下，然后又回到初始化的时候了（**动态添加路由之前**）,这样就导致所有添加的路由都无效了。
+第三步：考虑`initDynamicRoute()`方法的调用时机！，**该方法是给指定用户添加指定的路由，所以肯定实在登录过后才能调用**，但是这样又有一个小bug，当登录到平台后，刷新一下界面，`router`文件会自动加载一下，然后又回到初始化的时候了（**动态添加路由之前**）,这样就导致所有添加的路由都无效了。
 
 **所以最佳调用时机**：肯定是每个组件创建后都调用一下进行调用，所以我们应该放到组件的头子(`App.vue`)身上
+
+注意：**这个动态添加路由函数`initDynamicRoute`要在两个位置调用一：App.vue中 第二：在登录成功函数后面调用一次**
 
 `App.vue`代码：
 

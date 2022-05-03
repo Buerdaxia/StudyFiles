@@ -925,3 +925,28 @@ const routes = [
 ```
 
 详细操作可以看一看权限控制哪里
+
+
+
+## route.matched方法
+
+叫做给定路由当前标准化路由数组，就是获取当前访问路由的所有路由规则，返回的是一个数组
+
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/foo',
+     	component:Foo,
+      children: [
+        {
+          path: 'bar',
+          component: Bar
+        }
+      ]
+    }
+  ]
+})
+```
+
+如果当前访问的路由为`/foo/bar`，在当前路由组件中调用`this.$route.matched`方法会直接获取一个完整的对象的`routes`的副本，一般可以丢在面包屑中使用
