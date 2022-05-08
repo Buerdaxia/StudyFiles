@@ -131,7 +131,7 @@ Promise.reject('出错了')
 
 ## 3 Promise.all 方法
 
-Promise.all(promises);
+Promise.all(promises);返回的还是一个Promise的对象
 
 1. promises：包含n个promise的数组
 

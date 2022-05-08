@@ -266,3 +266,33 @@ tabCn: function() {
 }
 ```
 
+
+
+## vue3中script标签中使用方式
+
+> 第一种，直接引入自己封装完毕的i18n
+
+```vue
+<script setup>
+import i18n from '@/i18n'
+const t = i18n.global.t
+
+// 使用
+t('xxx.xxx')
+</script>
+```
+
+
+
+>第二种，使用的i18n的API
+
+```vue
+<script setup>
+import {useI18n} from 'vue-i18n'
+const i18n = useI18n()
+
+// 使用
+i18n.t('xxx')
+</script>
+```
+
