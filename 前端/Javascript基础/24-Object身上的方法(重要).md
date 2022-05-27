@@ -154,3 +154,40 @@ o.hasOwnProperty('prop'); // 返回 true
 delete o.prop;
 o.hasOwnProperty('prop'); // 返回 false
 ```
+
+
+
+## 方法7：Object.getPrototypeOf()
+
+语法：`Object.getPrototypeOf(prop)`
+
+作用：获取`prop`的原型对象，实际效果等同于`prop.__proto__`
+
+使用原因：ie浏览器不支持`prop.__proto__`
+
+示例：
+
+```js
+let arr = [];
+console.log(arr.__proto__ === Object.getPrototypeOf(arr)); // true
+```
+
+
+
+## 方法8：Object.getOwnPropertySymbols(prop)
+
+语法：`Object.getOwnPropertySymbols(prop)`
+
+作用：获取`prop`身上所有可枚举属性的属性名，组成一个数组并返回
+
+实例：
+
+```js
+let obj = {
+  [Symbol('A')]: 10,
+  [Symbol('B')]: 12
+}
+console.log(Object.getOwnPropertySymbols(obj));
+// [Symbol(A), Symbol(B)]
+```
+

@@ -665,6 +665,8 @@ function Phone(brand, price) {
 
 ## class中的get和set
 
+这个`class`中的`get`和`set`和`Object.defineProperty()`方法很像，底层应该调用的就是这个`api`
+
 ```js
         // get和set
         class Phone {

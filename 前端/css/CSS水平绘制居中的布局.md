@@ -410,26 +410,28 @@ flex布局设置父元素：display:flex;justify-content:center;
 
 
 
-方法：
+解决方式方法：
 
 html代码：
 
 ```html
-<div>垂直居中</div>
+  <div style="height: 300px">
+    <div class="middle">垂直居中</div>
+  </div>
 ```
 
 css代码：
 
 ```css
-div {
-  height: 100%
-}
-//添加以下伪元素
-div::before {
-  content: '';
-  display: inline-block;
-  vertical-align: middle;
-  height: 100%;
-}
+    .middle {
+      height: 100%
+    }
+		/*添加伪元素*/
+    .middle::before {
+      content: '';
+      display: inline-block;
+      vertical-align: middle;
+      height: 100%;
+    }
 ```
 
