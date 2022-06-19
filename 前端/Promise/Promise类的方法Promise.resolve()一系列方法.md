@@ -104,7 +104,7 @@ Promise.resolve(reason)；
 
 1. reason：失败的原因
 
-说明：返回一个失败的promise对象
+说明：返回一个失败的promise对象(无论你传递啥都是失败的)
 
 ```js
 const p = Promise.reject('出错了');

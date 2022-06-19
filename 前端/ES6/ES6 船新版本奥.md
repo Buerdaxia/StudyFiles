@@ -302,6 +302,8 @@ data('钱不二', '不二大侠');
 
 ... 扩展运算符能将将数组转换为逗号分隔的参数序列。
 
+注意：扩展运算符只能展开拥有迭代器`iterator`属性的数据结构，**不能展开对象**
+
 ```javascript
 let name = ['钱不二', '倩儿', '不二大侠'];
 function getName() {
@@ -345,12 +347,12 @@ function getName(...params) {
 getName('钱不二','不二大侠')
 ```
 
-4. 对象合并
+4. 对象合并（使用的不是...展开运算符）
 
 ```javascript
 let a = {name:'钱不二',age: 18, sex: '男'};
 let b = {age: 22, sex: '女'};
-
+// 注意这种写法是触发了构造字面量对象展开的特殊写法，并不是用到了展开运算符，而是一种固定写法
 let info = {...a,...b};
 console.log(info);//将a和b一起合并，一起有的值以后面的b为准
 ```
@@ -619,6 +621,7 @@ function Phone(brand, price) {
                 this.brand = brand;
                 this.price = price;
             }
+          // 外面的方法和属性是公共方法，加在原型prototype上的
             call() {
                 console.log("我可以打电话");
             }

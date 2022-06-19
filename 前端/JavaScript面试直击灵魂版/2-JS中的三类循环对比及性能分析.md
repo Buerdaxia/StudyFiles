@@ -147,7 +147,7 @@ ForEach~~: 75.47998046875 ms
 
 ## for...in循环（速度最慢）
 
-for...in的性能很差，很差的原因：迭代的当前对象中所有可枚举的属性（私有属性大部分可枚举，公有属性部分可枚举），`for...in`的查找机制（**遍历当前所有可枚举属性**）导致它会沿着原型链上进行查找，自然就很慢了
+for...in的性能很差，很差的原因：迭代的当前对象中所有可枚举的属性（私有属性大部分可枚举，公有属性部分可枚举），`for...in`的查找机制（**遍历当前所有可枚举属性（返回的值也是属性名）**）导致它会沿着原型链上进行查找，自然就很慢了
 
 ```js
     let arr = new Array(9999999).fill(0);
@@ -216,6 +216,7 @@ For in~~: 1990.171142578125 ms//最慢
     // 第一步：利用Object.keys()方法，读取所有非[Symbol]属性名
     let keys = Object.keys(obj);
     // 第二步：利用concat和Object.getOwnPropertySymbols()方法获取[Symbol]属性名
+		// Symbol !== 'undefined'这句判断是判断浏览器是否支持Symbol类型 如果支持我们就连接一下数组
     if (typeof Symbol !== 'undefined') keys = keys.concat(Object.getOwnPropertySymbols(obj));
 		// 遍历
     keys.forEach(key => {
@@ -248,7 +249,8 @@ For in~~: 1990.171142578125 ms//最慢
       let self = this;
       index = 0;
       return {
-        // 返回的对象必须具备一个next()方法
+        // 核心： 返回的对象必须具备一个next()方法
+        // next()方法要返回一个具有value和done的对象，value是值，done标识位
         /*
           done: 指是否停止
           value: 每一次获取的值

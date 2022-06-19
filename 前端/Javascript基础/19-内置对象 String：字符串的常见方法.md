@@ -650,7 +650,7 @@ console.log(str3.split('许')); // 同上
 
 解释：将字符串中的指定内容，替换为新的内容并返回。不会修改原字符串。
 
-注意：这个方法，默认只会替换第一个被匹配到的字符。如果要全局替换，需要使用正则。
+注意：这个方法，默认只会替换第一个被匹配到的字符。**如果要全局替换，需要使用正则。**
 
 代码举例：
 
@@ -665,7 +665,7 @@ console.log(str2.replace(/today/gi, 'tomorrow')); //这里用到了正则，才�
 
 
 
-全局替换：(1.必须使用正则。2.必须要带全局标记)
+**全局替换：(1.必须使用正则。2.必须要带全局标记)**
 
 ```js
 let text = 'cat, bat, sat, fat';
@@ -731,6 +731,43 @@ console.log(str.trim().length);
 打印结果：
 
 ![](http://img.smyhvae.com/20200607_2132.png)
+
+
+
+## match()
+
+match() 方法可在字符串内检索指定的值，或找到一个或多个正则表达式的匹配。
+
+语法：
+
+```js
+string.match(regexp)
+```
+
+返回类型：返回一个含有匹配信息的数组
+
+### [返回值](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/match#返回值)
+
+- 如果使用 g 标志，则将返回与完整正则表达式匹配的所有结果，但不会返回捕获组。
+- 如果未使用 g 标志，则仅返回第一个完整匹配及其相关的捕获组（`Array`）。 在这种情况下，返回的项目将具有如下所述的其他属性。
+
+示例：
+
+```js
+    let str = 'qianbuer is a good man';
+    let reg = /n$/i;
+    console.log(str.match(reg));
+/*['n', index: 21, input: 'qianbuer is a good man', groups: undefined]
+0: "n"
+groups: undefined
+index: 21
+input: "qianbuer is a good man"
+length: 1
+[[Prototype]]: Array(0)
+*/
+```
+
+
 
 ## 大小写转换
 

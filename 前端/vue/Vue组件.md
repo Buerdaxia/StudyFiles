@@ -195,9 +195,7 @@ this.$off();
 
 7）注意：通过`this.$ref.xxx.$on('things',回调)`绑定自定义事件时，回调要么配置在父元素的methods中，要么用箭头函数，否则this指向会有问题。
 
-
-
-### ref属性（重要，拿来获取元素的）
+**ref属性（重要，拿来获取元素的）**
 
 1）被用来给元素或者子组件注册引用信息（id的替代者）
 
@@ -233,29 +231,33 @@ props:{name: String}
 
 第三种方式（限制类型、限制必要性、限制默认值）：
 
+```js
 props: {
 
-​	name: {
+	name: {
 
-​		type: String,//类型
+		type: String,//类型
 
-​		required: true,//必要性
+		required: true,//必要性
 
-​		default: '老王'// 默认值
+		default: '老王'// 默认值
 
-​	}
+	}
 
 }
+```
 
 备注：props是只读的，Vue底层会监测你对props的修改，如果进行了修改，就会发出警告，若业务需求确实需要修改，那么请赋值props的内容到data中一份，然后去修改data中的数据。
 
-
+## 任意组件通讯
 
 ### 全局事件总线（乱传）(重要的一匹)
 
 1）一种组件间通信方式，适用于**任意组件间通信**
 
 2）安装全局事件总线：
+
+方式一：
 
 ```vue
 new Vue({
@@ -266,6 +268,32 @@ new Vue({
 	}
 })
 ```
+
+方式二：
+
+```js
+// 创建一个event-bus.js
+import Vue from 'vue';
+export const EventBus = new Vue();
+
+// 使用组件中引入
+import {EventBus} from '../event-bus.js'
+
+// A组件去通知B组件
+// A组件
+send() {
+  EventBus.$emit('aMsg', '来自A组件的信息');
+}
+
+// B组件
+mounted() {
+	EventBus.$on('aMsg',(msg) => {
+    console.log(msg);
+})
+}
+```
+
+
 
 3）使用事件总线
 

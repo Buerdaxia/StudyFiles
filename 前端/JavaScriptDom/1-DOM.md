@@ -98,15 +98,36 @@ event.stopPropagation();
 
 ##### 方法一：对象.事件 = function() {}
 
+事件监听：
+
+**通过on+事件名儿，这种类型的事件绑定叫做DOM0事件**
+
+事件触发：
+
+- 事件的触发：触发事件时候运行绑定的处理函数
+
 这种方式只能为一个元素的一个事件绑定一个响应函数，特殊情况下比较单一。
 
-##### 方法二：对象.addEventListener(参数1，参数2，参数3)
+```js
+const dom = document.get...;
+dom.onclick = function() {
+	xxx
+}
+```
 
-参数1：事件字符串"click"
+
+
+##### 方法二：对象.addEventListener(参数1，参数2，参数3) 
+
+首先DOM2级事件是，DOM0级事件的优化，同一个文档对象同一个事件，支持绑定多个事件处理程序，还能控制执行阶段。
+
+**对象.addEventListener(）就是DOM2级事件**
+
+参数1：事件字符串"click" ->标准事件(内置事件)
 
 参数2：回调函数 function(){}
 
-参数3：是否在捕获阶段触发事件，需要一个布尔值，一般为false
+参数3：是否在捕获阶段触发事件，需要一个布尔值，一般为false（默认为冒泡阶段）
 
 使用方法二可以同时为一个元素的相同事件同时绑定多个响应函数。
 
@@ -114,7 +135,16 @@ event.stopPropagation();
 
 还有一个问题：利用该方法不能使用return false；取消默认行为，**要使用event.preventDefault()来取消默认行为(ie8不支持)**。
 
+```js
+const dom = document.get...;
+dom.addEventListener('click', callback);
+```
+
+
+
 ##### 方法三：对象.attachEvent(参数1，参数2)
+
+**对象.attachEvent(）也是DOM2级事件**
 
 参数1：绑定事件名字符串
 
@@ -126,41 +156,45 @@ event.stopPropagation();
 
 所以综合绑定函数bind
 
-`        function bind(obj, eventStr, callback) {
+```js
+ function bind(obj, eventStr, callback) {
 
 
 
-​            if(obj.addEventListener) {
+            if(obj.addEventListener) {
 
-​                obj.addEventListener(eventStr, callback, false);
+                obj.addEventListener(eventStr, callback, false);
 
-​            } else {
+            } else {
 
-​                // 怎样修改this值
-
-
-
-​                obj.attachEvent("on"+eventStr, function() {
-
-​                    // 调用时将this指向obj
-
-​                    callback.call(obj);
-
-​                });
-
-​            }
-
-​                    // // 大部分浏览器兼容方式
-
-​                    // obj.addEventListener(eventStr, callback, false);
+                // 怎样修改this值
 
 
 
-​                    // // ie8及一下
+                obj.attachEvent("on"+eventStr, function() {
 
-​                    // obj.attachEvent("on"+eventStr, callback);
+                   // 调用时将this指向obj
 
-​        }`
+                    callback.call(obj);
+
+                });
+
+            }
+
+                    // // 大部分浏览器兼容方式
+
+                    // obj.addEventListener(eventStr, callback, false);
+
+
+
+                    // // ie8及一下
+
+                    // obj.attachEvent("on"+eventStr, callback);
+
+        }
+```
+
+
 
 #### 事件的传播
 

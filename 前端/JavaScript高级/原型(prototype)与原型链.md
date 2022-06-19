@@ -101,3 +101,27 @@ Object的原型对象时原型链的尽头
 **如果B函数的显式原型对象在A对象的原型链上，就返回true，否则返回false。**
 
 B只看它的显式原型(prototype)就不动了，a要一步一步来走
+
+
+
+## 面试题
+
+网上有一道美团外卖的面试题是这样的：  
+
+```js
+Function.prototype.a = 'a';
+Object.prototype.b = 'b';
+function Person(){};
+var p = new Person();
+console.log('p.a: '+ p.a); // p.a: undefined
+console.log('p.b: '+ p.b); // p.b: b  问为什么？
+
+/*
+有不少同学第一眼看上去就觉得很疑惑，p不是应该继承了Function原型里面的属性吗，为什么p.a返回值是undefined呢？
+其实，只要仔细想一想就很容易明白了，Person函数才是Function对象的一个实例，所以通过Person.a可以访问到Function原型里面的属性，
+但是new Person()返回来的是一个对象，它是Object的一个实例,是没有继承Function的，所以无法访问Function原型里面的属性。
+但是,由于在js里面所有对象都是Object的实例，所以，Person函数可以访问到Object原型里面的
+属性，Person.b => 'b' 
+*/
+```
+

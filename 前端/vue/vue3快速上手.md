@@ -167,7 +167,7 @@ npm run dev
     - Reflect：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect
     
       ```js
-      new Proxy(data, {
+      const proxy =new Proxy(data, {
       	// 拦截读取属性值
           get (target, prop) {
           	return Reflect.get(target, prop)
