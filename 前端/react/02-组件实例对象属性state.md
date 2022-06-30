@@ -39,13 +39,14 @@ state是组件对象中最重要的属性，值是对象（可以包含多个key
       render() {
         // console.log(this);
         const {isHot,wind} = this.state;
+        // this.changeWeather没有调用，是点击之后再调用
         return <h1 onClick={this.changeWeather}>今天天气很{isHot ? '炎热' : '凉爽'},{wind}</h1>
       }
 
       // changeWeather调用几次？ --- 触发几次调几次
       changeWeather() {
         // changeWeather放在哪里？--Weather的原型上
-        // 由于changeWeather作为onClick的回调，所以不是通过实例进行调用的，是直接调用
+        // 由于changeWeather作为onClick的回调（触发后才调用），所以不是通过实例进行调用的，是直接调用
         // 然后类中的方法默认开启局部严格模式，所以changeWeather中的this为undefined
         const {isHot} = this.state;
         // 严重注意：状态(state)不可以直接更改，需要借助一个内置API

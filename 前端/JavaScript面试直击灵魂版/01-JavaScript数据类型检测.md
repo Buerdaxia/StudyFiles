@@ -86,6 +86,7 @@ arr instanceof Object; // true 特殊点
 /*
   核心：实例.__proto__ === 类.prototype
   Object.getPrototypeOf(xx)
+  由于现在不能直接通过_proto_来获取了所以使用一个API
 */
 function instance_of(example, classFunc) {
   let classFuncPrototype = classFunc.prototype;

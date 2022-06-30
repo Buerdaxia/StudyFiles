@@ -127,3 +127,15 @@
 <Good></Good>会直接被当作为组件component
 ```
 
+
+
+## jsx注释标签
+
+先用大括号包裹一下，再用/**/
+
+代码：
+
+```jsx
+{/*<input ref={(c)=>{this.input1 = c;console.log('@',c)}} type="text" placeholder="点击按钮提示数据" />&nbsp;*/}
+```
+
