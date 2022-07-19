@@ -145,6 +145,7 @@ function Phone(brand, price) {
         
         
         let s = new Phone();
+				// 通过get可以直接引用函数的返回值，不用调用
         console.log(s.price);//s.price的值就是 上面方法的返回值
     
         s.price = "123";//赋值就调用set price了

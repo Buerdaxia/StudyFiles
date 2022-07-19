@@ -59,6 +59,19 @@ const result = fn();
 console.log(result);//返回失败的promise对象值为失败了
 ```
 
+### 箭头函数的async
+
+注意：**箭头函数的async只能卸载括号前面**
+
+```jsx
+// 箭头函数的async
+const fn = async ()=> {
+  ...
+}
+```
+
+
+
 
 
 ## await

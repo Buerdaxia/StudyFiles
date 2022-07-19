@@ -9,7 +9,7 @@ state是组件对象中最重要的属性，值是对象（可以包含多个key
 1. `state`属性在组件实例对象身上
 2. `state`属性为一个对象
 3. `state`通过`constructor`进行初始化
-4. 严重注意：不能直接修改`state`，需要内置`API`使用`setState()`修改
+4. 严重注意：**不能直接修改`state`，需要内置`API`使用`setState()`修改**
 
 
 
@@ -93,5 +93,93 @@ state是组件对象中最重要的属性，值是对象（可以包含多个key
     ReactDOM.render(<Weather/>, document.getElementById('test'));
     
   </script>
+```
+
+
+
+## state相关API
+
+### `setState`
+
+`setState()` 将对组件 state 的更改排入队列，并通知 React 需要使用更新后的 state 重新渲染此组件及其子组件。这是用于更新用户界面以响应事件处理器和处理服务器数据的主要方式
+
+注意：**React更新状态的动作是异步的**(简单来说，就是setState调用后修改属性的操作是异步的)
+
+`setState`更新状态的2种方法：
+
+```jsx
+	(1). setState(stateChange, [callback])------对象式的setState
+            1.stateChange为状态改变对象(该对象可以体现出状态的更改)
+            2.callback是可选的回调函数, 它在状态更新完毕、界面也更新后(render调用后)才被调用
+					
+	(2). setState(updater, [callback])------函数式的setState
+            1.updater为返回stateChange对象的函数。
+            2.updater可以接收到state和props。
+            4.callback是可选的回调函数, 它在状态更新、界面也更新后(render调用后)才被调用。
+总结:
+		1.对象式的setState是函数式的setState的简写方式(语法糖)
+		2.使用原则：
+				(1).如果新状态不依赖于原状态 ===> 使用对象方式
+				(2).如果新状态依赖于原状态 ===> 使用函数方式
+				(3).如果需要在setState()执行后获取最新的状态数据, 
+					要在第二个callback函数中读取
+
+示例：
+  add = () => {
+    const {count} = this.state;
+    // 对象式的setState
+    // this.setState({count: count+1}, () => {
+    //   console.log('setState回调中的count:',this.state.count);
+    // });
+    // // 此时count还未更新完毕
+    // console.log('现在的count:' ,this.state.count);
+  
+    // 函数式的setState
+    this.setState((state, props)=> {
+      console.log(state, props);
+      return {count: state.count+1};
+    })
+
+  }
+```
+
+
+
+### `useState`（Hooks）
+
+返回一个 state，以及更新 state 的函数。
+
+语法:
+
+```jsx
+
+const [state, setState] = React.useState(initialState);
+// state：是接收状态的变量第一个指是initialState
+// setState是改变状态的方法
+// 数组的解构赋值
+```
+
+
+
+示例：使用`useState`
+
+```jsx
+import { useState } from 'react';
+function Button(props) {
+	const [color, setColor] = useState('red');
+	const handleButtonClick = () => {
+		setColor('green');
+	};
+	const { children } = props;
+	return (
+		<div>
+			<button onClick={handleButtonClick}>{children}</button>
+			<span style={{ color }}>这时一段文字</span>
+		</div>
+	);
+}
+
+export default Button;
+
 ```
 

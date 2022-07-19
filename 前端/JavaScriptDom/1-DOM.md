@@ -515,7 +515,7 @@ element.scrollWidth
 
 element.scrollHeight
 
-注意：此属性能获取元素整个滚动区域的高度。
+注意：此属性能获取元素**整个**滚动区域的高度。
 
 获取滚动高度 = 内容区 + 内边距
 

@@ -60,4 +60,4 @@ then()方法中promise状态不改变不会进行回调。
 
 如果当使用promise的then链式调用时，想要在中间中断，不再调用后面的回调函数！
 
-方法：在回调函数中返回一个pending状态的promise对象
+方法：在回调函数中返回一个pending状态的promise对象（`return new Promise()`就行了）

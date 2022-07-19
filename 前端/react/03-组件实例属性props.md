@@ -47,6 +47,22 @@
 ### 对props进行类型限制
 
 > 首先需要引入一个库`prop-types.js`，这样在全局就会多一个对象`PropTypes`（15.5版本之后就必须要引入这个库了）
+>
+> react脚手架中要自己安装：
+>
+> ```
+> npm install prop-types
+> yarn add prop-types
+> ```
+>
+
+
+
+## 一些特殊的方法
+
+`PropTypes.oneOf(['xxx', 'aaa'])`: 可以在多个字符串之间匹配。
+
+`PropTypes.oneOfType([PropTypes.string, PropTypes.number])`：在多个类型之间匹配
 
 注意：**注意这两个单词的大小写，有一点儿点儿区别**
 
@@ -174,7 +190,8 @@ function Person(props) {
 Person.propTypes = {
   // 注意两个p的大小写不一样
   name: PropTypes.string.isRequired,
-  sex: PropTypes.string,
+  // 可以使用一个oneOf函数，里面写入匹配值
+  sex: PropTypes.oneOf(['男', '女']),
   age: PropTypes.number,
   // 注意限制函数使用的是func
   speak: PropTypes.func
@@ -208,3 +225,36 @@ constructor(props) {
 }
 ```
 
+
+
+## props小细节（标签体内容）
+
+注意：**不仅标签属性能够传递，而且标签体的内容，也会通过`props`传递过去，将内容存放在`props.children`上**
+
+小贴士：可以通过children获取标签体内容，也可以反向操作，直接设置children属性也会有标签体内容
+
+小贴士代码：
+
+```jsx
+<MyNavLink to="/about">About</MyNavLink>
+// 等同于
+<MyNavLink to="/about" children="About"></MyNavLink>
+```
+
+
+
+
+
+示例：
+
+```jsx
+// 组件中传递了to属性和About标签内容
+<MyNavLink to="/about">About</MyNavLink>
+<MyNavLink to="/home">Home</MyNavLink>
+```
+
+
+
+在`MyNavLink`中：
+
+![3-props传递标签体内容](../../前端图片/react/3-props传递标签体内容.png)

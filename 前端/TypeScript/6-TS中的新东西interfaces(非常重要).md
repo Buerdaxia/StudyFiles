@@ -65,6 +65,7 @@ interface Vehicle {
 	summary(): string;
 }
 
+// 可重用的接口
 interface Reportable {
 	summary(): string;
 }
@@ -115,6 +116,78 @@ printSummary(beverage);
 在`TS`中编写可重用代码的策略
 
 1. 在创建接收输入参数的函数时，要使用接口
-2. 对象或者类能够给定一个满足接口的函数（当然这里不一定非要是函数，类型有很多的嘛(●'◡'●)）
+2. 对象或者类能够给定一个满足接口的函数
 
 ![03-interfaces2](../../前端图片/typescript/03-interfaces2.PNG)
+
+
+
+## `implements`关键字(不是必须要写的，但是有帮助)
+
+在`class`和`interface`共同使用时，`TS`报错信息有时会不完整，就是并没有指明错误地点，我们可以借助`implements`关键字来帮助我们，确保这个类(`class`)，满足我们定义的接口(`interface`)
+
+作用：**如果一个类使用了`implements`关键字，该类就必须要满足接口的所有属性**
+
+
+
+示例：
+
+```tsx
+// 我们声明了一个接口，接口中的color属性，User类和Company类都没有
+export interface Mappable {
+	location: {
+		lat: number;
+		lng: number;
+	};
+	markerContent(): string;
+	color: string;
+}
+```
+
+报错信息：
+
+`TS`只帮我们找到了这两处有问题，但是没有指出出问题的文件是哪一个
+
+![7-implements关键字](../../前端图片/typescript/7-implements关键字.PNG)
+
+
+
+使用`implements`关键字
+
+示例：
+
+```tsx
+import faker from 'faker';
+// 引入接口
+import { Mappable } from './CustomMap';
+// 使用implements关键字
+export class User implements Mappable {
+	name: string;
+	location: {
+		lat: number;
+		lng: number;
+	};
+	constructor() {
+		this.name = faker.name.firstName();
+		// 给location初始化
+		this.location = {
+			// parseFloat()将字符串转换为number
+			lat: parseFloat(faker.address.latitude()),
+			lng: parseFloat(faker.address.longitude())
+		};
+	}
+
+	markerContent(): string {
+		return `User Name: ${this.name}`;
+	}
+}
+
+```
+
+
+
+注意报错：
+
+使用关键字后，`TS`不仅帮我们提示报错信息，并且还帮助我们直接将有错误的文件标出来了
+
+![8-implements关键字2](../../前端图片/typescript/8-implements关键字2.PNG)
