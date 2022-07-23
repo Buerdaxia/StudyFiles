@@ -210,7 +210,7 @@ import 'styled-components/macro';
 
 ### 如果出现嵌套关系，怎样修改css样式
 
-例如：目前的`Avatar`组件在<StyledNavBar>标签包裹下，我们如何修改`Avatar`组件的css属性呢？
+例如：目前的`Avatar`组件在`<StyledNavBar>`标签包裹下，我们如何修改`Avatar`组件的css属性呢？
 
 ```jsx
 function NavBar({ children, ...rest }) {
@@ -269,7 +269,7 @@ const StyledNavBar = styled.nav`
 	height: 100vh;
 	background-color: ${({ theme }) => theme.darkPurple};
 	padding: 30px 0;
-	/*第二步直接通过${}访问并修改CSS样式*/
+	/*第二步直接通过${}访问Avatar组件最外层标签并修改CSS样式*/
 	${StyledAvatar} {
 		justify-self: center;
 		${StatusIcon} {
@@ -285,6 +285,315 @@ const MenuItems = styled.div``;
 export default StyledNavBar;
 
 export { StyledMenuItem, MenuIcon, MenuItems };
+
+```
+
+
+
+## 函数
+
+### useTheme方法
+
+调用后，返回一个你自定义的主题对象，让标签中也能使用主题变量
+
+例如:
+
+自定义`theme.js`文件：
+
+```js
+export default {
+	primaryColor: 'red',
+	green: '#34D859',
+	gray: 'rgba(24, 28, 47, 0.2)',
+	red: '#f34848',
+	darkPurple: '#292f4c',
+
+	// 输入框背景
+	gray2: 'rgba(241, 237, 237, 0.3)',
+	// placeholder文字颜色
+	gray3: 'rgba(24, 28, 47, 0.3)',
+	// 输入框文字
+	grayDark: '#181c2f',
+
+	// 字体
+	normal: '1.4rem',
+	medium: '1.6rem'
+};
+
+```
+
+使用：`useTheme`方法
+
+```jsx
+import { useTheme } from 'styled-components';
+
+function Search({ placeholder = '请输入内容...', ...rest }) {
+  // 这里调用
+	const theme = useTheme();
+	return (
+		<Input
+			placeholder={placeholder}
+      {/*使用theme.xxx访问自定义主题对象内容*/}
+			prefix={<Icon icon={SearchIcon} color={theme.gray3} width={18} height={18} />}
+			{...rest}
+		></Input>
+	);
+```
+
+### styled函数式写法
+
+styled()函数式写法，可以直接使用你之前写好的styled组件的css样式。
+
+语法：
+
+```js
+const StyledParagraph = styled(xxx)``;
+// 然后StyledParagraph拥有xxx所有样式，并且还能再``书写自己独有的样式
+```
+
+示例：
+
+```js
+// 这里StyledParagraph想拥有所有StyledText组件的css样式，并且自己的超出还隐藏
+import StyledText from 'components/Text/style';
+import styled from 'styled-components';
+
+const StyledParagraph = styled(StyledText)`
+	${({ ellipsis }) =>
+		ellipsis &&
+		css`
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			overflow: hidden;
+		`}
+`;
+
+export default StyledParagraph;
+
+
+```
+
+
+
+示例2：传递一个封装好的组件
+
+```js
+import Paragraph from 'components/Paragraph';
+import styled from 'styled-components';
+// 这样是传递了整个组件给Time，Time标签就是Paragraph组件
+const Time = styled(Paragraph)``;
+```
+
+
+
+### css函数
+
+css函数支持我们书写一些css样式并赋值给一个变量
+
+语法：
+
+```js
+import styled, { css } from 'styled-components';
+const demo = css`
+	font-size: 14px;
+`
+```
+
+
+
+我们一般使用他来做一些样式的变体：
+
+```js
+// 创建一个对象，+css函数，访问时通过键名儿访问
+import styled, { css } from 'styled-components';
+
+// 字体类型变体
+const typeVariants = {
+	primary: css`
+		color: ${({ theme }) => theme.grayDark};
+	`,
+	secondary: css`
+		color: ${({ theme }) => theme.grayDark};
+		opacity: 0.3;
+	`,
+	danger: css`
+		color: ${({ theme }) => theme.red};
+	`
+};
+
+// 字体符号变体
+const sizeVariants = {
+	normal: css`
+		${({ theme }) => theme.normal}
+	`,
+	medium: css`
+		${({ theme }) => theme.medium}
+	`,
+	large: css`
+		${({ theme }) => theme.large}
+	`,
+	xlarge: css`
+		${({ theme }) => theme.xlarge}
+	`,
+	xxlarge: css`
+		${({ theme }) => theme.xxlarge}
+	`,
+	small: css`
+		${({ theme }) => theme.small}
+	`,
+	xsmall: css`
+		${({ theme }) => theme.xsmall}
+	`,
+	xxsmall: css`
+		${({ theme }) => theme.xxsmall}
+	`
+};
+
+const StyledText = styled.span`
+	font-size: ${({ size }) => sizeVariants[size] || sizeVariants.normal};
+	${({ bold }) => bold && 'font-weight: 500'};
+	${({ type }) => typeVariants[type]};
+`;
+
+export default StyledText;
+
+```
+
+
+
+### attrs函数
+
+`attrs`函数，允许我们给一个`styled`标签用对象的方式传递属性和属性值。
+
+示例：
+
+```js
+import styled from 'styled-components';
+// 这里我们引入封装好的Text
+import Text from 'components/text';
+// 创建一个Name标签，应用Text组件，同时还传递了一个size属性
+const Name = styled(Text).attrs({ size: 'large' });
+const StyledMessageCard = styled.div``;
+
+export default StyledMessageCard;
+
+```
+
+
+
+## as属性
+
+as属性可以指明一个styled标签是HTML中的一种元素。
+
+示例：
+
+```jsx
+{/*这里就是 styledParagraph就被渲染为p标签*/}
+<StyledParagraph as="p" ellipsis={ellipsis} {...rest}>
+  {children}
+</StyledParagraph>
+```
+
+
+
+## ${}的作用
+
+${}的作用，我使用的有两种：
+
+1. 访问变量，访问styled标签传递的属性值
+2. 访问定义好的styled标签，来修改整体css样式
+
+
+
+示例1：访问变量
+
+```react
+// 页面结构，index.js
+<StyledChatBubble type={type} {...rest}>
+</StyledChatBubble>
+
+// 样式style.js
+const StyledChatBubble = styled.div`
+	display: flex;
+	flex-direction: column;
+	/*这里解构属性中的type*/
+	${({ type }) => typeVariants[type]}
+`;
+```
+
+
+
+示例2：功能2访问定义好的`style`标签
+
+```js
+import styled, { css } from 'styled-components';
+import Icon from 'components/Icon';
+import Paragraph from 'components/Paragraph';
+import Text from 'components/Text';
+
+const Time = styled(Paragraph).attrs({ type: 'secondary', size: 'small' })`
+	margin: 6px;
+	margin-left: 24px;
+	word-spacing: 1rem;
+`;
+
+const BubbleTip = styled(Icon)`
+	position: absolute;
+	bottom: -15%;
+	left: 0;
+	z-index: 5;
+`;
+
+const Bubble = styled.div`
+	padding: 15px 22px;
+	box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1);
+	border-radius: 100px;
+	position: relative;
+	z-index: 10;
+`;
+
+const MessageText = styled(Text)``;
+
+const StyledChatBubble = styled.div`
+	display: flex;
+	flex-direction: column;
+	${({ type }) => typeVariants[type]}
+`;
+
+// typeVariants是放在StyledChatBubble下,所以可以访问她下面所有styled标签
+const typeVariants = {
+	mine: css`
+		/*这里访问到Bubble标签所有属性*/
+		${Bubble} {
+			background-color: ${({ theme }) => theme.primaryColor};
+		}
+
+		${BubbleTip} {
+			transform: rotateY('180deg');
+			/* unset是取消原来left的值 */
+			left: unset;
+			right: 0;
+		}
+
+		/* svg中的path来控制svg的颜色的 */
+		path {
+			fill: ${({ theme }) => theme.primaryColor};
+		}
+
+		${Time} {
+			text-align: right;
+			margin-left: 0;
+			margin-right: 24px;
+		}
+
+		${MessageText} {
+			color: white;
+		}
+	`
+};
+
+export default StyledChatBubble;
+export { MessageText, Bubble, BubbleTip, Time };
 
 ```
 

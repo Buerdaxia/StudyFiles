@@ -113,7 +113,7 @@ printAnything<string>(['a', 'b', 'c']);
 
 
 
-## 泛型的约束（interface）
+## 泛型的约束（interface+extends）
 
 通过使用`interface`可以约束泛型传入的参数
 
@@ -144,5 +144,53 @@ printHousesOrCars([1,2,3,4]);//这里就会报错
 
 printHousesOrCars<House>([new House(), new House()]);
 printHousesOrCars<Car>([new Car(), new Car()]);
+```
+
+
+
+
+
+## 泛型约束2（Object + extends + keyof）
+
+前置知识：
+
+1. 在TS中，一个字符串也能当作类型
+
+```ts
+type 'name';
+// name 可以是一个类型
+```
+
+
+
+第二种约束，可以约束泛型的类型是对象的一个**键名儿**
+
+```ts
+
+export class Attributes<T>{
+  constructor(private data: T) {}
+	/*
+		解释：K只能是T的键名类型
+		get函数返回的类型，是T[k]对应值的类型
+	*/
+  get<K extends keyof T>(key: K):T[K]{
+    return this.data[key];
+  }
+
+  set(update: T):void {
+    this.data = {...this.data, ...update};
+  }
+}
+
+/*
+	例如：T是一个对象(也可以是一个interface)
+	T = {
+		name: '123',
+		age: 01,
+		id: 1
+	}
+	那么K就只能是 name类型，或者age类型，id类型
+	T[K]对应的就是string，number，number
+*/
 ```
 

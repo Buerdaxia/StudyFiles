@@ -141,7 +141,7 @@ VueComponent.prototype.__proto__ === Vue.prototype
 
 ## 传递数据
 
-### 组件的自定义事件（子给父）
+### 组件的自定义事件（子给父）emits和on
 
 原则：**给谁帮的事件，就找谁触发**
 
@@ -207,6 +207,51 @@ this.$off();
 
 获取：**this.$refs.xxx 获取到的是标签或者组件实例对象**
 
+### 配置项emits
+
+emits和props配置项功能几乎差不多，不过emits接收的是函数。
+
+语法：
+
+```js
+// 子组件接收
+export default {
+  props: ['id','link'],
+  emits: ['deletePost']
+}
+
+// 父组件绑定监听事件
+<Item @deletePost="handlerDelete">
+```
+
+模板中触发事件：
+
+```vue
+<template>
+	<button @click="$emit('deletePost', id)">
+    删除
+  </button>
+</template>
+```
+
+methods或者其他事件中触发：
+
+```vue
+<script>
+	export default {
+    methods: {
+      handleClick() {
+        this.$emit('deletePost', this.id);
+      }
+    }
+  }
+</script>
+```
+
+
+
+
+
 
 
 ### 配置项props
@@ -217,37 +262,150 @@ this.$off();
 
 1）传递数据：
 
-<demo name="xxx">
+`<demo name="xxx">`或者动态属性`<demo :name="xxx">`
 
 2）接收数据：
 
 第一种方式（只接收）：
 
-props:['name']
+`props:['name']`
 
 第二种方式（限制类型）：
 
-props:{name: String}
+`props:{name: String}`
 
-第三种方式（限制类型、限制必要性、限制默认值）：
+多种类型：`props:{name: [String,Number]}`
+
+第三种方式（限制类型、限制必要性、限制默认值、自定义验证器）：
 
 ```js
 props: {
 
 	name: {
 
-		type: String,//类型
+		type: Number,//类型
 
 		required: true,//必要性
-
-		default: '老王'// 默认值
-
+		
+		default: 10// 默认值
+		/*
+			如果type是一个Array或Object，default必须写成函数形式，如果type是Function，default也必须是一个函数，并且本身就是默认值
+			default() {
+				return 数组或者对象
+			}
+		*/
+    
+    
+    validator(value) {
+      return value > 0 // 自定义验证器
+    }
 	}
 
 }
 ```
 
-备注：props是只读的，Vue底层会监测你对props的修改，如果进行了修改，就会发出警告，若业务需求确实需要修改，那么请赋值props的内容到data中一份，然后去修改data中的数据。
+备注：**props是只读的**，Vue底层会监测你对props的修改，如果进行了修改，就会发出警告，若业务需求确实需要修改，那么请赋值props的内容到data中一份，然后去修改data中的数据。
+
+### props的简写
+
+首先，必须是动态传递的`props`，如果传递的属性动态属性值和组件接收时的值是一样的可以使用`v-bind="对象名"`来简写
+
+示例：
+
+```vue
+<template>
+	<!--<MessageItem :name="message.name" :msg="message.msg" :time="message.time"></MessageItem>-->
+
+<!--props简写操作-->
+<MessageItem v-bind="message"></MessageItem>
+</template>
+<script>
+import MessageItem from './components/MessageItem.vue';
+export default {
+	components: { MessageItem },
+	data() {
+		return {
+			message: {
+				name: '张三',
+				msg: '我是李四',
+				time: '10点'
+			}
+		};
+	}
+};
+</script>
+
+```
+
+`MessageItem.vue`组件内容:
+
+```vue
+<template>
+	<div>
+		<p>{{ name }}</p>
+		<p>{{ msg }}</p>
+		<p>{{ time }}</p>
+	</div>
+</template>
+
+<script>
+export default {
+  // 注意这里接收的参数，和上面组件传递的对象属性名一致，就可以触发简写
+	props: ['name', 'msg', 'time']
+};
+</script>
+<style>
+div {
+	border: 1px solid #000;
+}
+</style>
+
+```
+
+
+
+### props的类型
+
+props中可以限制的类型：
+
+![02-props的类型](../../前端图片/vue/02-props的类型.PNG)
+
+
+
+### 未定义的props传递
+
+例如现在这种常见，给组件传递了`props`属性，但是组件中没有用`props:[xxx]`来接收，那么传递进来的`props`去哪里了呢？
+
+答案：**会自动加在组件`<template>`标签内最外层的元素上**，当然通过`this.$attrs`也可以访问到
+
+函数或者生命周期想要访问：一般都是生命周期或者函数想要访问时通过`this.$attrs`
+
+常见使用：就是给组件传递class或id等情况
+
+如果要阻止这种情况发生：配置项填入`inheritAttrs:false`
+
+示例：
+
+```vue
+<!--给Item组件传递一个class的props-->
+<Item class='myclass'></Item>
+
+// item组件内容
+<template>
+<!--默认直接传到这里-->
+	<div class='myclass'>
+    自动将class属性和属性内容传递到最外层标签辣
+  </div>
+</template>
+<script>
+	export default {
+    // 没有定义props: [],也就是没有接收
+    // 如果不想有这种情况发生：这里填入inheritAttrs:false
+  }
+</script>
+```
+
+
 
 ## 任意组件通讯
 
@@ -471,13 +629,15 @@ this.$nextTick(_ => {
 
 1）作用：让父组件可以向子组件指定位置插入HTML结构，也是一种组件间通信方式父组件 ===>子组件。
 
+**这个就和react的children能传递组件一样特别像**
+
 2）分类：默认插槽、具名插槽、作用域插槽
 
 3）使用方式：
 
 （1）默认插槽
 
-```javascript
+```vue
 父组件中：
 	<Category>
 		<div>html结构</div>
@@ -492,21 +652,24 @@ this.$nextTick(_ => {
 
 （2）具名插槽：
 
-```javascript
+```vue
 父组件：
 	<Category>
-		<template slot="header">
+    <!--注意这里还能简写v-solt可以简写为#  -->
+		<template v-slot:header>
 			<div>html结构1</div>
 		</template>
-
-		<template slot="footer">
+		<!--<template #header>
+			<div>html结构1</div>
+		</template> -->
+		<template v-slot:footer>
 			<div>html结构2</div>
 		</template>
 	</Category>
 	
 子组件：
 	<template>
-		//定义插槽 上面的div结构会根据名称填到slot中
+		//定义插槽加上name属性 上面的div结构会根据名称填到slot中
 		
 		<slot name="header">插槽默1认内容</slot>
 		<slot name="footer">插槽2默认内容</slot>		
@@ -517,7 +680,7 @@ this.$nextTick(_ => {
 
 （3）作用域插槽：（比较麻烦的）
 
-1)理解：数据在组件自身，**但是根据数据生成的结构需要组件的使用者决定。**(games数据在Category组件中，但使用数据所遍历出来的结构由App决定)
+1)理解：数据在组件自身，**但是根据数据生成的结构需要组件的使用者决定。**(`games`数据在`Category`组件中，但使用数据所遍历出来的结构由`App`决定)
 
 2)具体编码：
 
