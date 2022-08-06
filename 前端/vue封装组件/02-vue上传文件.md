@@ -50,7 +50,9 @@ submitAddFile() {
   this.fileArr.forEach((item) => {
     formData.append('file', item)
   })
-  
+  /*
+  	将formData作为body进行发送
+  */
   // 发送axios请求
   
 }

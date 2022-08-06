@@ -29,7 +29,7 @@ const props = defineProps({
     required: true
   }
 })
-// 并不知直接使用 需要加一个#
+// 并不能直接使用 需要加一个#
 const iconName = computed(() => {
   return `#icon-${props.icon}`
 })
@@ -59,6 +59,8 @@ const iconName = computed(() => {
 
 
 ## 二、配置webpack
+
+这里是配置webpack帮我们导入所有icons下的svg
 
 > 1.创建`src/icons/index.js`
 >

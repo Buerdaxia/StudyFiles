@@ -111,6 +111,20 @@ printAnything<string>(['a', 'b', 'c']);
 
 
 
+## 多个泛型
+
+泛型的值不一定传递一个，像函数形参一样可以传递多个
+
+语法：
+
+```ts
+class User<T, K> {
+  XXXX
+}
+```
+
+
+
 
 
 ## 泛型的约束（interface+extends）

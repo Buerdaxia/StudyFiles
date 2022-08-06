@@ -139,6 +139,66 @@ VueComponent.prototype.__proto__ === Vue.prototype
 
 
 
+## 组件异步加载(重要)
+
+组件异步加载，只有在挂载组件后，组件的代码才会被加载进来，有时候能够提升一定的首屏加载事件
+
+核心：`defineAsyncComponent`函数，和`es6`的动态引入`import`
+
+使用：
+
+```vue
+<script>
+  import {defineAsyncComponent} from 'vue';
+  // 原版导入
+	//import Home from './components/Home.vue';
+  
+  // 异步加载
+  const Home = defineAsyncComponent(()=> import('./components/Home.vue'))
+</script>
+```
+
+
+
+## vue应用的错误处理
+
+进行错误处理后，控制台就不会出现红色报错了
+
+错误处理有两种：
+
+1. 全局错误处理
+2. 错误边界
+
+### 全局错误处理
+
+使用全局错误处理函数
+
+![03-全局错误处理](../../前端图片/vue/03-全局错误处理.PNG)
+
+示例：
+
+```js
+app.config.errorHandler = (err, vm, info) => {
+  console.log(err);
+  console.log(vm);
+  console.log(info);
+}
+```
+
+### 局部错误处理(错误边界)
+
+首先解释一下错误边界，`vue`中也是子组件只要报错，就会像事件冒泡一样一路报错，直接到根组件`App.vue`中，但是只要我们设置了错误边界，错误就会被封住，不会向上传递，进而影响整个项目的运行。
+
+![04-错误边界](../../前端图片/vue/04-错误边界.PNG)
+
+注意：`return false`时，才会阻止错误传播。
+
+使用：`errorCaptured(err, instance,info)`函数，接收参数和上面全局的一致
+
+一般都是在父组件中使用`errorCaptured`来控制子组件的错误边界
+
+
+
 ## 传递数据
 
 ### 组件的自定义事件（子给父）emits和on
@@ -228,6 +288,7 @@ export default {
 
 ```vue
 <template>
+<!--触发事件通过$-->
 	<button @click="$emit('deletePost', id)">
     删除
   </button>
@@ -250,11 +311,13 @@ methods或者其他事件中触发：
 
 
 
+### 事件emits与属性props的设计方式
 
-
-
+`vue`中设计的非常巧妙，遵循props属性向下（父->子），而事件反过来向上传递(子->父)
 
 ### 配置项props
+
+**单行数据流模式：**数据只能由一方传递给另一方，就像props，数据只能从父组件传递到子组件，子组件不允许修改。父组件中的props刷新，子组件也跟着刷新。
 
 功能：让组件接收外部传过来的数据
 
@@ -407,6 +470,127 @@ props中可以限制的类型：
 
 
 
+### 子组件props的响应机制
+
+首先：由于单向数据流模式的限制，子组件是不能修改传递进来的`props`的，如果我们想要传递进来的`props`可以修改该怎么办呢？
+
+方法：子组件自身在data或者computed中维护数据，默认值等于传入的`props`属性，在`<template>`模板中，绑定`data`中维护的数据即可。
+
+
+
+示例：
+
+```vue
+<template>
+	<span>现在的页数是:{{currentPage}}</span>
+	<button @click="change">
+    点我加1
+  </button>
+</template>
+<script>
+	export default {
+    props:['defaultCurrentPage'],
+    data() {
+      return {
+        currentPage: this.defaultCurrentPage
+      }
+    },
+    methods:{
+      change() {
+        this.currentPage+=1;
+      }
+  	}
+  }
+</script>
+```
+
+
+
+### props是否可以传递函数（）
+
+**可以，但是我们不用**
+
+首先，props也是可以传递函数的，但是这样会导致子组件依赖于父组件，一旦父组件没有传递`props`那么直接就会报错。
+
+但是通过自定义事件`emits与on`就不会有这个问题，即使父组件没有传递，也不会报错。
+
+
+
+## 深层次组件传递属性(Provide/Inject)
+
+现在有一个小问题出现了！当组件发生的多层次的嵌套，那么如何从最外层组件给最内层的组件**快速传递数据呢**？肯定不会用props一层一层的传递吧？这也太慢了。
+
+就和react中的Context很像。
+
+
+
+这时候我们就需要provide与inject了：
+
+最外层组件配置`provide`配置项，内层属性想要接收的组件中，配置`inject`配置项即可
+
+示例：
+
+```vue
+<!--最外层组件-->
+<template>
+	<Item></Item>
+</template>
+<script>
+	export default {
+    provide: {
+      // 传递name属性
+      name: '我是name'
+    }
+  }
+</script>
+
+<!--item组件-->
+<template>
+	<children></children>
+</template>
+
+<!--children接收数据 -->
+<template>
+	<p>
+    {{name}}
+  </p>
+</template>
+<script>
+	export default {
+    // 这里直接接收name属性
+    inject: ['name']
+  }
+</script>
+```
+
+### provide/inject使用data中的属性
+
+provide中想要访问data中的属性时，需要将provide定义成一个**函数,并返回一个对象**
+
+示例：
+
+```vue
+<script>
+	export default {
+    data() {
+			return {
+        name: '我是name'
+      }
+    },
+    // 注意这里，不能在写成对象型式了
+    provide() {
+      return{
+         name: this.name;
+      }
+    }
+  }
+</script>
+```
+
+注意：这里provide不是响应式的，data属性更新后，provide中传递的值也不会改变。(vue3提供的响应式API后面解决了这个问题)
+
+
+
 ## 任意组件通讯
 
 ### 全局事件总线（乱传）(重要的一匹)
@@ -511,28 +695,74 @@ mounted() {
 
    
 
-## 配置项mixin（混入）
+## 配置项mixin（混入）（已经不推荐使用嘞）
 
 功能：可以把多个组件共用的配置提取成一个混入对象
 
 使用方式：
 
-第一步：定义混合
+第一步：分析文件，定义混合
 
 创建一个混合文件，并定义
 
-向外暴露 {
+向外暴露:
 
-data(){...},
-
-methods:{...}
-
+```js
+const XxxMixin = {
+   data(){...},
+   methods:{...}
 }
+export default XxxMixin;
+```
+
+
+
+
 
 第二步：使用混入
 
-1. 全局混入：Vue.mixin(xxx)
-2. 局部混入：mixins:[xxx]（配置对象）
+1. 全局混入：`Vue.mixin(xxx)`
+2. 局部混入：`mixins:[xxx]`（配置对象）
+
+示例：
+
+```vue
+<script>
+  // 局部引入，
+	import XxxMixin from '../Mixins/XxxMixin.js'
+  export default {
+    // 使用定义好的配置项
+    mixins: ['XxxMixin']
+  }
+</script>
+```
+
+全局：
+
+```js
+// 自定义一个通用属性配置，并用computed简化操作
+app.mixin({
+	setTitle: '我的 Vue 应用'
+  computed:{
+    setTitle() {
+      return this.$options.setTitle;
+    }
+	}
+})
+
+// 在组件中访问
+this.$options.setTitle
+```
+
+
+
+
+
+注意：使用`Mixin`后，组件自身身上的配置对象会和`Mixin`中的进行合并，如果有重复的，**组件的会覆盖mixin的**
+
+**如果是同名的生命周期钩子！会先执行mixin的再执行组件自身的**
+
+
 
 
 
@@ -678,9 +908,9 @@ this.$nextTick(_ => {
 
 
 
-（3）作用域插槽：（比较麻烦的）
+（3）作用域插槽：（比较麻烦的）很重要，vue中许多默认的组件身上的方法，都是通过作用域插槽暴露出来的
 
-1)理解：数据在组件自身，**但是根据数据生成的结构需要组件的使用者决定。**(`games`数据在`Category`组件中，但使用数据所遍历出来的结构由`App`决定)
+1)理解：数据在组件自身，**但是根据数据生成的结构需要组件的使用者决定。**(`games`数据在`Category`组件中，但使用数据所遍历出来的结构由`App`(父组件)决定)
 
 2)具体编码：
 
@@ -738,7 +968,78 @@ this.$nextTick(_ => {
 
 
 
-## 组件的is属性
+### 插槽组件传递数据
+
+使用场景：数据是在组件自身维护的，但是页面是在父元素中，想要即将页面解构通过`slot`传递过去，这时候我们就可以用这个技术。
+
+在子组件的<slot>中将数据暴露出去，在父组件中要传递的标签包裹<template>并用`v-solt:xx`进行接收
+
+直接上代码：
+
+```vue
+<!--父组件-->
+<template>
+	<div>
+		<ContactList>
+			<!-- 由于我们只传递了一个参数,所以写default -->
+			<template v-slot:default="props">
+				<p>{{ props.contact.name }}</p>
+				<p>{{ props.contact.phone }}</p>
+			</template>
+		</ContactList>
+
+    <ContactList>
+			<!--传递多个就要写其他名字了 -->
+			<template v-slot:default="props">
+				<!-- 模板 -->
+			</template>
+      <template v-slot:otherSlot="otherProps">
+				<!-- 模板 -->
+			</template>
+		</ContactList>
+	</div>
+</template>
+
+
+<!--子组件-->
+<template>
+	<ul>
+		<li v-for="contact in contacts" :key="contact.id">
+			<!-- 这里将contact暴露出去 -->
+			<slot :contact="contact"></slot>
+		</li>
+	</ul>
+</template>
+<script>
+export default {
+	data() {
+		return {
+			contacts: [
+				{
+					id: 1,
+					name: '钱不二',
+					phone: 13209903517
+				},
+				{
+					id: 2,
+					name: '钱儿',
+					phone: '没有电话'
+				}
+			]
+		};
+	}
+};
+</script>
+
+```
+
+
+
+
+
+
+
+## 动态组件(is)
 
 什么时候要用到`is`属性呢，
 
@@ -752,11 +1053,52 @@ this.$nextTick(_ => {
 
 **第二种**：动态组件的实现，在同一个标签中，希望能够切换组件
 
-**官网介绍**
+**官网介绍**(注意里面的组件名为`<Component>`)
 
 ![image-20220501153727567](../../../../../AppData/Roaming/Typora/typora-user-images/image-20220501153727567.png)
 
+**动态的切换`is`绑定的组件可以实现，动态组件**
+
+### 动态组件切换后数据丢失问题(keepAlive解决)
+
+问题：每次重新切换组件时，组件都是重新创建并销毁，所以每次我们在组件中输入的值，在切换之后都会被清除。
+
+解决办法：在有`is`属性的组件`<Component>`外层套上`<KeepAlive>`组件，让组件缓存起来，切换时重新利用。
+
+示例：
+
+```vue
+<KeepAlive>
+  <Component :is="currentForm">
+  </Component>
+</KeepAlive>
+```
+
+
+
+
+
 ## 关于自定义组件的双向绑定v-model
+
+原理：
+
+首先，我们知道，**`vue`中原生`v-model`指令其实就是绑定了一个变量+绑定了一个方法实现的**
+
+示例：
+
+```vue
+<!--这里我们拿input标签举例-->
+<input type="text" v-model="val"/>
+
+<!--转换成普通的绑定是绑定了一个值，和一个函数-->
+<input type="text" :value="val" @input="input" />
+```
+
+所以说：自定义组件绑定`v-model`时呢，也是在本质上绑定一个**变量+一个方法**，只不过这两个是固定的
+
+变量：`model-value` 子组件中修改为`modelValue`
+
+方法：`update:model-value`子组件接收时修改为`update:modelValue`
 
 比如现在有一个自定义组件`<Dialog>`
 
@@ -766,9 +1108,13 @@ this.$nextTick(_ => {
 
 在上述自定义组件中使用`v-model`后，vue会帮助我们修改为以下内容
 
-```html
+```vue
 <Dialog :model-value="value" @update:model-value="value = $event"></Dialog>
-// 注意这里的update:model-value是可以传递参数的，
+<!-- 注意这里的update:model-value是可以传递参数的-->
+
+<!--子组件通过props和emits接收属性和方法，这两个时固定的 -->
+props:['modelValue'],
+emits:['update:modelValue']
 ```
 
 具体的使用：(**vue2版本**)
@@ -804,6 +1150,7 @@ this.$nextTick(_ => {
 <script>
 export default {
   name: 'Dialog',
+  /*子组件要接收父组件绑定的v-model*/
   props: ['modelValue'],
   emits: ['update:modelValue'],// 绑定父组件的触发方法，格式必须写成这样
   methods: {
@@ -910,4 +1257,198 @@ const handleClose = () => {
 <style></style>
 
 ```
+
+
+
+## 组件绑定v-model传递多个响应式变量
+
+上面讲的`v-model`只绑定了一个的响应式变量，组件也支持绑定多个`v-model`
+
+语法：
+
+```vue
+<!--父组件-->
+<Item v-model:search="aa" v-model:query="bb" />
+<script>
+  export default {
+		data() {
+      aa: 0,
+      bb: 2
+    }
+  }
+</script>
+
+
+<!--子组件接受时-->
+props:['search', 'query'],
+emits:['update:search', 'update:query']
+
+<!--模板中使用时-->
+@click="$emit('update:search', '123')"
+```
+
+注意：注意emits和props都有修改
+
+
+
+
+
+## 组件传送`teleport`
+
+有时候有一些组件，本身的存在就是没有父组件，是依赖于`body`标签或什么的进行定位的，这个时候就需要`<teleport to="选择器">`了
+
+注意：想要传送到什么位置，更具to属性内容有关
+
+例如：消息提示框组件，就是基于`body`定位
+
+示例：(消息提示框组件)
+
+```vue
+<template>
+	<!--就直接会将个组件整个结构传送到</body>头上-->
+	<Teleport to="body">
+		<div v-if="show" class="alertBox">
+			<div class="closeIcon" @click="show = false">x</div>
+			<div class="content">
+				<slot>消息提示框组件</slot>
+			</div>
+		</div>
+	</Teleport>
+</template>
+<script>
+export default {
+	data() {
+		return {
+			show: true
+		};
+	}
+};
+</script>
+<style scoped>
+.alertBox {
+	width: 350px;
+	height: 80px;
+	border: 1px solid hsl(280, 100%, 50%);
+	border-radius: 8px;
+
+	position: absolute;
+	right: 12px;
+	bottom: 12px;
+}
+</style>
+
+```
+
+
+
+### `teleport`的多次传送
+
+注意：`<teleport>`标签支持多次传送，指的就是，可以重复的将结构多次传入到`to`指定的位置，会不断追加进结构中
+
+示例：用`teleport`创建一个消息提示组件，并会不断消失。
+
+>第一步，在根html中创建一个容器来存放我们的消息提示组件
+
+index.html中追加：
+
+```html
+<body>
+  <div id="app"></div>
+  <div id="messages"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+```
+
+
+
+>第二步，在App.vue中设置全局样式，让我们的消息提示组件排列顺序没有太大问题
+
+App.vue：
+
+```vue
+<template>
+	<div class="container">
+		<AlertBox v-for="(msg, index) in msgs" :key="index">
+			{{ msg }}
+		</AlertBox>
+		<button @click="msgs.push(`这是一段啊消息${msgs.length}`)">点我+1</button>
+	</div>
+</template>
+<script>
+import AlertBox from './components/AlertBox.vue';
+export default {
+	components: { AlertBox },
+	data() {
+		return {
+			msgs: []
+		};
+	}
+};
+</script>
+
+<style>
+#messages {
+	position: absolute;
+	right: 12px;
+	bottom: 12px;
+	display: flex;
+	/* 每次添加进来的标签都放到上面 */
+	flex-direction: column-reverse;
+	gap: 12px;
+}
+</style>
+
+```
+
+
+
+>第三步：编写消息提示组件
+
+`AlertBox.vue`:
+
+```vue
+<template>
+	<Teleport to="#messages">
+		<div v-if="show" class="alertBox">
+			<div class="closeIcon" @click="show = false">x</div>
+			<div class="content">
+				<slot>消息提示框组件</slot>
+			</div>
+		</div>
+	</Teleport>
+</template>
+<script>
+import { onMounted } from 'vue';
+
+export default {
+	data() {
+		return {
+			show: true
+		};
+	},
+
+	mounted() {
+    /*挂载2s自动关闭*/
+		setTimeout(() => {
+			this.show = false;
+		}, 2000);
+	}
+};
+</script>
+<style scoped>
+.alertBox {
+	width: 350px;
+	height: 80px;
+	border: 1px solid hsl(280, 100%, 50%);
+	border-radius: 8px;
+
+	/* position: absolute; */
+}
+</style>
+
+```
+
+
+
+
 

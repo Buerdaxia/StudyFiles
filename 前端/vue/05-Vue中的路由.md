@@ -283,7 +283,7 @@ this.$router.push({
 
 ## 命名路由
 
-1）作用：可以简化路由的跳转
+1）作用：可以简化路由的跳转，并且可以相同如果有相同path，通过name也能进行跳转，可以避免有歧义的URL
 
 2）如何使用
 
@@ -324,8 +324,52 @@ this.$router.push({
 		title:'你好'
 	}
 }"
-</router-link>         
+</router-link>       
+
+<!--如果要传递params参数-->
+<router-link
+:to="{
+	name:'hello',
+	params: {
+		id:666,
+		title:'你好'
+	}
+}"
+</router-link>   
 ```
+
+
+
+## 路由别名alias
+
+路由还支持给路由起别名，这样对应的路由组件相当于有两个路径了，访问这两个路径都能跳转。
+
+示例：
+
+```js
+{
+	path: '/demo',
+	component: Demo,
+	alias: '/posts'
+}
+
+// 假如携带参数，alias中也要携带
+{
+	path: '/:UserId',
+	component: User,
+	alias: '/user/:UserId'
+}
+
+
+// 设置多个别名，用数组形式书写,现在User有三个URL了
+{
+	path: '/',
+	component: User,
+	alias: ['/user', '/people']
+}
+```
+
+
 
 
 
@@ -462,7 +506,7 @@ this.$router.push({
     // props的第一种写法 值为对象,该对象中的所有key-value都会以props的形式传给Detail组件
    	props:{a:1, b:'hello'}
 
-    // props的第二种写法 值为布尔值，若布尔值为真，就会把该路由组件收到的所有params参数，以props的形式传给Detail组件
+    // props的第二种写法 值为布尔值，若布尔值为真，就会把该路由组件收到的所有params参数，以props的形式传给Detail组件,注意传递的params参数都是string类型的
     props:true
 
     // props的第三种写法 值为函数,以props的形式传给Detail组件，
@@ -480,6 +524,15 @@ this.$router.push({
 
 
 **接收的时候和父子组件的props参数一样**
+
+示例：
+
+```vue
+props:['id','title']
+
+// vue3.2
+defineProps(['id','title'])
+```
 
 
 
@@ -509,12 +562,13 @@ this.$router.push({
 
 1）作用：不借助`<router-link>`实现路由的跳转，让路由跳转更加灵活。
 
-2）具体代码
+2）具体代码：
 
-```javascript
+```vue
 <button @click="pushShow(m)">push查看</button>
 <button @click="replaceShow(m)">replace查看</button>
 
+<script>
 // router的两个api
 methods: {
     pushShow(m) {
@@ -536,7 +590,8 @@ methods: {
             }
         })
     },
-}
+} 
+</script>
 ```
 
 
@@ -691,7 +746,11 @@ router.beforeEach((to, from, next) => {
     }
 })
 
-// 全局后置路由守卫---初始化时被调用，每次路由切换之后被调用
+// 导航守卫执行完毕、且组件加载完毕、组件中的导航守卫执行完毕之后、且导航实际跳转前执行。适合加载全局数据，或者在beforeEach做数据权限鉴定完毕后，还有一些特定权限的可以在beforeResolve中实现
+router.beforeResolve((to) => {
+})
+
+// 全局后置路由守卫---初始化时被调用，每次路由切换切实际跳转之后被调用，这时页面dome已经渲染完毕，可以修改例如：document.title = to.path;
 router.afterEach((to, from) => {
     console.log('后置路由守卫',to, from);
     document.title = to.meta.title || '练习';
@@ -703,6 +762,8 @@ router.afterEach((to, from) => {
 
 ### 独享守卫：
 
+如果导航守卫返回false，则会阻止导航的跳转。
+
 ```javascript
 //独享路由是写在路由内部的，里面内容和全局前置路由一致
 {
@@ -710,6 +771,7 @@ router.afterEach((to, from) => {
     path: 'news',
     component: News,
     meta: {isAuth: true, title: '新闻'},
+    // 路由跳转时，组件创建前执行,不能访问组件的实例
     beforeEnter:(to, from, next) => {
         console.log('路由被切换了',to, from);
         // 判断是否需要鉴定权限
@@ -722,9 +784,20 @@ router.afterEach((to, from) => {
         } else {
             next();
         }
-    }
-},
+    },
+     // 也可以写成数组模式,数组模式就可以写多个验证函数了
+    beforeEnter: [auth]
+}
+
+// 将验证逻辑抽离成一个函数
+function auth = (to, from) => {
+  xxxx
+}
 ```
+
+注意：**该守卫只有从不同的url跳转进来，才会进行触发。而向动态路由`/:postId`这种的，从`/1`跳转到`/2`就不会触发**
+
+
 
 ### 组件内路由守卫：
 
@@ -775,7 +848,7 @@ beforeRouteLeave (to, from, next) {
 
 history解决方法之一：npm搜connect-history-api-fallback这个中间件可以解决。
 
-## 路由中的配置项redirect
+## 路由重定向redirect
 
 redirect是重定位配置项，可以将你现在访问到的路径重新定位到redirect后的路径
 
@@ -785,11 +858,32 @@ redirect是重定位配置项，可以将你现在访问到的路径重新定位
     redirect: '/login'
   }
 //标识访问更目录就跳到/login
+
+// 第二种写法：对象式
+{
+  path: '/user',
+  // 重定向到home
+  redirect: {
+    name: 'home'
+  }
+}
+
+
+// 第三种写法：函数式
+{
+  path:'/posts/:postId',
+  redirect: (to) => {
+    return {
+      path: `/${to.params.postId}`
+    }
+  }
+  // 如果直接写成：redirect: '/:postId'会出错，他会将/:postId直接当作URL进行跳转，并不会接收参数
+}
 ```
 
 
 
-## 路由元信息
+## 路由元信息（meta）
 
 `meta:{xxx}`为路由下的一个配置项，配置过后会添加到$route上，可以存放一些标识信息，用`$route.meta.xxx`来访问
 
@@ -817,6 +911,18 @@ const routes = [
   }
 ]
 ```
+
+配合全局守卫进行权限控制：
+
+```js
+router.beforeEach((to, from, next) => {
+    // 通过to.meta来访问
+})
+```
+
+注意：`to.meta`是`to.matched`上所有顶级路由`meta`的浅合并出来的值，如果有子路由，还是建议判断`to.matched`身上的所有`meta`
+
+如果一个父路由及其全部子路由都需要登陆后访问，那么我们只给父路由设置meta属性即可
 
 ## 路由懒加载
 

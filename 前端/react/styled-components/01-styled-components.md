@@ -344,14 +344,33 @@ function Search({ placeholder = '请输入内容...', ...rest }) {
 
 styled()函数式写法，可以直接使用你之前写好的styled组件的css样式。
 
-语法：
+styled函数式写法，根据传递的值不同，会有不同的效果。
 
-```js
-const StyledParagraph = styled(xxx)``;
-// 然后StyledParagraph拥有xxx所有样式，并且还能再``书写自己独有的样式
-```
+**第一种：传递一个styled标签**
 
 示例：
+
+```js
+import StyledText from 'components/Text/style';
+const StyledParagraph = styled(StyledText)``;
+
+// 这样的效果是，直接拥有所有StyledText的样式，并且可以在``中创建添加样式
+```
+
+**第二种：传递一个分装好的React组件**
+
+示例：传递一个封装好的组件
+
+```js
+import Paragraph from 'components/Paragraph';
+import styled from 'styled-components';
+// 这样是传递了整个组件给Time，Time标签就是Paragraph组件
+const Time = styled(Paragraph)``;
+```
+
+
+
+使用示例：
 
 ```js
 // 这里StyledParagraph想拥有所有StyledText组件的css样式，并且自己的超出还隐藏
@@ -374,15 +393,6 @@ export default StyledParagraph;
 ```
 
 
-
-示例2：传递一个封装好的组件
-
-```js
-import Paragraph from 'components/Paragraph';
-import styled from 'styled-components';
-// 这样是传递了整个组件给Time，Time标签就是Paragraph组件
-const Time = styled(Paragraph)``;
-```
 
 
 

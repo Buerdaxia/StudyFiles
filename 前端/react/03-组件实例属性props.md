@@ -216,6 +216,7 @@ ReactDOM.render(<Person name="Jerry" sex='女' age={19} speak={speak} />, docume
 * `PropTypes.oneOfType([number, string])`：指定类型中选择一个
 * `PropTypes.func`：函数类型
 * `PropTypes.shape({x: PropTypes.number, y: PropTypes.number})`：限制传递值为一个对象，对象里的内容还有限制
+* `PropTypes.elementType`：限制类型为一个react组件
 
 
 

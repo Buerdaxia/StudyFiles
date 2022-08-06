@@ -137,7 +137,7 @@ devServer: {
     },
     '/demo': {
       target: 'http://localhost:5001',
-      // 将所有/api转换为空字符串
+      // 将所有/demo转换为空字符串
       pathRewrite:{'^/demo':''},
       ws: true,//用于支持 websocket
       changeOrigin: true//如果是true,代理服务器会伪装成和服务器一样的端口号
