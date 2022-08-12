@@ -53,6 +53,7 @@ root.render(
 
 ```jsx
 // Create a Title component that'll render an <h1> tag with some styles
+// styled.后面跟着的就是，这个用哪一个标签进行渲染
 const Title = styled.h1`
   font-size: 1.5em;
   text-align: center;
@@ -473,7 +474,7 @@ export default StyledText;
 
 ### attrs函数
 
-`attrs`函数，允许我们给一个`styled`标签用对象的方式传递属性和属性值。
+`attrs`函数，允许我们给一个`styled`标签（或者普通标签）用对象的方式传递属性和属性值。
 
 示例：
 
@@ -487,6 +488,15 @@ const StyledMessageCard = styled.div``;
 
 export default StyledMessageCard;
 
+```
+
+普通标签示例：
+
+```js
+import styled from 'styled-components';
+
+// 用input标签渲染，并将type设置为radio
+const RadioButtpn = styled.input.attrs({ type: 'radio' })``;
 ```
 
 

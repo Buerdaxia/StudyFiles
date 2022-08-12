@@ -429,7 +429,17 @@ const vm = new Vue({
 
 2）style样式
 
-​	:style="{fontSize: xxx}"其中xxx是动态值
+​	**:style="{fontSize: xxx}"其中xxx是动态值**
+
+示例：
+
+```vue
+<image :src="floor.product_list[0].image_src" mode="widthFix" :style="{width: floor.product_list[0].image_width + 'rpx'}"></image>
+
+<!--这里的值是从后端获取的数据中拿到的哦-->
+```
+
+
 
 ​	:style="[a,b]"其中a、b是样式对象
 
