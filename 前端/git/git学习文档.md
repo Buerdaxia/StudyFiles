@@ -67,7 +67,7 @@ git commit -m "完成了xxx功能"
 第二步：再将分支提交到码云云端上
 
 ```js
-// 第一次提交就要加上-u origin
+// 任何分支的第一次提交就要加上-u origin
 git push -u origin 分支名
 ```
 

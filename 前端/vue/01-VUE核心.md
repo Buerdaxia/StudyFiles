@@ -837,6 +837,28 @@ vm.$watch('isHot',{
 
 
 
+### 立即执行
+
+watch默认情况下，第一次的初始化，不会进行监视，如果需要进行监视需要配置。
+
+配置：immediate配置项为true
+
+```js
+watch: {
+    isHot: {
+			handler(xxx) {
+        xxxx
+      },
+      // 关键在这个配置项，第一次初始化时也会监听
+      immediate: true
+    }
+}
+```
+
+
+
+
+
 ### 深度监视
 
 1）Vue中的watch默认不检测对象内部值的改变(一层)。
