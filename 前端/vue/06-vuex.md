@@ -129,6 +129,10 @@ const mutations = {
     JIA: function(state,value) {
         console.log('mutations中的JIA被调用了',state,value);
         state.sum += value;
+      
+      
+      // 可以通过来触发别的mutations
+      this.commit('xxx')
     },
     //执行减操作
     JIAN: function(state,value) {
@@ -349,6 +353,7 @@ this.$store.getters['personAbout/firstPersonName'];
 this.$store.dispatch('personAbout/addPersonWang',person);
 //方式二：利用mapAction
 ...mapAction('personAbout',{incrementOdd:'jiaOdd',incrementWait:'jiaWait'});
+...mapAction('personAbout',['jiaOdd','jiaWait']);
 ```
 
 6）开启命名空间后，组件中调用commit
@@ -356,8 +361,12 @@ this.$store.dispatch('personAbout/addPersonWang',person);
 ```javascript
 //方式一：自己直接读取
 this.$store.commit('personAbout/ADD_PERSON',person);
+// 在mutations中触发别的mutations
+this.commit('模块名/方法名');
 //方式二：借助mapMutations
 ...mapMutations('personAbout',{increment:'JIA',decrement:'JIAN'});
+
+.....mapMutations('personAbout',['JIA', 'JIAN']);
 ```
 
 注意：所有的方法二中：就是首先要开启命名空间，然后再原有map方法基础上，添加一个参数，参数是对应模块的命名空间

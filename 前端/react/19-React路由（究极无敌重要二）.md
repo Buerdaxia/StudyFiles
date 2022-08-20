@@ -279,7 +279,24 @@ export default class Message extends Component {
 
 ```
 
+### 编程式路由导航的hooks（更爽一些）
 
+`useHistory()`方法可以直接获得一个对象，对象中就包含上面那些方法。
+
+```js
+import { useHistory } from 'react-router-dom';
+function Nav() {
+  const history = useHistory();
+  /*
+  	history身上这些防法都有
+  	go: ƒ go(n)
+    goBack: ƒ goBack()
+    goForward: ƒ goForward()
+    push: ƒ push(path, state)
+    replace: ƒ replace(path, state)
+  */
+}
+```
 
 
 
