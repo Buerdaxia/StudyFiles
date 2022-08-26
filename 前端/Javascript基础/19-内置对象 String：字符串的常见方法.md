@@ -716,6 +716,8 @@ console.log(mix_telephone); // 打印结果：1308888****
 
 该方法不会影响原字符串。
 
+返回一个新的字符串
+
 代码举例：
 
 ```javascript

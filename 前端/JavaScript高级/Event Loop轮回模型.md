@@ -32,7 +32,7 @@
 
 1. 执行全局代码，有同步，有异步的；
 2. 全局Script代码执行完毕，调用栈stack清空；
-3. 从微队列microtask queue中取出位于队首的回调任务，放入调用栈Stack中执行，执行完后microtask queue长度减1；
+3. （先执行宏任务，应为script就是一个宏任务）从微队列microtask queue中取出位于队首的回调任务，放入调用栈Stack中执行，执行完后microtask queue长度减1；
 4. 继续取出位于队首的任务，放入调用栈Stack中执行，以此类推，直到直到把microtask queue中的所有任务都执行完毕。**注意，如果在执行microtask的过程中，又产生了microtask，那么会加入到队列的末尾，也会在这个周期被调用执行**；
 5. microtask queue中的所有任务都执行完毕，此时microtask queue为空队列，调用栈Stack也为空；
 6. 取出宏队列macrotask queue中位于队首的任务，放入Stack中执行；注意：**宏任务阶段产生的微任务，重新加入microtask queue 并且重新激活微任务队列**
