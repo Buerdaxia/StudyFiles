@@ -267,3 +267,323 @@ $(function () {
 })
 ```
 
+
+
+
+
+# jQuery的自定义事件
+
+自定义事件需要通过on绑定方法的方式能够进行绑定
+
+注意：**自定义事件只能通过自动触发，来进行事件触发（trigger和triggerHandler）**
+
+语法：
+
+```js
+$('button').on('myClick', function() {
+  alert('我是自定义事件')
+})
+
+// 触发自定义事件，两个方法都可以
+$('button').trigger('myClick');
+$('button').triggerHandler('myClick');
+```
+
+
+
+
+
+# jQuery中的事件命名空间
+
+注意：它也必须只能通过on方式来绑定的事件才能有命名空间
+
+作用：用一个标识，来标注该方法，在协同开发时，可以通过标记事件的方式，来表明函数的来源（就是谁写的）
+
+语法：
+
+```js
+// 在事件名儿后面通过.跟上标识
+$('.son').on('click.zs', function() {
+	alert('zs click')  
+})
+
+$('.son').on('click.ls', function() {
+	alert('ls click')  
+})
+
+
+// 如果想要分别触发不同标识的click事件，可以通过trigger
+$('.son').trigger('click.zs');
+```
+
+
+
+## 命名空间的一些特点
+
+**第一个：**利用trigger触发子元素带命名空间的事件，那么父元素带相同命名空间的事件也会被触发，而父元素不带命名空间的不会被触发
+
+示例：
+
+```js
+$('.father').on('click.zs', function () {
+  alert('父元素有命名空间');  // 4.会触发
+})
+
+$('.father').on('click', function () {
+  alert('父元素没有命名空间的事件');  // 3.不会触发
+})
+
+
+$('.son').on('click.zs', function () {
+  alert('子元素有命名空间事件'); // 2.会触发
+})
+
+// 1.自动触发带命名空间的子元素事件
+$('.son').trigger('click.zs');
+```
+
+
+
+第二个：如果利用trigger触发常规事件，就是没有命名空间的事件，则所有对应的**同类型事件**都会被触发
+
+注意：触发顺序是有命名空间的 ----> 没有命名空间的
+
+示例：
+
+```js
+
+$('.father').on('click.zs', function () {
+  alert('父元素有命名空间'); // 2.父元素的被触发
+})
+
+$('.father').on('click', function () {
+  alert('父元素没有命名空间的事件'); // 3.父元素不带命名空间事件被触发
+})
+
+// 1.子元素被触发带命名空间事件被触发
+$('.son').on('click.zs', function () {
+  alert('子元素有命名空间事件');
+})
+
+// 1.触发不带命名空间click事件
+$('.son').trigger('click');
+```
+
+
+
+
+
+# jQuery事件委托
+
+什么是事件委托？
+
+请别人帮忙做事，然后将做完的结果反馈给我们
+
+事件委派jQuery有两种方法
+
+核心：**利用了事件冒泡机制**
+
+有几个注意点：
+
+1. 委托，最主要的功能是，委托存在的元素，来帮忙触发，目前还不存在的元素身上的事件（**其实，任何一个有父子关系的标签都可以**）。
+2. 尽量选择一些没有绑定过事件的元素进行委托
+
+
+
+## delegate方法
+
+该方法基本上已经启用，可以用on绑定事件来代替，但是这里还是讲一下吧。
+
+语法：
+
+```js
+// 给ul绑定事件，然后委派给ul下的li元素，每个li都有一个click事件
+$('ul').delegate('li', 'click', function () {
+  console.log($(this).html());
+})
+```
+
+
+
+## on方法
+
+on方法不仅能够绑定事件，还可以委派事件，传递三个参数即可。
+
+语法：
+
+```js
+// 传入三个参数，第一个：委派的事件名，第二个委派对象，第三个委派事件
+$('ul').on('click', 'li', function () {
+  console.log($(this).html());
+})
+```
+
+
+
+
+
+**综合示例：**
+
+```html
+  <script>
+    $(function () {
+      $('button').on('click', function () {
+        $('ul').append('<li>新增的li</li>');
+      })
+
+
+      // 这种方式，新增的li 就无法点击
+      $('ul>li').on('click', function () {
+        // 调用$(this)身上的方法
+        console.log($(this).html());
+      })
+
+      // 事件委派方式1：利用delegate方法(弃用)
+      $('ul').delegate('li', 'click', function () {
+        console.log($(this).html());
+      })
+
+
+      // 事件委派方式2：利用on事件绑定
+      $('ul').on('click', 'li', function () {
+        console.log($(this).html());
+      })
+      
+      // 注意：不一定非要委托到ul上，也可以委托到body上，body也是li的父父元素(●'◡'●)
+       $('body').on('click', 'li', function () {
+        console.log($(this).html());
+      })
+    })
+  </script>
+</head>
+
+<body>
+  <ul>
+    <li>我是第1个li</li>
+    <li>我是第2个li</li>
+    <li>我是第3个li</li>
+  </ul>
+
+  <button>增加li</button>
+</body>
+```
+
+
+
+
+
+# jQuery鼠标移入移出事件
+
+测试基础代码：
+
+```html
+
+  <style>
+    .father {
+      width: 100px;
+      height: 100px;
+      background-color: red;
+    }
+
+    .son {
+      width: 50px;
+      height: 50px;
+      background-color: #bfc;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="father">
+    <div class="son"></div>
+  </div>
+</body>
+```
+
+
+
+
+
+## mouseover方法
+
+作用：当鼠标移入一个绑定的dom元素时，会被触发
+
+语法：
+
+```js
+$('.father').on('mouseover', function () {
+  console.log('鼠标移入father');
+})
+```
+
+
+
+## mouseout方法
+
+作用：当鼠标移出一个dom元素时被触发
+
+语法：
+
+```js
+$('.father').on('mouseout', function () {
+  console.log('鼠标移出father');
+})
+```
+
+
+
+## mouseover和mouseout的小问题
+
+mouseover和mouseout虽然能够监听移入和移出方法，但是他们俩有一点点儿的问题。当有嵌套关系时，移入/移出子元素，也会触发父元素的事件（即使子元素在父元素内）
+
+所以一般我们都比较喜欢使用下面这三个方法
+
+
+
+## mouseenter方法
+
+作用：也是鼠标移入事件，但是没有奇怪的小问题
+
+语法：
+
+```js
+$('.father').on('mouseenter', function () {
+  console.log('鼠标移入father');
+})
+```
+
+
+
+## mouseleave方法
+
+作用：鼠标移出事件
+
+语法：
+
+```js
+$('.father').on('mouseleave', function () {
+  console.log('鼠标移入father');
+})
+```
+
+
+
+注意：**这两个方法，就不会出现移入移出子元素触发父元素鼠标事件的情况**
+
+
+
+## hover方法
+
+作用：是mouseenter和mouseleave的结合版，传入两个回调，用来简写的。
+
+语法：
+
+```js
+$('.father').hover(function () {
+  console.log('移入father') // 回调函数1对应mouseenter
+}, function () {
+  console.log('移出father') // 回调函数2对应mouseleave
+})
+```
+
+注意：这个方法只能通过eventName方式绑定哦，on绑定无效
