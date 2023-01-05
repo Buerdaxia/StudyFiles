@@ -803,6 +803,50 @@ const vm = new Vue({
 })
 ```
 
+**计算属性使用v-model进行绑定**：
+
+注意：computed的简写形式，是无法进行双向绑定的，绑定后会报错，但是通过**完全体方式**，是可以进行双向绑定的
+
+核心：使用`get`和`set`
+
+```vue
+<template>
+	<input v-model="count" />
+	<div>
+    计算属性: {{count}}
+  </div>
+</template>
+<script>
+	export default {
+    data(){
+        return {
+          a:1
+        }
+    },
+    computed: {
+        // 完全体，fullname就是可访问的属性
+        count: {
+            get() {
+                return a+1;
+            },
+            set(value) {//监测修改，value是修改之后的值
+              	// 检测修改，一修改，我们就计算属性依赖的值，从而会计算属性也会改变
+              	return this.a = value;
+            }
+        }
+    }
+  }
+</script>
+```
+
+
+
+
+
+
+
+
+
 ## 监视属性
 
 功能：一般可以去完成一些开销比较大的动作，如定时器，API请求等耗时工作
@@ -910,6 +954,22 @@ vm.$watch('isHot',{
 vm.$watch('isHot',function(newValue, oldValue) {
     console.log("isHot被修改了",newValue,oldValue);
 })
+```
+
+
+
+### 监听对象中的某个属性
+
+写法：
+
+```js
+watch: {
+  "search.name": {
+    handler() {
+      
+    }
+  }
+}
 ```
 
 

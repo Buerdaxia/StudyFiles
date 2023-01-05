@@ -587,3 +587,18 @@ $('.father').hover(function () {
 ```
 
 注意：这个方法只能通过eventName方式绑定哦，on绑定无效
+
+# jQuery监听滚动条
+
+## scroll方法
+
+作用：监听整个网页或者一个对象的滚动
+
+语法：
+
+```js
+$(window).scroll() // 监听整个网页的滚动条
+
+$('div').scroll() // 监听div元素的滚动条(如果有的化)
+```
+

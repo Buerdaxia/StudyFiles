@@ -10,6 +10,16 @@
 
 4）提升层级（用z-index样式的值可以改变一个定位元素的层级关系，从而改变元素的覆盖关系，值越大越在上面，z-index只能在position属性值为relative或absolute或fixed的元素上有效。） （两个都为定位元素，后面的会覆盖前面的定位）
 
+**z-index必须要设置一下position才能设置**
+
+## 注意点
+
+**记然你使用position，就一定要配合使用top，right，bottom，left这四个属性，来控制元素的位置**
+
+记住没：再说一遍，只要position了，就一定要使用top、right、bottom、left这四个属性，
+
+重要的事情说三遍：只要使用position了，就一定要使用top、right、bottom、left！！！
+
 
 
 ## 2：position：absolute；绝对定位
@@ -59,4 +69,10 @@ fixed生成的固定定位的元素，相对于浏览器窗口进行定位。
 **这个特定阈值指的是 top, right, bottom 或 left 之一，换言之，指定 top, right, bottom 或 left 四个阈值其中之一，才可使粘性定位生效。否则其行为与相对定位相同**
 
 **注意:** Internet Explorer, Edge 15 及更早 IE 版本不支持 sticky 定位。 Safari 需要使用 -webkit- prefix 。
+
+
+
+注意2：**这个属性，如果不生效，可以尝试在元素外层再套上一个div，这样就会生效（我也不知道为啥）**
+
+
 

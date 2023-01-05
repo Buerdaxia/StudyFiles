@@ -62,10 +62,111 @@ Promise对象的错误有冒泡的性质，会一直向后转递，直到被捕�
 
 `finally()`方法用于指定不管Promise对象最后状态如何，都会执行的操作。
 
+返回值：返回一个新的期约(`promise`)实例
+
 ```js
 promise
 .then(result => {···})
 .catch(error => {···})
 .finally(() => {···});
+```
+
+
+
+注意：**这个新期约实例不同于 then()或 catch()方式返回的实例。因为 onFinally 被设计为一个状态 无关的方法，所以在大多数情况下它将表现为父期约的传递。对于已解决状态和被拒绝状态都是如此。**
+
+
+
+## 期约连锁（promise的链式调用）
+
+因为实例方法（`then`、`catch`、`finally`）都会返回一个**新的**期约对象，而这个期约对象又有自己的实例方法，所以就可以进行期约连锁。
+
+示例：
+
+```js
+let p = new Promise((resolve, reject) => { 
+ console.log('first'); 
+ resolve(); 
+}); 
+p.then(() => console.log('second')) 
+ .then(() => console.log('third')) 
+ .then(() => console.log('fourth')); 
+// first 
+// second 
+// third 
+// fourth
+```
+
+
+
+又或者这样：执行异步任务，**串行化**异步任务：
+
+```js
+let p1 = new Promise((resolve, reject) => { 
+ console.log('p1 executor'); 
+ setTimeout(resolve, 1000); 
+}); 
+p1.then(() => new Promise((resolve, reject) => { 
+ console.log('p2 executor'); 
+ setTimeout(resolve, 1000); 
+ })) 
+ .then(() => new Promise((resolve, reject) => { 
+ console.log('p3 executor'); 
+ setTimeout(resolve, 1000); 
+ })) 
+ .then(() => new Promise((resolve, reject) => { 
+ console.log('p4 executor'); 
+ setTimeout(resolve, 1000); 
+ })); 
+// p1 executor（1 秒后）
+// p2 executor（2 秒后）
+// p3 executor（3 秒后）
+// p4 executor（4 秒后）
+```
+
+
+
+可以说：**期约连锁**就是解决”回调地狱“的核心关键
+
+示例：
+
+
+
+```js
+// 期约连锁版本
+function delayedResolve(str) { 
+ return new Promise((resolve, reject) => { 
+ console.log(str); 
+ setTimeout(resolve, 1000); 
+ }); 
+} 
+delayedResolve('p1 executor') 
+ .then(() => delayedResolve('p2 executor')) 
+ .then(() => delayedResolve('p3 executor')) 
+ .then(() => delayedResolve('p4 executor')) 
+// p1 executor（1 秒后）
+// p2 executor（2 秒后）
+// p3 executor（3 秒后）
+// p4 executor（4 秒后）
+
+// 回调函数版本
+function delayedExecute(str, callback = null) { 
+ setTimeout(() => { 
+ console.log(str); 
+ callback && callback(); 
+ }, 1000) 
+} 
+delayedExecute('p1 callback', () => { 
+ delayedExecute('p2 callback', () => { 
+ delayedExecute('p3 callback', () => { 
+ delayedExecute('p4 callback'); 
+ }); 
+ }); 
+}); 
+// p1 callback（1 秒后）
+// p2 callback（2 秒后）
+// p3 callback（3 秒后）
+// p4 callback（4 秒后）
+
 ```
 

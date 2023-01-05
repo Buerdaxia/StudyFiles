@@ -21,3 +21,27 @@ ts-node:（就是我们执行ts文件时，第一步`tsc xxx.ts` 第二步，用
 
 
 
+## 小满版本的
+
+>第一步：
+
+```
+npm install @types/node -D
+```
+
+>第二步：
+
+```
+ npm install ts-node -g
+```
+
+
+
+> 第三步直接执行ts文件，可以看到输出结果
+
+```
+ts-node app.ts
+```
+
+
+

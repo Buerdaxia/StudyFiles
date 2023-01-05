@@ -123,6 +123,31 @@ a[class~="logo"] {
 }
 ```
 
+
+
+
+
+#### 属性选择器高级使用(常用)
+
+示例：
+
+```css
+/*选中所有类名是以col-开头的*/
+[class^="col-"] {
+	xxx...    
+}
+
+
+/*选中所有类名尾部是col-的类*/
+[class$="col-"] {
+	xxx...    
+}
+```
+
+
+
+
+
 ### 后代选择器
 
 格式 `标签 标签... {属性名:属性值;...}`   标签可以是id可以是类等等（中间是有一个空格的）
@@ -154,6 +179,34 @@ a[class~="logo"] {
 格式`标签1+标签2 {属性名:属性值;...}`
 
 是同一个父元素时的元素才使用，并且这两个标签时相邻的。
+
+注意：**这个选择器只能选择下面的，不能选择上面的**
+
+示例：
+
+```css
+<input id="name" type="text" class="form__input" placeholder="姓名" required>
+<label for="name" class="form__label">
+姓名
+</label>
+
+.form__input + label {
+  /*这样可以选中label*/
+}
+
+
+/*如果反过来，label在input的上面，这样就通过+就不行了*/
+<label for="name" class="form__label">
+姓名
+</label>
+<input id="name" type="text" class="form__input" placeholder="姓名" required>
+
+.form__input + label {
+  /*这样不行*/
+}
+```
+
+
 
 **还要记住这个选择器，只选中第二标签，不管第一个标签的。**
 

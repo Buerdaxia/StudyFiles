@@ -42,11 +42,170 @@ printVehicle(oldCivic);
 
 
 
+## 重名interface
+
+TS中允许定义重名的接口，如果两个接口的名字相同，那么会将interface中的内容合并在一起。**重名的interface会合并**
+
+示例：
+
+```tsx
+interface A {
+  name: string
+}
+
+interface A {
+  age: number
+}
+// 合并为 interface A { name: string, age: number }
+
+// 对象要满足A接口的所有内容
+let obj: A = {
+  name: 'ec',
+  age: 18
+}
+```
+
+
+
+## 可选操作符？
+
+对象中的属性的有无常常是不确定的，所以我们在定义接口的时候，肯定也不是将属性写死的，所以这时候可选操作符的作用就来了。
+
+
+
+示例：
+
+```tsx
+interface Person {
+  name: string,
+  age?: number
+}
+
+let p:Person = {
+  name: '123',
+  // age属性可有可无
+}
+```
+
+
+
+## [propName: string]: any属性
+
+这个属性的在接口中的作用是，接下来的对象中有任意个属性，属性名为string，属性值为any类型（注意：**是任意多个**）
+
+这个关键字的使用方式呢，就是你不知道后端返回对象有那些东西，有时候就可以用这个来写道interface中。
+
+示例：
+
+```tsx
+interface Person {
+  name: string,
+  age?: number,
+  [propName: string]: any // 除了有name,age之外还有任意个其他类型的属性
+}
+
+let p:Person = {
+  name: '123',
+  // age属性可有可无
+  abc:'xixi', // [propName: string]: any如果没有这个属性，下面的都会报错
+  bcd: 'hhh',
+  efg:'ooo'
+}
+```
+
+
+
+## readonly关键字
+
+只读关键字，可以约束一个属性是只读的，不能进行修改
+
+示例：
+
+```tsx
+interface Student {
+  readonly name: string,
+  age?:number
+}
+
+let stu:Student = {
+  name: 'qec',
+  age: 18
+}
+
+stu.name = 'wuhu'; // 这里就会报错，应为name是只读的
+```
+
+
+
+## 接口追加函数
+
+对象我们往往不只是简单定义一个属性，有时候我们也会定义方法是吧，定义方法的方式也很简单，如下：
+
+示例：
+
+```tsx
+interface Student {
+  readonly name: string,
+  age?:number,
+  cb():void // 定义一个函数cb,不返回值
+}
+
+let stu:Student = {
+  name: 'qec',
+  age: 18,
+  cb: ()=> {}
+}
+```
+
+
+
+## extends关键字组合使用
+
+interface也是可以组合使用的，也是用extends关键字，就和es6中类继承一样
+
+示例：
+
+```tsx
+interface A {
+  name: string
+}
+
+interface B extends A { // 可以连着extends
+  age: number
+}
+
+// 这时B接口中，就有两个约束了
+let ex: B = {
+  name :'123',
+  age: 10
+}
+
+```
+
+
+
+
+
 ## 高级使用(可重用的interface)
 
 interface接口的检查顺序是，只要对象满足了我接口中的东西即可，其他无所谓。
 
-意思就是我接口中定义的东西，你对象中存在，那么就不会报错
+意思就是我接口中定义的东西，你对象中存在，那么就不会报错（注意**这种检查方式，不适用在普通的类型注释**）
+
+如果是这样：
+
+```tsx
+interface P {
+  name: '123'
+}
+
+// 这样就必须要满足接口P，多一个或者少一个都会报错
+let person:P = {
+  name: 'xixi'
+}
+```
+
+
 
 
 

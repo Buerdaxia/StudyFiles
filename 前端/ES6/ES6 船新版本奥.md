@@ -259,7 +259,7 @@ function getName(...params) {
 getName('钱不二','不二大侠')
 ```
 
-4. 对象合并（使用的不是...展开运算符）
+4. **对象合并（使用的不是...展开运算符）**
 
 ```javascript
 let a = {name:'钱不二',age: 18, sex: '男'};

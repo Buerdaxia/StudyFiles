@@ -68,7 +68,7 @@ Set 实例的方法分为两大类：操作方法（用于操作数据）和遍�
 
 ### Set 实例的操作方法
 
-- `Set.prototype.add(value)`：添加某个值，返回 Set 结构本身。
+- `Set.prototype.add(value)`：添加某个值，返回 Set 结构本身（因为返回集合的实例，所以可以链式调用进行添加）。
 - `Set.prototype.delete(value)`：删除某个值，返回一个布尔值，表示删除是否成功。
 - `Set.prototype.has(value)`：返回一个布尔值，表示该值是否为`Set`的成员。
 - `Set.prototype.clear()`：清除所有成员，没有返回值。
@@ -230,11 +230,57 @@ set = new Set(Array.from(set, val => val * 2));
 
 
 
-### WeakSet
+## WeakSet
 
-还没看，后面补
+语法：
+
+```js
+const ws = new WeakSet(); 
+```
+
+弱集合中的**值只能是 Object 或者继承自 Object 的类型**，尝试使用非对象设置值会抛出 TypeError。
+
+初始化实例：
+
+```js
+const val1 = {id: 1}, 
+ val2 = {id: 2}, 
+ val3 = {id: 3}; 
+// 使用数组初始化弱集合
+const ws1 = new WeakSet([val1, val2, val3]); 
+alert(ws1.has(val1)); // true 
+alert(ws1.has(val2)); // true 
+alert(ws1.has(val3)); // true 
+// 初始化是全有或全无的操作
+// 只要有一个值无效就会抛出错误，导致整个初始化失败
+const ws2 = new WeakSet([val1, "BADVAL", val3]); 
+// TypeError: Invalid value used in WeakSet 
+typeof ws2; 
+// ReferenceError: ws2 is not defined 
+// 原始值可以先包装成对象再用作值
+const stringVal = new String("val1"); 
+const ws3 = new WeakSet([stringVal]); 
+alert(ws3.has(stringVal)); // true 
+```
+
+
+
+
+
+### WeakSet的add,has,delete方法
+
+WeakSet的这些方法，和Set一致，一致，一致！
+
+
 
 ## Map
+
+**Map与Object之间的区别**：
+
+1. Map的键，可以是JavaScript中的任意一个类型，Object却只能是字符串
+2. Map会严格维护键值对的插入顺序的，因此可以根据插入顺序执 行迭代操作。
+
+
 
 JavaScript 的对象（Object），本质上是键值对的集合（Hash 结构），但是传统上只能用字符串当作键。这给它的使用带来了很大的限制。
 
@@ -514,3 +560,90 @@ const map = new Map([
 // [[1,'one'], [2, 'two'], [3, 'three']]
 ```
 
+
+
+## weakMap
+
+语法：
+
+```js
+const wm = new WeakMap();
+```
+
+特点：弱映射中的**键只能是 Object 或者继承自 Object 的类型**，尝试使用非对象设置键会抛出 TypeError。**值的类型没有限制**。
+
+
+
+初始化示例：
+
+```js
+const key1 = {id: 1},
+      key2 = {id: 2},
+      key3 = {id: 3};
+// 使用嵌套数组初始化弱映射
+const wm1 = new WeakMap([ 
+ [key1, "val1"], 
+ [key2, "val2"], 
+ [key3, "val3"] 
+]); 
+alert(wm1.get(key1)); // val1 
+alert(wm1.get(key2)); // val2 
+alert(wm1.get(key3)); // val3 
+// 初始化是全有或全无的操作
+// 只要有一个键无效就会抛出错误，导致整个初始化失败
+const wm2 = new WeakMap([ 
+ [key1, "val1"], 
+ ["BADKEY", "val2"], 
+ [key3, "val3"] 
+]); 
+// TypeError: Invalid value used as WeakMap key 
+typeof wm2; 
+// ReferenceError: wm2 is not defined 
+// 原始值可以先包装成对象再用作键
+const stringKey = new String("key1"); 
+const wm3 = new WeakMap([ 
+ stringKey, "val1" 
+]); 
+alert(wm3.get(stringKey)); // "val1" 
+```
+
+
+
+### weakMap的set,get,has方法
+
+weakMap的这三个方法包括delete方法，都是和上面的Map数据类型方法一致，不能说是很像，只能说是一模一样。
+
+
+
+### weakMap浅析
+
+WeakMap 中“weak”表示弱映射的键是“弱弱地拿着”的。意思就是，这些键不属于正式的引用， 不会阻止垃圾回收。但要注意的是，弱映射中值的引用可不是“弱弱地拿着”的。只要键存在，键/值 对就会存在于映射中，并被当作对值的引用，因此就不会被当作垃圾回收。
+
+可以这样理解：弱映射，由于键，必须的Object类型，是一个引用值，当这个引用值被垃圾回收掉后，这个映射也会相继消失
+
+例如：
+
+```js
+const wm = new WeakMap(); 
+wm.set({}, "val");
+// 由于 {} 没有任何人引用，所以，代码执行完毕后，立刻就被垃圾回收了，相应的这个键/值对也消失了
+```
+
+
+
+另一个例子：
+
+```js
+const wm = new WeakMap(); 
+const container = { 
+ key: {} 
+}; 
+wm.set(container.key, "val"); 
+function removeReference() { 
+ container.key = null; 
+}
+```
+
+这一次，container 对象维护着一个对弱映射键的引用，因此这个对象键不会成为垃圾回收的目 标。不过，如果调用了 removeReference()，就会摧毁键对象的最后一个引用，垃圾回收程序就可以 把这个键/值对清理掉。
+
+>例子来自（《JavaScript高级程序设计第6章》）

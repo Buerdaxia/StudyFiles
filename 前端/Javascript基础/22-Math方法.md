@@ -63,6 +63,21 @@ console.log(Math.fround(2.5));//2.5
 
 
 
+**四舍五入公式**：
+
+```js
+Math.round(value * num) / num;
+
+// value: 被舍入的值
+// num	: 舍入位数，1位小数：10，2位小数：100，三位小数：1000 ...
+```
+
+
+
+
+
+
+
 ## random()方法
 
 Math.random()方法返回一个0~1范围内的随机数，**其中包含0但是不包含1**
@@ -105,4 +120,37 @@ let arr = ['blue', 'black', 'white', 'red'];
 let color = arr[selectFrom(0, arr.length - 1)];
 console.log(color); //就是随机一项
 ```
+
+
+
+
+
+## Math的其他方法
+
+**带有*号的是平常可能会用到的，其他用的非常少，甚至不用。**
+
+| 方法                | 说明                             |
+| ------------------- | -------------------------------- |
+| *Math.abs(x)        | 返回 x 的绝对值                  |
+| *Math.exp(x) 返回   | Math.E 的 x 次幂                 |
+| Math.expm1(x)       | 等于 Math.exp(x) - 1             |
+| *Math.log(x)        | 返回 x 的自然对数                |
+| Math.log1p(x)       | 等于 1 + Math.log(x)             |
+| *Math.pow(x, power) | 返回 x 的 power 次幂             |
+| Math.hypot(...nums) | 返回 nums 中每个数平方和的平方根 |
+| Math.clz32(x)       | 返回 32 位整数 x 的前置零的数量  |
+| Math.sign(x)        | 返回表示 x 符号的 1、0、-0 或-1  |
+| Math.trunc(x)       | 返回 x 的整数部分，删除所有小数  |
+| *Math.sqrt(x)       | 返回 x 的平方根                  |
+| Math.cbrt(x)        | 返回 x 的立方根                  |
+| Math.acos(x)        | 返回 x 的反余弦                  |
+| Math.acosh(x)       | 返回 x 的反双曲余弦              |
+| Math.asin(x)        | 返回 x 的反正弦                  |
+| Math.asinh(x)       | 返回 x 的反双曲正弦              |
+| Math.atan(x)        | 返回 x 的反正切                  |
+| Math.atanh(x)       | 返回 x 的反双曲正切              |
+| Math.atan2(y, x)    | 返回 y/x 的反正切                |
+| *Math.cos(x)        | 返回 x 的余弦                    |
+| *Math.sin(x)        | 返回 x 的正弦                    |
+| *Math.tan(x)        | 返回 x 的正切                    |
 

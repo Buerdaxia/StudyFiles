@@ -2,7 +2,7 @@
 
 ![15-ts中的泛型](../../前端图片/typescript/15-ts中的泛型.PNG)
 
-
+核心：**定义时，不明确它的类型，使用时明确类型**
 
 示例：
 
@@ -85,6 +85,8 @@ const stringArr = new ArrayOfAnything<string>(['one','two','three','four','five'
 
 ### 函数使用泛型的示例
 
+**动态类型，传递什么类型就变成什么类型的函数！**
+
 ```jsx
 // 带有函数的泛型
 
@@ -106,7 +108,10 @@ function printAnything<T>(arr: T[]) {
     console.log(arr[i]);
   }
 }
-printAnything<string>(['a', 'b', 'c']);
+// 想要什么类型传递什么类型，
+printAnything<string>(['a', 'b', 'c']); // string类型
+
+printAnything<number>([1, 2, 3]);// number类型
 ```
 
 
@@ -121,6 +126,13 @@ printAnything<string>(['a', 'b', 'c']);
 class User<T, K> {
   XXXX
 }
+
+function sub<T, U>(a: T, b: U):Array<T, U> {
+  let arr: Array<T | U> = [a, b]
+	return arr;
+}
+
+sub<number, boolean>(1, false);
 ```
 
 
@@ -203,8 +215,33 @@ export class Attributes<T>{
 		age: 01,
 		id: 1
 	}
-	那么K就只能是 name类型，或者age类型，id类型
+	那么K就只能是 name类型，或者age类型，id类型 联合类型name | age | id
 	T[K]对应的就是string，number，number
 */
+```
+
+
+
+例子2：（来自小满）
+
+示例：
+
+```tsx
+// keyof关键字
+
+/**
+ * 1.就是keyof 把T的所有键，全部分割出来，拼接成一个联合类型
+ * a | b | c
+ * 2.利用extends关键字约束K，只能是联合类型
+ */
+function prop<T, K extends keyof T>(obj: T, key: K) {
+  return obj[key];
+}
+
+let o = { a: 1, b: 2, c: 3};
+
+prop(o, 'a');
+
+prop(0, 'd'); //这样写就会报错，d属于联合类型 a | b | c
 ```
 

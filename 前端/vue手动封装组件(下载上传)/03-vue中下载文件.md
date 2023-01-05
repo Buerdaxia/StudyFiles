@@ -259,3 +259,50 @@ Blob部分作者及链接如下
 链接：https://www.jianshu.com/p/b322c2d5d778
 来源：简书
 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+
+
+
+
+# 后端返回url
+
+如果后端返回的是url，那么也可以用两种方式进行下载：
+
+## 1.还是用原生a标签
+
+这个我们就不需要自己手动转换url了，直接用后端返回的url就可以。
+
+示例：
+
+```js
+const link = document.createElement('a'); // 创建一个a标签
+link.style.display = 'none'; // 隐藏a标签
+link.target = '_blank';
+link.href = res.data.url; // res.data.url是后端返回的url
+link.setAttribute('download', res.data.name); // 文件名
+document.body.append(link); // 添加到body
+link.click(); // 出发点击事件
+document.body.removeChild(link); // 移除a标签
+```
+
+**注意:** 1.要添加dwonload属性，2.后端返回的url直接利用a标签来下载会有同源协议的问题，有时候开发环境可能油问题，但是生产环境没问题
+
+
+
+## 2.利用window.open()方法
+
+window.open(url)原来是用来打开一个新的页面，如果url是一个文件地址(文件url)，就会开始下载文件。
+
+注意：**pdf文件，打开是一个预览文件的效果，需要自己点保存**
+
+
+
+示例：
+
+```js
+// 灰常简单奥，直接一个方法
+window.open(res.data.url);
+// 有时候下载可能会先打开一下再进行下载，我们可以设置第二个参数
+window.open(res.data.url, '_self'); // 这个就是a标签的target属性值作用也是一样的
+```
+

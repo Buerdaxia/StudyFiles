@@ -45,6 +45,15 @@ components: {组件名}//局部注册组件名没有引号
 
 2）全局注册：在main.js中Vue.component('组件名','组件')
 
+```js
+...
+import Vue from 'vue';
+import 组件 from '@...';
+Vue.component('组件名','组件');
+```
+
+之后全局都可以使用辣！
+
 ### 三、编写组件标签：
 
 <组件名></组件名>
@@ -267,7 +276,58 @@ this.$off();
 
 获取：**this.$refs.xxx 获取到的是标签或者组件实例对象**
 
-### 配置项emits
+#### 自定义事件中的$event
+
+$event在原生事件中时，我们都是用来获取当前节点元素的，但是在自定义事件中，它的作用比较特殊。
+
+作用：**如果想要接受组件传递过来的值，同时，父组件本身也想要传递参数，这个时候就需要用到$event**
+
+子组件传值：
+
+```js
+export default {
+  methods: {
+    customEvent() {
+      this.$emit(custom-event, value)
+    }
+  }
+}
+```
+
+
+
+父组件定义事件
+
+```vue
+<template>
+	<div>
+    <my-item v-for="(item, index) in list" @custom-event="customEvent(index, $event)"></my-item>
+    <!--我们自己要传递index，同时还想要子组件的传递的内容 -->
+  </div>
+</template>
+
+<script>
+	export default {
+    methods: {
+      customEvent(index, e) {
+        console.log(index,e);
+        // index是本身自己传递的值
+        // e是子组件传递过来的值
+      }
+    }
+  }
+</script>
+```
+
+
+
+
+
+
+
+
+
+### 配置项emits（接收事件）
 
 emits和props配置项功能几乎差不多，不过emits接收的是函数。
 
@@ -337,7 +397,7 @@ methods或者其他事件中触发：
 
 `props:{name: String}`
 
-多种类型：`props:{name: [String,Number]}`
+**多种类型：`props:{name: [String,Number]}`**
 
 第三种方式（限制类型、限制必要性、限制默认值、自定义验证器）：
 
@@ -513,6 +573,87 @@ props中可以限制的类型：
 首先，props也是可以传递函数的，但是这样会导致子组件依赖于父组件，一旦父组件没有传递`props`那么直接就会报错。
 
 但是通过自定义事件`emits与on`就不会有这个问题，即使父组件没有传递，也不会报错。
+
+
+
+### 同步更新父子组件内容`.sync`很重要
+
+子组件来更新父组件的data值时，我们都会使用on、emit方式来让子组件触发父组件的方法来修改父组件的值。
+
+**这个方法可以帮助我们简化很多代码，所以说还是很重要的**
+
+示例：
+
+父组件:
+
+```vue
+<template>
+	<!--注意必须要用update事件，才能进行简写-->
+	<children @update:title="vale => title = val"
+</template>
+
+<script>
+	export default {
+		data() {
+      return {
+        title: '我是title'
+      }
+    }
+  }
+</script>
+```
+
+子组件：
+
+```vue
+<script>
+	export default {
+    methods: {
+			fn() {
+        this.$emit('update:title', newTitle)
+      }
+    }
+  }
+</script>
+```
+
+**上面这种写法，就是一种普通的on绑定事件，emit来触发事件，上面这种写法可以用.sync来进行简写**
+
+`.sync`简写父组件
+
+```vue
+<template>
+	<!--注意必须要用update事件，才能进行简写-->
+	<children :title.sync="title"></children>
+</template>
+
+<script>
+	export default {
+		data() {
+      return {
+        title: '我是title'
+      }
+    }
+  }
+</script>
+```
+
+子组件写法不变，emit必须时**update:改变属性**
+
+```vue
+<script>
+	export default {
+    methods: {
+			fn() {
+        // 注意这里必须要这样写update后面的值，就是父组件要改变的那个值
+        this.$emit('update:title', newTitle)
+      }
+    }
+  }
+</script>
+```
+
+
 
 
 
@@ -868,12 +1009,12 @@ this.$nextTick(_ => {
 （1）默认插槽
 
 ```vue
-父组件中：
+使用组件时：
 	<Category>
 		<div>html结构</div>
 	</Category>
 
-子组件：
+定义组件时：
 	<template>
 		//定义插槽 上面的div结构会填到slot中
 		<slot>插槽默认内容</slot>
@@ -883,7 +1024,7 @@ this.$nextTick(_ => {
 （2）具名插槽：
 
 ```vue
-父组件：
+使用组件时
 	<Category>
     <!--注意这里还能简写v-solt可以简写为#  -->
 		<template v-slot:header>
@@ -897,14 +1038,16 @@ this.$nextTick(_ => {
 		</template>
 	</Category>
 	
-子组件：
+定义组件时：
 	<template>
 		//定义插槽加上name属性 上面的div结构会根据名称填到slot中
 		
-		<slot name="header">插槽默1认内容</slot>
+		<slot name="header">插槽默1认内容</slot> <!--注意这的默认内容，如果没有传递插槽，就会使用默认的内容-->
 		<slot name="footer">插槽2默认内容</slot>		
 	</template>
 ```
+
+注意点：**注意使用具名插槽时，在使用时，是写在template标签上的**
 
 
 
@@ -914,7 +1057,7 @@ this.$nextTick(_ => {
 
 2)具体编码：
 
-```javascript
+```vue
 父组件：
     <Category title="游戏">
       <template scope="at">

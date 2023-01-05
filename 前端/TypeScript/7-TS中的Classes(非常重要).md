@@ -23,13 +23,91 @@ vehicle.honk();
 
 
 
+## TS中定义一个简单的类
+
+ts中的类还是和js中有不小的区别的：
+
+示例：
+
+```tsx
+class Person {
+  name: String // TS类需要在这里声明一下参数类型
+  age: number
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+}
+
+
+new Person('qec', 18)
+```
+
+
+
+### TS定义类时的一个小问题
+
+就是，你在类中声明一个变量类型时，一定要使用，如果不用就会报错：
+
+示例：
+
+```tsx
+class Person {
+  name: String // TS类需要在这里声明一下参数类型
+  age: number
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    // 像这样，虽然上面定义了age，但是构造函数中没有用，就会报错。
+  }
+}
+
+
+new Person('qec', 18)
+```
+
+注意：检查时可能没有标出来错误，但是允许绝对会报错
+
+
+
+解决方式：
+
+解决方式也很简单，那就赋值呗，要么给一个初始值，要么就在constructor中赋值一下
+
+示例：
+
+```tsx
+class Person {
+  name: String // TS类需要在这里声明一下参数类型
+  age: number = 0 // 解决方式一：赋初始值
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    // 像这样，虽然上面定义了age，但是构造函数中没有用，就会报错。
+    
+    // 解决方式2：赋值
+    this.age = age;
+  }
+}
+
+
+new Person('qec', 18)
+```
+
+
+
+
+
+
+
 ## TS与JS中的区别
 
 `TS`的类中有三类关键字：
 
 注意：**这三个关键字不仅可以用于方法，也可以用在属性身上**
 
-1. `public`：(默认情况)这个方法任何时间任何地点都能被调用
+1. `public`：(**默认情况不写就是public**)这个方法任何时间任何地点都能被调用
 2. `private`：私有的，该方法只允许自己身上的方法去调用它（**也就是只能在自己的类中调用**）
 3. `protected`：被保护的，该方法只能被自己的类和自己的子类**中**调用
 
@@ -163,9 +241,7 @@ car.startDrivingProcess();
 
 
 
-
-
-## 抽象类（！！！）
+# 抽象类（！！！）
 
 关键字：`abstract`
 
@@ -179,7 +255,49 @@ car.startDrivingProcess();
 2. 抽象类只能用作父类(超类)，只能别人`extents`它，我们只想让别的类使用它的方法
 3. 可以包含一些方法
 4. 抽象类中，我们可以实现一些暂时还没有存在的方法（唯一的要求：**我们必须写出这些方法的名称和类型**）
-5. 继承抽象类的子类，必须保证实现这些方法（第4点的方法）
+5. 继承抽象类的子类（也叫**派生类**），必须保证实现这些方法（第4点的方法）
+
+注意：**派生类虽然继承了父类，但是父类身上的方法，需要自己实现（注意这条限制是，被abstract修饰过的方法和属性，普通的方法属性和普通的继承一样，都可以用）**
+
+示例：
+
+```tsx
+abstract class Father {
+  name: string
+  constructor (name: string) {
+    this.name = name
+  }
+// 这里只需要方法声明
+  abstract getName(): string
+	
+  // 普通的方法，public默认
+  setName(name:string):void {
+    this.name = name
+  }
+}
+
+
+class B extends Father {
+  constructor() {
+    super('qec')
+  }
+
+  // 派生类实现父类的方法
+  getName(): string {
+    return this.name
+  }
+}
+
+// new Father() // 无法实例抽象类
+  
+let b =  new B()
+b.setName('钱不二') // 普通的方法和属性（public修饰的）都继承过来了
+console.log(b.getName())
+```
+
+
+
+
 
 
 
@@ -417,3 +535,145 @@ console.log(charactersCollection.data);
 interface：怎么说呢，类之间的耦合性就很低，欸你知道吧，即使没有interface都是能工作的，
 
 abstract class呢：就耦合性较高，它与子类的耦合性很高，
+
+
+
+
+
+# 静态类
+
+静态类，指一个类中的一些属性用了static关键字来修饰，如果要访问是通过类名来进行访问的，这一点和**JS中的ES6中的static一模一样**
+
+核心：static关键字修饰的方法和属性，它们是放在当前**类**上的，而constructor中的都是放在**类的实例**身上，所以它们之间的属性和方法，是互相访问不到的
+
+
+
+示例：
+
+```tsx
+class Person {
+  public name: String // TS类需要在这里声明一下参数类型
+  private age: number
+  protected sub: boolean
+  public smile(): string
+  static qec: string // 一个静态属性
+
+  constructor(name: string, age: number, sub:boolean) {
+    this.name = name;
+    this.age = age;
+    this.sub = sub
+  }
+  public smile() {
+    return '笑'
+  }
+
+  static run () {
+    this.qec
+    this.name // 这里是无法访问name的，应为name是在实例身上
+    return '跑';
+  }
+
+  static eat() {
+    this.run() // 静态方法可以互相访问，因为都放在Person类上
+
+    this.smile() //访问不到实例方法
+    return '吃'
+  }
+}
+
+
+class Man extends Person {
+  constructor() {
+    super('qec', 22, false);
+    this.sub// protected子类和自己中可以使用
+  }
+}
+
+let p = new Person('qec', 18, true);
+
+Person.qec // 获取静态属性
+Person.run() //调用静态方法
+```
+
+
+
+# 类和interface结合起来
+
+类和interface结合起来使用，需要用一个关键字`implements`，来让interface来约束类
+
+
+
+示例：
+
+```tsx
+interface A {
+  run(type: boolean): boolean
+}
+
+interface B {
+  set(): void
+}
+
+// 利用接口约束类的内容
+class Alphabet implements A {
+  run(type: boolean): boolean {
+    return type
+  }
+}
+
+
+// 如果要多个接口,用逗号跟在后面
+class letter implements A, B {
+  run(type: boolean): boolean {
+    return type;
+  }
+
+  set(): void {
+    console.log('我是set函数')
+  }
+}
+
+```
+
+
+
+## 继承和interface一起使用
+
+继承和接口约束可以一起使用，把extends关键在放在implements关键字前面：
+
+示例：
+
+```tsx
+interface A {
+  run(type: boolean): boolean
+}
+
+interface B {
+  set(): void
+}
+
+// 利用接口约束类的内容
+class Alphabet implements A {
+  run(type: boolean): boolean {
+    return type
+  }
+  
+  smile():void {
+    console.log('笑')
+  }
+}
+
+
+// 继承
+class letter extends Alphabet implements A, B {
+  run(type: boolean): boolean {
+    return type;
+  }
+
+  set(): void {
+    console.log('我是set函数')
+  }
+}
+
+```
+

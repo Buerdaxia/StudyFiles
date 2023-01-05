@@ -23,9 +23,20 @@ new Promise(resolve => resolve('foo'));
 
 如果参数是 Promise 实例，那么`Promise.resolve`将不做任何修改、原封不动地返回这个实例
 
-2. **参数是一个`thenable`对象**
+```js
+// 是一个幂等方法，无论调用多少次都是一样的值
+let p = Promise.resolve(7); 
+setTimeout(console.log, 0, p === Promise.resolve(p)); 
+// true 
+setTimeout(console.log, 0, p === Promise.resolve(Promise.resolve(p))); 
+// true 
+```
 
-`thenable`对象指的是具有`then`方法的对象，比如下面这个对象。
+
+
+2. **参数是一个`Thenable`对象**
+
+`Thenable`对象指的是具有`then`方法的对象，比如下面这个对象。
 
 ```js
 let thenable = {
@@ -33,6 +44,11 @@ let thenable = {
     resolve(42);
   }
 };
+
+// 例如这个，有then接口的类
+class MyThenable { 
+ then() {} 
+} 
 ```
 
 Promise.resolve()会将这个对象转换为Promise对象，然后立即执行`thenable`对象的`then`方法。
@@ -66,7 +82,7 @@ let p2 = Promise.resolve(521);
 
 4. **不带有任何参数**
 
-`Promise.resolve()`方法允许调用时不带参数，直接返回一个`resolved`状态的 Promise 对象。
+`Promise.resolve()`方法允许调用时不带参数，直接返回一个`resolved`状态的 Promise 对象，值为`undefined`。
 
 所以，如果希望得到一个 Promise 对象，比较方便的方法就是直接调用`Promise.resolve()`方法。
 
@@ -127,6 +143,13 @@ Promise.reject('出错了')
 // true
 ```
 
+注意：`Promise.reject()`方法没有照搬`Promise.resolve()`的幂等逻辑，如果给他传递一个期约对象，则这个期约则会成为返回的拒绝期约的理由：
+
+```js
+setTimeout(console.log, 0, Promise.reject(Promise.resolve())); 
+// Promise <rejected>: Promise <resolved> 
+```
+
 
 
 ## 3 Promise.all 方法
@@ -152,7 +175,7 @@ Promise.all([p1, p2, p3]).then(res=> {
 
 
 
-（2）只要`p1`、`p2`、`p3`之中有一个被`rejected`，`p`的状态就变成`rejected`，此时第一个被`reject`的实例的返回值，会传递给`p`的回调函数。
+（2）只要`p1`、`p2`、`p3`之中有一个被`rejected`，`p`的状态就变成`rejected`，此时第一个被`reject`的实例的返回值，会传递给`p`的回调函数，之后再被`rejected`的不会影响当前返回结果
 
 代码举例：(nodejs)**读取文件并写入**
 
@@ -194,6 +217,30 @@ Promise.all([p1, p2, p3])
 
 
 
+>传如数据的不同，也会又几种不同的方式：
+
+示例：
+
+```js
+let p1 = Promise.all([ 
+ Promise.resolve(), 
+ Promise.resolve() 
+]); 
+// 可迭代对象中的元素会通过 Promise.resolve()转换为期约
+let p2 = Promise.all([3, 4]); 
+// 空的可迭代对象等价于 Promise.resolve() 
+let p3 = Promise.all([]); 
+// 无效的语法
+let p4 = Promise.all(); 
+// TypeError: cannot read Symbol.iterator of undefined 
+```
+
+
+
+
+
+
+
 ## 4 Promise.race 方法
 
 Promise.race(promises);
@@ -204,7 +251,7 @@ Promise.race(promises);
 const p = Promise.race([p1, p2, p3]);
 ```
 
-说明：上面代码中，只要`p1`、`p2`、`p3`之中有一个实例率先改变状态，`p`的状态就跟着改变。那个率先改变的 Promise 实例的返回值，就传递给`p`的回调函数。
+说明：上面代码中，只要`p1`、`p2`、`p3`之中有一个实例率先改变状态，`p`的状态就跟着改变。那个率先改变的 Promise 实例的返回值，就传递给`p`的回调函数，后续的状态变更，也不会影响当前结果。
 
 例子：
 
@@ -223,6 +270,36 @@ p
 // 如果fetch在5s之内还没有结果(成功或者失败),那么就返回的是第二个promise失败的状态
 ```
 
+
+
+示例二：
+
+```js
+// 解决先发生，超时后的拒绝被忽略
+let p1 = Promise.race([ 
+ Promise.resolve(3), 
+ new Promise((resolve, reject) => setTimeout(reject, 1000)) 
+]); 
+setTimeout(console.log, 0, p1); // Promise <resolved>: 3 
+// 拒绝先发生，超时后的解决被忽略
+let p2 = Promise.race([ 
+ Promise.reject(4), 
+ new Promise((resolve, reject) => setTimeout(resolve, 1000)) 
+]); 
+setTimeout(console.log, 0, p2); // Promise <rejected>: 4 
+// 迭代顺序决定了落定顺序
+let p3 = Promise.race([ 
+ Promise.resolve(5), 
+ Promise.resolve(6), 
+ Promise.resolve(7) 
+]); 
+setTimeout(console.log, 0, p3); // Promise <resolved>: 5 
+```
+
+
+
+
+
 race与all方法的区别：
 
 all是全部成功，则成功并且返回一个成功的值组成的数组，否则失败
@@ -230,6 +307,30 @@ all是全部成功，则成功并且返回一个成功的值组成的数组，�
 race是谁先成功，则返回那个率先成功的值
 
 相同点：**都是传递一个由`Promise`对象组成的数组**
+
+
+
+>和`Promise.all()`方法一样，传如数据不同结果也不一样
+
+示例：
+
+```js
+let p1 = Promise.race([ 
+ Promise.resolve(), 
+ Promise.resolve() 
+]); 
+// 可迭代对象中的元素会通过 Promise.resolve()转换为期约
+let p2 = Promise.race([3, 4]); 
+// 空的可迭代对象等价于 new Promise(() => {}) 
+let p3 = Promise.race([]); 
+// 无效的语法
+let p4 = Promise.race(); 
+// TypeError: cannot read Symbol.iterator of undefined 
+```
+
+
+
+
 
 ## 5 Promise.any()方法
 

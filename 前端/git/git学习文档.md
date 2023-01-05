@@ -188,7 +188,7 @@ git diff 文件名:可以看到文件变动的内容
 
 
 
-### 版本回退
+### 版本回退（回退到指定commit）
 
 
 
@@ -238,6 +238,74 @@ git checkout -- 文件名: 这个操作会让该文件回到最近一个git comm
 
 gitreset HEAD <file>: 可以把暂存区的修改撤销掉。
 ```
+
+
+
+`git reset`的基本语法：
+
+```
+git reset [--soft | --mixed | --hard] [HEAD]
+```
+
+`--mixed`:为默认，可以不用带该参数，用于重置暂存区的文件与上一次的提交(commit)保持一致，工作区文件内容保持不变。
+
+```
+git reset  [HEAD] 
+```
+
+示例：
+
+```
+git reset HEAD^            # 回退所有内容到上一个版本  
+git reset HEAD^ hello.php  # 回退 hello.php 文件的版本到上一个版本  
+git  reset  052e           # 回退到指定版本
+```
+
+
+
+**--soft** 参数用于回退到某个版本：
+
+```
+git reset --soft HEAD
+```
+
+示例：
+
+```
+git reset --soft HEAD~3   # 回退上上上一个版本 
+```
+
+
+
+**--hard** 参数撤销工作区中所有未提交的修改内容，将暂存区与工作区都回到上一次版本，并删除之前的所有信息提交：
+
+```
+git reset --hard HEAD
+```
+
+示例：
+
+```
+git reset --hard HEAD~3  # 回退上上上一个版本  
+git reset –hard bae128  # 回退到某个版本回退点之前的所有信息。 
+git reset --hard origin/master    # 将本地的状态回退到和远程的一样 
+```
+
+**注意：谨慎使用 `–-hard` 参数，它会删除回退点之前的所有信息。**
+
+
+
+HEAD说明：
+
+* HEAD表示当前版本
+* HEAD^表示上个版本
+* HEAD^^上上个版本
+* 以此类推...
+
+HEAD也可以用~数字表示
+
+* HEAD~0	表示当前版本
+* HEAD~1    表示上个版本
 
 
 
@@ -360,6 +428,24 @@ git reset --hard
 
 // 更新代码
 git pull
+```
+
+
+
+### 拉取代码只有master分支问题
+
+使用`git clone xxx`时，如果发现只拉取下来了master，这是正常的，通俗的来讲其他远端分支都被隐藏掉了，使用`git branch -a`可以看到，红色的都是远程分支。
+
+如果要让本地和远端联系起来使用：
+
+```
+git checkout -t origin/分支名
+```
+
+例如：要拉去远端的dev隐藏分支
+
+```
+git checkout -t origin/dev
 ```
 
 

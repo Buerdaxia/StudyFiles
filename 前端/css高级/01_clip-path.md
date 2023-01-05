@@ -28,9 +28,16 @@ clip-path: ellipse(50px 60px at 0 10% 20%);
 clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
 ```
 
+注意：该属性也比较新建议加上-webkit-
+
+```css
+-webkit-clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+```
 
 
-例如切一个三角形：
+
+## 例如切一个三角形：
 
 ```css
 div {

@@ -38,7 +38,7 @@ innerText是获取一个标签内文本内容，不包括标签，如果是单�
 
 使用模型来表示对象之间的关系，这样方便我们获取对象
 
-![模型](C:\Users\10854\Desktop\前端图片\js\模型.png)
+![模型](../../前端图片/js/模型.png)
 
 ### 节点 node
 
@@ -48,11 +48,13 @@ innerText是获取一个标签内文本内容，不包括标签，如果是单�
 
 虽然都是节点，但是实际上他们的具体类型不同。
 
-例如：标签可以成为元素节点，属性为属性节点、文本时文本节点、文档为文档节点，节点类型的不同使用方法也不同。
+例如：标签可以成为元素节点，属性为属性节点、文本时文本节点、文档为文档节点，节点类型的不同使用方法也不同。![节点](../../前端图片/js/节点.png)
 
-![节点](C:\Users\10854\Desktop\前端图片\js\节点.png)
+节点属性：
 
-节点属性：![节点属性](C:\Users\10854\Desktop\前端图片\js\节点属性.png)
+**我们可以使用节点身上的nodeType属性，来判断它到底是哪一种类型的节点**
+
+![节点属性](../../前端图片/js/节点属性.png)
 
 ### 事件
 
@@ -241,11 +243,32 @@ W3C综合了两个公司的方案，将事件传播分成了三个阶段
 3. 删除节点：**element.removeChild（要删子节点）** *element 是父节点名称*
 4. 查找节点：**document.getElementById（）、document.getElementsByClassName（）、document.querySelector（）、document.querySelectorAll（）**
 
-## 获取节点属性
+## 操作节点属性
+
+与属性相关的 DOM 方法 主要有 3 个：getAttribute()、setAttribute()和 removeAttribute()。
 
 获取：element.getAttribute("属性名");
 
+返回值：`string/null`
+
 修改：element.setAttribute("属性名","属性值");
+
+移除：element.removeAttribute("属性名");
+
+示例：
+
+```js
+let div = document.getElementById("myDiv"); 
+alert(div.getAttribute("id")); // "myDiv" 
+alert(div.getAttribute("class")); // "bd" 
+alert(div.getAttribute("title")); // "Body text" 
+alert(div.getAttribute("lang")); // "en" 
+alert(div.getAttribute("dir")); // "ltr" 
+```
+
+>注意：属性名不区分大小写，因此"ID"和"id"被认为是同一个属性（但是我建议都写小写）
+
+
 
 
 
@@ -257,9 +280,18 @@ W3C综合了两个公司的方案，将事件传播分成了三个阶段
 
 ### 用于创建一个元素节点，会根据tagName创建元素节点对象
 
-document.createElement（tagName
+document.createElement（tagName）
 
 tagName:是一个字符串(例如"div")
+
+示例：
+
+```js
+let div = document.createElement("div");
+
+// 然后把它添加到文档树中
+document.body.appendChild(div);
+```
 
 
 
@@ -268,6 +300,25 @@ tagName:是一个字符串(例如"div")
 document.createTextNode(name);
 
 name:是一个文本字符串(例如："广州")
+
+
+
+示例：
+
+```js
+let element = document.createElement("div"); 
+element.className = "message"; 
+let textNode = document.createTextNode("Hello world!"); 
+element.appendChild(textNode); 
+document.body.appendChild(element);
+// 创建了一div元素节点，和一个textNode文本节点，然后将文本节点添加进div节点中
+```
+
+
+
+
+
+
 
 ## 获取节点
 
@@ -289,15 +340,57 @@ name:是一个文本字符串(例如："广州")
 
 document.getElementById（）
 
+> 注意：如果页面中存在多个具有相同 ID 的元素，则 getElementById()返回在文档中出现的第一个元素。
+
+示例：
+
+```html
+<div id="id1">
+ 123
+</div>
+<script>
+	let div1 = document.getElementById('id1');
+</script>
+```
+
+
+
+
+
 #### 2 通过标签名获取一组元素节点对象（一组类数组）
 
 document.getElementsByTagName()
 
 当标签只有一个时可以且只想要一个document.getElementsByTagName()[0]
 
+
+
+>注意：对于 document.getElementsByTagName()方法，虽然规范要求区分标签的大小 写，但为了最大限度兼容原有 HTML 页面，实际上是不区分大小写的。如果是在 XML 页 面（如 XHTML）中使用，那么 document.getElementsByTagName()就是区分大小 写的。
+
+
+
+
+
+
+
 #### 3 通过name属性获取一组元素属性（一组类数组）
 
 document.getElementsByName()
+
+
+
+示例：
+
+```html
+<img src="myimage.gif" name="myImage"> 
+<script>
+let myImage = document.getElementsByTagName('myImage')
+</script>
+```
+
+
+
+
 
 #### 4 通过类获取一组元素属性（一组类数组）
 
@@ -315,23 +408,25 @@ getelementsByTagName()
 
 #### 1属性，获取当前节点的所有子节点
 
-当前节点.childNodes 此属性会获取包括文本节点在内的所有节点，甚至标签之间的空白都会当作节点。
+语法：当前节点.childNodes 
+
+此属性会获取包括文本节点在内的所有节点，甚至标签之间的空白都会当作节点。
 
 注意：在ie8及以下的浏览器中，不会将空白文本当成子节点
 
-#### 1属性，获取当前节点所有的元素子节点
+#### 2属性，获取当前节点所有的元素子节点
 
 当前节点.children 此属性只会获取元素节点（所有子元素）
 
-#### 2属性，获取当前节点的第一个子节点
+#### 3属性，获取当前节点的第一个子节点
 
 当前节点.firstChild 此属性也会把空白的文本节点获取
 
-#### 2属性，获取当前节点的第一个元素子节点
+#### 4属性，获取当前节点的第一个元素子节点
 
 当前节点.firstElementChild 只会获取元素标签
 
-#### 属性，获取当前节点的最后一个子节点
+#### 5属性，获取当前节点的最后一个子节点
 
 当前节点.lastChild 此属性也也会把空白的文本节点获取
 
@@ -345,15 +440,15 @@ getelementsByTagName()
 
 当前节点.previousSibling 此属性也会获取到**空白文本节点**
 
-#### 1属性，获取当前节点的前一个兄弟元素节点
+#### 2属性，获取当前节点的前一个兄弟元素节点
 
 当前节点.previousElementSibling 缺陷ie8及一下浏览器不支持
 
-#### 2属性，表示当前节点的后一个兄弟节点
+#### 3属性，表示当前节点的后一个兄弟节点
 
 当前节点.nextSibling 此属性也会获取**空白文本节点**
 
-#### 2属性，表示当前节点的后一个兄弟元素节点
+#### 4属性，表示当前节点的后一个兄弟元素节点
 
 当前节点.nextElementSibling 缺陷ie8及一下浏览器不支持
 
@@ -364,6 +459,16 @@ getelementsByTagName()
 父节点.appendChild(子节点)
 
 注意：必须得到父节点
+
+
+
+一些小知识点：
+
+**即使 DOM 树通过各种关系指针维系，一个节点也不会在文档中同时出现在两个或更多个地方。**
+
+所以：如果已经存在的节点，通过调用appendChild()方法只会将节点转移，而不会重新创建
+
+
 
 ### 在指定的子节点前插入新的子节点
 
@@ -377,7 +482,22 @@ getelementsByTagName()
 
 父节点.replaceChild(新子节点, 旧子节点);
 
-注意：必须先得到父节点
+示例：
+
+```js
+// 替换第一个子节点
+let returnedNode = someNode.replaceChild(newNode, someNode.firstChild); 
+// 替换最后一个子节点
+returnedNode = someNode.replaceChild(newNode, someNode.lastChild);
+
+// 返回的是被替换的节点
+```
+
+
+
+小知识：**要替换的节点会被返回并从文档 树中完全移除，要插入的节点会取而代之。**
+
+
 
 ## 删除子节点
 
@@ -395,19 +515,105 @@ getelementsByTagName()
 
 注意：需要得到父节点
 
+示例：
+
+```js
+// 删除第一个子节点
+let formerFirstChild = someNode.removeChild(someNode.firstChild); 
+// 删除最后一个子节点
+let formerLastChild = someNode.removeChild(someNode.lastChild); 
+
+// 返回的是被删除的节点
+```
+
+
+
+
+
+# document全局文档对象
+
+document全局文档对象中，放着很多可能会用到的一些属性
+
+## 获取URL
+
+document有一个URL属性，可以获取地址栏中的URL
+
+示例：
+
+```js
+// 取得完整的 URL 
+let url = document.URL; 
+```
+
+
+
+## 获取域名
+
+示例：
+
+```js
+// 取得域名
+let domain = document.domain; 
+```
+
+在很老的版本中，还在使用<iframe>标签的时候。
+
+当页面中包含来自某个不同子域的窗格（）或内嵌窗格（<iframe>）时，设置
+document.domain 是有用的
+
+因为跨源通信存在安全隐患，所以不同子域的页面间无法通过 JavaScript 通信。此时，在每个页面上把 document.domain 设置为相同的值，这些页面就可以访问对方的 JavaScript 对象了。比如，一个加载自` www.wrox.com `的页面中包含一个内嵌窗格，其中的页面加载自 p2p.wrox.com。这两个页面的 document.domain 包含不同的字符串，内部和外部页面相互之间不能 访问对方的 JavaScript 对象。如果每个页面都把 document.domain 设置为 wrox.com，那这两个页面 之间就可以通信了。（来自JavaScript高级程序设计）
+
+
+
+> 注意：浏览器对 domain 属性还有一个限制，即这个属性一旦放松就不能再收紧。比如，把 document.domain 设置为"wrox.com"之后，就不能再将其设置回"p2p.wrox.com"，后者会导致错 误，
+
+示例：
+
+```js
+// 页面来自 p2p.wrox.com 
+document.domain = "wrox.com"; // 放松，成功
+document.domain = "p2p.wrox.com"; // 收紧，错误！
+```
+
+
+
+
+
+
+
 ## 获取body标签
 
-方式一
+全局文档对象document上专门放了一个body属性，是来指向body标签的
 
-var body = document.getElementsByTagName(“body”)[0]
 
-方式二
 
-var body = document.body;
+示例：
+
+```js
+let body = document.body; // 取得对<body>的引用
+```
+
+
+
+
 
 ## 获取html根标签
 
-var html = document.documentElement;
+获取html根标签有几种方法，第一个是 documentElement 属 性，始终指向 HTML 页面中的元素
+
+第二个：document全局文档对象的第一个子节点就是html
+
+示例：
+
+```js
+let html = document.documentElement; // 取得对<html>的引用
+alert(html === document.childNodes[0]); // true 
+alert(html === document.firstChild); // true
+```
+
+
+
+
 
 
 
@@ -481,7 +687,17 @@ element.offsetTop
 
 element.offsetParent
 
-注意：就近原则，获取最近的定位祖先元素，
+注意：就近原则，获取最近的定位祖先元素
+
+
+
+![01-offset](../../前端图片/JavaScript高级程序设计/01-offset.PNG)
+
+
+
+
+
+
 
 ## 三大家族之client(只读)
 
@@ -501,6 +717,14 @@ element.clientHeight
 
 此高度返回的值是：内容区+内边距(padding)
 
+
+
+![02-client](../../前端图片/JavaScript高级程序设计/02-client.PNG)
+
+
+
+
+
 ## 三大家族之scroll(只读)
 
 ### 读取滚动宽度：
@@ -511,6 +735,10 @@ element.scrollWidth
 
 获取滚动宽度 = 内容区 + 内边距
 
+
+
+>注意：没有滚动条出现时，元素内容的总宽度。
+
 ### 读取滚动高度：
 
 element.scrollHeight
@@ -519,13 +747,47 @@ element.scrollHeight
 
 获取滚动高度 = 内容区 + 内边距
 
+
+
+>注意：没有滚动条出现时，元素内容的总高度。
+
 ### 读取水平滚动条滚动的距离：
 
 element.scrollLeft
 
+>注意：
+>
+>内容区左侧隐藏的像素数，设置这个属性可以改变元素的滚动位置。
+
+
+
 ### 读取垂直滚动条滚动的距离
 
 element.scrollTop
+
+>注意：
+>
+>内容区顶部隐藏的像素数，设置这个属性可以改变元素的滚动位置。
+
+
+
+小栗子：如果不在顶部则滚到顶部
+
+```js
+function scrollToTop(element) { 
+ if (element.scrollTop != 0) { 
+ element.scrollTop = 0; 
+ } 
+} 
+```
+
+
+
+
+
+![03-scroll](../../前端图片/JavaScript高级程序设计/03-scroll.PNG)
+
+
 
 ### 奇妙的等式
 
@@ -544,6 +806,22 @@ Math.ceil(scrollWidth - scrollLeft)
 2:当满足scrollWidth - scrollLeft == clientWidth
 
 **说明水平滚动条滚动到底了**
+
+
+
+
+
+## 确定尺寸的方法getBoundingClientRect()
+
+浏览器在每个元素上都暴露了 getBoundingClientRect()方法，返回一个 DOMRect 对象，包含 6 个属性：left、top、right、bottom、height 和 width。
+
+这些属性给出了元素在页面中相对于**视 口**的位置。
+
+![04-getBoundingClientRect()方法](../../前端图片/JavaScript高级程序设计/04-getBoundingClientRect()方法.PNG)
+
+
+
+
 
 ## BOM (Browser Object Model)
 

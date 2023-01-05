@@ -7,6 +7,8 @@ yarn create vite
 
 // @latest表示安装最新版本
 npm init vite@latest
+
+npm create vite@latest // 创建
 ```
 
 

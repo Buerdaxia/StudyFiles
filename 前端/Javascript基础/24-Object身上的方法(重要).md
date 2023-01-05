@@ -4,7 +4,7 @@
 
 对象的属性的可枚举性和不可枚举性是由属性的**enumerable**值决定的，true为可枚举，false为不可枚举
 
-不可枚举：JS中预定义的原型属性一般是不可枚举的
+不可枚举：JS中预定义的原型属性一般是不可枚举的（还有通过Object.defineProperty()方阿飞定义属性时，如果没有指定enumerable，则也会是false的）
 
 可枚举：自己定义的属性一般可枚举
 
@@ -12,7 +12,9 @@
 
 语法：`Object.getOwnPropertyNames(参数)`
 
-该方法方法返回一个由指定对象的**所有自身属性的属性名**（**包括不可枚举属性**但不包括Symbol值作为名称的属性）**组成的数组**。
+作用：该方法方法返回一个由指定对象的**所有自身属性的属性名**（**包括不可枚举属性([[enumerable]]为false的)**但不包括Symbol值作为名称的属性）**组成的数组**。
+
+枚举顺序：先以升序枚举数值键，然后以插入顺序枚举字符串和符号键
 
 示例：
 
@@ -34,7 +36,9 @@ console.log('obj', Object.getOwnPropertyNames(obj));
 
 语法：`Object.keys(obj)`
 
-方法会返回一个由一个给定**对象的自身可枚举属性**组成的**数组**，数组中属性名的排列顺序和正常循环遍历该对象时返回的顺序一致 。
+方法会返回一个由一个给定**对象的自身可枚举属性**组成的**数组**。
+
+枚举顺序：不确定。
 
 示例：
 
@@ -178,14 +182,17 @@ console.log(arr.__proto__ === Object.getPrototypeOf(arr)); // true
 
 语法：`Object.getOwnPropertySymbols(prop)`
 
-作用：获取`prop`身上所有可枚举属性的属性名，组成一个数组并返回
+作用：获取`prop`身上所有`Symbols`属性的属性名，组成一个数组并返回。
+
+枚举顺序：先以升序枚举数值键，然后以插入顺序枚举字符串和符号键
 
 实例：
 
 ```js
 let obj = {
   [Symbol('A')]: 10,
-  [Symbol('B')]: 12
+  [Symbol('B')]: 12,
+  a: 1
 }
 console.log(Object.getOwnPropertySymbols(obj));
 // [Symbol(A), Symbol(B)]
