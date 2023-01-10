@@ -655,6 +655,371 @@ props中可以限制的类型：
 
 
 
+## 子孙组件传值
+
+
+
+### $attrs与$listeners
+
+子孙组件（父-->孙，孙-->父）的传值可以使用`$attrs`和`$listeners`
+
+`$attrs`：用于父组件隔代向孙组件传值。
+
+`$listeners`：用于孙组件隔代向父组件传值。
+
+当然，这两个也可以同时使用，达到父组件和孙组件双向传值的目的。
+
+`Vue2.4` 中，引入了`attrs` 和`listeners` ， 新增了 `inheritAttrs` 选项。
+
+    $attrs：包含了父作用域中没有被 prop 接收的所有属性（不包含class 和 style 属性）。可以通过 v-bind="$attrs" 直接将这些属性传入内部组件。
+    
+    $listeners：包含所有父组件中的 v-on 事件监听器 (不包含 .native 修饰器的) ，可以通过 v-on="$listeners" 传入内部组件。
+    
+    inheritAttrs为true：继承除props之外的所有属性；inheritAttrs为false：只继承class属性
+
+
+例如：现在有这么一个情况
+
+![05-子孙组件传值](../../前端图片/vue/05-子孙组件传值.PNG)
+
+现在有一个嵌套组件：A->B, B->C
+
+想让A给C传递数据的方式：
+
+1. Vuex，Vuex在这种多层级组件中传递数据非常好用，唯一缺点就是如果要传递的数据很少，使用起来很麻烦，其他到没什么缺点了
+2. 全局事件总线event bus，原理类似vuex，使用特别简单。bus适合碰到组件跨级兄弟组件等无明显依赖关系的消息传递，原生app开发中经常用到，但是缺点是bus破坏了代码的链式调用，大量的滥用将导致逻辑的分散，出现问题后很难定位，降低了代码可读性。
+3. 让B来做中转组件，A传给B，B再传给C，这是最容易想到的方案，但是如果嵌套的组件过多，需要传递的事件和属性较多，会导致代码繁琐，代码维护困难。
+4. 使用$attrs，和$listeners，其实这种方式和上面的3是差不多的，也是需要B来做中转的
+5. Provide/Inject来传递，问题在于该方式传递的数据不是响应式的。
+
+
+
+**实例：父组件隔代传值给孙组件**
+
+代码：
+
+**`Parent.vue`（父组件（顶层组件））**
+
+```vue
+
+<template>
+  <div class="outer">
+    <h3>父组件</h3>
+ 
+    名字：<input v-model="name">
+    年龄：<input v-model.number="age" type="number">
+    电话：<input v-model="phoneNumber">
+ 
+    <child :name="name" :age="age" :phoneNumber="phoneNumber"></child>
+  </div>
+</template>
+ 
+<script>
+import Child from "./Child";
+export default {
+  name: 'Parent',
+  components: {Child},
+  data() {
+    return {
+      name: 'Tony',
+      age: 20,
+      phoneNumber: '1234567890'
+    }
+  }
+}
+</script>
+ 
+<style scoped>
+.outer {
+  margin: 20px;
+  border: 2px solid red;
+  padding: 20px;
+}
+</style>
+
+```
+
+
+
+**`Child.vue`（子组件（中间组件））**
+
+子组件作为父组件和孙组件的传递中介，在儿子组件中给孙子组件添加v-bind="$attrs"，这样孙子组件才能接收到数据。
+
+```vue
+
+<template>
+  <div class="outer">
+    <h3>子组件</h3>
+    <div>获得顶层组件的name：{{name}}</div>
+    
+    <!--这里要用v-bind帮一下，让孙组件获得父组件传递来的参数-->
+    <grand-child v-bind="$attrs"></grand-child>
+  </div>
+</template>
+ 
+<script>
+import GrandChild from "./GrandChild";
+export default {
+  components: {GrandChild},
+  props: ['name'],
+  created() {
+    console.log('Child=> $attrs: ' + JSON.stringify(this.$attrs));
+  }
+}
+</script>
+ 
+<style scoped>
+.outer {
+  margin: 20px;
+  border: 2px solid blue;
+  padding: 20px;
+}
+</style>
+
+```
+
+
+
+**GrandChild.vue（孙组件（最底层组件））**
+
+孙组件使用props接收从父组件传递过来的数据。（也可以在created时接收数据）
+
+```vue
+
+<template>
+  <div class="outer">
+    <h3>孙组件</h3>
+    <div>顶层组件的name：{{name}}</div>
+    <div>顶层组件的age：{{age}}</div>
+    <div>顶层组件的phoneNumber：{{phoneNumber}}</div>
+  </div>
+</template>
+<script>
+export default {
+  name: "GrandChild",
+  props: {
+    name: {
+      type: String
+    },
+    age: {
+      type: Number
+    },
+    phoneNumber: {
+      type: String
+    }
+  },
+  created() {
+    // this.parentAge = this.age;  //也可以这样取值
+    console.log('GrandChild=> $attrs: ' + JSON.stringify(this.$attrs));
+  }
+ 
+}
+</script>
+ 
+<style scoped>
+.outer {
+  margin: 20px;
+  border: 2px solid green;
+  padding: 20px;
+}
+</style>
+```
+
+
+
+
+
+![06-父孙组件传值$attrs](../../前端图片/vue/06-父孙组件传值$attrs.PNG)
+
+可以看到：
+
+子组件的`$attrs`中包含了所有**除了本组件props之外**的父组件属性。
+
+孙组件无法获取到未被子组件`props`接收的属性：`name`
+
+孙组件可以获取到未被子组件props接收的属性：age，phoneNumber
+
+
+
+
+
+**$listeners**
+
+**示例：孙组件隔代传值给父组件**
+
+**`Parent.vue`（父组件（顶层组件））**
+
+```vue
+
+<template>
+  <div class="outer">
+    <h3>父组件</h3>
+    <div>myData:{{ myData }}</div>
+    <child @changeData="changeMyData"></child>
+  </div>
+</template>
+<script>
+import Child from "./Child";
+export default {
+  name: 'Parent',
+  components: {Child},
+  data() {
+    return {
+      myData: 100
+    };
+  },
+  methods: {
+    changeMyData(val) {
+      this.myData = val;
+    }
+  }
+}
+</script>
+ 
+<style scoped>
+.outer {
+  margin: 20px;
+  border: 2px solid red;
+  padding: 20px;
+}
+</style>
+
+```
+
+**`Child.vue`（子组件（中间组件））**
+
+​    子组件作为父组件和孙组件的传递中介，在儿子组件中给孙子组件添加v-on="$listeners"，这样父组件才能接收到孙组件的数据。
+
+```vue
+<template>
+  <div class="outer">
+    <h3>子组件</h3>
+    <grand-child v-on="$listeners"></grand-child>
+  </div>
+</template>
+<script>
+import GrandChild from "./GrandChild";
+export default {
+  components: {GrandChild}
+}
+</script>
+ 
+<style scoped>
+.outer {
+  margin: 20px;
+  border: 2px solid blue;
+  padding: 20px;
+}
+</style>
+```
+
+
+
+**`GrandChild.vue`（孙组件（最底层组件））**
+
+```vue
+<template>
+  <div class="outer">
+    <h3>孙组件</h3>
+    <input v-model="data1" @input="edit"/>
+  </div>
+</template>
+<script>
+export default {
+  name: "GrandChild",
+  data() {
+    return {
+      data1: 200,
+    }
+  },
+  methods: {
+    edit() {
+      // 发送事件(孙组件就能触发父组件帮给子组件的时间啦)
+      this.$emit("changeData", this.data1);
+    }
+  }
+}
+</script>
+ 
+<style scoped>
+.outer {
+  margin: 20px;
+  border: 2px solid green;
+  padding: 20px;
+}
+</style>
+
+```
+
+
+
+#### $attrs和$listeners的实际应用
+
+应用一：封装组件
+
+element-ui开发的后台项目中，大量使用到了el-table和el-pagination做分页数据展示，所以我封装一个自定义组件page-table
+
+**错误写法：**
+
+```vue
+<template>
+  <div class="page-table">
+    <div class="wrapper">
+      <el-table
+          ref="elTable"
+          :data="tableData">
+        <slot/>
+      </el-table>
+      <div style="margin-top: 16px;overflow: hidden">
+        <el-pagination
+            class="page"
+            :current-page="currentPage"
+            layout="total, prev, pager, next, jumper"
+            :total="total"
+            @current-change="handleCurrentChange"/>
+      </div>
+    </div>
+  </div>
+</template>
+
+```
+
+这样封装的副作用：**引用page-table组件的地方无法使用el-table和属性和事件。**
+
+
+
+解决方案：我们可以利用$attrs和$listeners在用到el-table的地方用v-on和v-bind绑定一下，这样使用page-table的地方可使用所有el-table的属性和事件。
+
+**正确封装：**
+
+```vue
+
+<template>
+  <div class="page-table">
+    <div class="wrapper">
+      <el-table
+          ref="elTable"
+          v-bind="$attrs"
+          v-on="$listeners"
+          :data="tableData">
+        <slot/>
+      </el-table>
+      <div style="margin-top: 16px;overflow: hidden">
+        <el-pagination
+            class="page"
+            :current-page="currentPage"
+            layout="total, prev, pager, next, jumper"
+            :total="total"
+            @current-change="handleCurrentChange"/>
+      </div>
+    </div>
+  </div>
+</template>
+
+```
+
+
+
 
 
 ## 深层次组件传递属性(Provide/Inject)
@@ -729,6 +1094,8 @@ provide中想要访问data中的属性时，需要将provide定义成一个**函
 ```
 
 注意：这里provide不是响应式的，data属性更新后，provide中传递的值也不会改变。(vue3提供的响应式API后面解决了这个问题)
+
+
 
 
 
