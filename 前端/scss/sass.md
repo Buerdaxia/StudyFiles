@@ -375,7 +375,7 @@ mixin是用代码替换掉@include的位置。
 以上代码经过编译后的css代码：
 
 ```css
-/*会用选择器，替换掉对于的标识符，这个就是extend的效果*/
+/*会用当前选择器，替换掉声明时候的选择器，这个就是extend的效果*/
 .btn--main:link, .btn--hot:link{
    text-decoration: none;
   text-transform: uppercase;
