@@ -1,6 +1,10 @@
 # vue中下载文件
 
-## 一、原生的a标签下载
+
+
+# 一：后端返回文件流
+
+## 1、原生的a标签下载
 
 格式：`<a href="" download="" >`
 
@@ -10,7 +14,7 @@ download：一般不需要，但是用于规定作为文件名来使用的文本
 
 注意: **一般这样下载文件的都是不带token等验证的下载方法,如果必须带token,可以和后端协商在href后面拼接,然后后端去接受验证**
 
-## 二、通过按钮来进行下载
+## 2、通过按钮来进行下载
 
 这种不用担心`token`验证，应为`token`验证可以在路由守卫中验证或者`axios`的拦截器。
 
@@ -30,6 +34,7 @@ async downloadBackup(row) {
   const res = await this.$http({
     url:'xxx',
     method:'post'
+    // 注意：这里也可以直接写responseType: blob 就不用下面的new Blob了可以直接转换
   })
   
   const blob = new Blob([res.data]);
@@ -50,11 +55,39 @@ async downloadBackup(row) {
 
 
 
+## 3、插件`js-file-download`（挺好用的）
+
+>安装
+
+```js
+npm install js-file-download
+```
 
 
-## Bolb对象
 
-### 创建
+>使用
+
+```js
+import fileDownload from 'js-file-download';
+// 导出
+handlerExpt() {
+  this.loading = true;
+  this.$http(`/salary/wageStaff/export?grantId=1613719933698183170`, {responseType: 'blob'}).then(({data: res}) => {
+    this.loading = false;
+    // 注意: 第一个参数是传递一个blob对象，可以自己new 也可以直接像这个一样，修改一下axios的responseType为blob直接就会返回blob对象， 第二个参数：文件名
+    fileDownload(res, '导出结果.xlsx');
+  });
+}
+
+```
+
+
+
+
+
+# Bolb对象（介绍）
+
+## 创建
 
 可以通过Blob的构造函数创建Blob对象：
 
@@ -153,10 +186,6 @@ console.log(blob2);  //输出：Blob {size: 3, type: ""}
   reader.readAsBinaryString(blob);
 }
 ```
-
-
-
-
 
 ### Bolb URL
 
@@ -264,7 +293,7 @@ Blob部分作者及链接如下
 
 
 
-# 后端返回url
+# 二：后端返回url
 
 如果后端返回的是url，那么也可以用两种方式进行下载：
 

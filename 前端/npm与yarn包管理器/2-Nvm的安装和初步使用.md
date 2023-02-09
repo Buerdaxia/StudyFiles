@@ -100,3 +100,28 @@ node版本对应npm版本：https://nodejs.org/zh-cn/download/releases/
 
 
 之后，在cmd中允许npm -v看看是否有版本号，如果有就成功了
+
+
+
+## cmd中使用nvm list说nvm不是操作命令问题
+
+
+
+**系统变量需要下面这样配置，用户变量一模一样配置一遍即可。**
+
+这个需要配置一下环境变量，
+
+通过安装包安装好`nvm`后，会在系统变量中多两个变量：`NVM_HOME`和`NVM_SYMLINK`之后需要把这两个变量加到`Path`变量后面
+
+>点击Path编辑，把下面俩跟到最后面
+
+```
+%NVM_HOME%
+%NVM_SYMLINK%
+```
+
+
+
+`Path`变量：
+
+![nvm安装npm03](../../前端图片/npm与yarn/nvm安装npm03.PNG)
