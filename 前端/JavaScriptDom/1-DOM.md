@@ -144,17 +144,33 @@ dom.addEventListener('click', callback);
 
 
 
+**removeEventListener**解绑事件，必须是同一个函数，匿名函数无效，示例如下：
+
+```js
+let btn = document.getElementById("myBtn"); 
+let handler = function() { 
+ console.log(this.id); 
+}; 
+btn.addEventListener("click", handler, false); 
+// 其他代码
+btn.removeEventListener("click", handler, false); // 有效果！
+```
+
+
+
+
+
 ##### 方法三：对象.attachEvent(参数1，参数2)
 
 **对象.attachEvent(）也是DOM2级事件**
 
-参数1：绑定事件名字符串
+参数1：绑定事件名字符串（`onclick`和addEventListerner不一样事件前面需要多加一个`on`）
 
 参数2：回调函数
 
 这个方法也可以同时绑定多个处理函数，不同的是它后绑定的先执行，和addEventListerner相反
 
-注意：只能ie使用，attachEvent中的this是window。
+注意：只能ie使用，attachEvent中的this是window（上面两个this都是当前的dom）。
 
 所以综合绑定函数bind
 
@@ -198,6 +214,24 @@ dom.addEventListener('click', callback);
 
 
 
+**detachEvent解绑函数**
+
+解绑函数必须要是解绑同一个函数，匿名函数无效：
+
+```js
+var btn = document.getElementById("myBtn"); 
+var handler = function() { 
+ console.log("Clicked"); 
+}; 
+btn.attachEvent("onclick", handler); 
+// 其他代码
+btn.detachEvent("onclick", handler); // 解绑函数
+```
+
+
+
+
+
 #### 事件的传播
 
 ie8及一下没有事件的捕获。
@@ -233,6 +267,42 @@ W3C综合了两个公司的方案，将事件传播分成了三个阶段
 5. 跟随逻辑改变
 
 事件有很多例如（**单击双击，键盘，滚轮，鼠标移入移出**等等）
+
+
+
+
+
+### 修饰符（ctrl、shift、enter、alt键）
+
+这几个键盘上的按键，在事件的`event`对象上，都有对应的属性，DOM 规定了 4 个属性来表 示这几个修饰键的状态：`shiftKey`、`ctrlKey`、`altKey` 和 `metaKey`。**这几属性会在各自对应的修饰 键被按下时包含布尔值 true，没有被按下时包含 false。**
+
+示例：
+
+```js
+let div = document.getElementById("myDiv"); 
+div.addEventListener("click", (event) => { 
+ let keys = new Array(); 
+ if (event.shiftKey) { 
+ keys.push("shift"); 
+ } 
+ if (event.ctrlKey) { 
+ keys.push("ctrl"); 
+ } 
+ if (event.altKey) { 
+ keys.push("alt"); 
+ } 
+ if (event.metaKey) { 
+ keys.push("meta"); 
+ } 
+ console.log("Keys: " + keys.join(",")); 
+}); 
+
+// 
+```
+
+
+
+兼容性：**现代浏览器支持所有这 4 个修饰键。IE8 及更早版本不支持 metaKey 属性。**
 
 
 

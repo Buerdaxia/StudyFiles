@@ -505,6 +505,44 @@ git branch -d 分支名: 删除分支
 
 解决冲突就是把Git合并失败的文件手动编辑为我们希望的内容，再提交。
 
+
+
+真实场景：有时候你想提交，但是必须要先拉一下最新的代码`git pull`一下，发现突然报`conflict`冲突了，可能在一些指定文件中出现以下的代码
+
+```
+Accept Current Change | Accept InComing Change | Accept Both Change	| Compare Changes
+<<<<<<<< HEAD (current change)
+xxxx 代码
+
+========
+xxxx 代码
+
+>>>>>>>> 分支1 (incoming change)
+```
+
+> HEAD（current change）
+
+是当前本地的代码
+
+
+
+>分支1 incoming Change
+
+是准备导入的代码
+
+
+
+然后该文件会有4个选项在`HEAD`头顶上
+
+| 选项                   | 含义                       |
+| :--------------------- | :------------------------- |
+| Accept Current Change  | 接受当前分支1的修改        |
+| Accept Incoming Change | 接受pull导入主分支的修改   |
+| Accept Both Change     | 同时接受两个分支的修改     |
+| Compare Changes        | 对比修改，主要用于手动修改 |
+
+
+
 用`git log --graph`命令可以看到分支合并图。
 
 ​	
@@ -518,6 +556,8 @@ git branch -d 分支名: 删除分支
 二、那在哪干活呢？干活都在`dev`分支上，也就是说，`dev`分支是不稳定的，到某个时候，比如1.0版本发布时，再把`dev`分支合并到`master`上，在`master`分支发布1.0版本；
 
 三、你和你的小伙伴们每个人都在`dev`分支上干活，每个人都有自己的分支，时不时地往`dev`分支上合并就可以了。
+
+
 
 
 
