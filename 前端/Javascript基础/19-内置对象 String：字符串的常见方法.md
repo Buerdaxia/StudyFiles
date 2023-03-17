@@ -483,9 +483,36 @@ for (var i = 0; i < str.length; i++) {
 
 - `(-3)` 表示从倒数第三个开始，截取到最后。
 
-- `(1, -1)` 表示从第一个截取到倒数第一个。
+- **`(1, -1)` 表示从第一个截取到倒数第一个。**(这个很好用，有时候就想把末尾的给干掉，就可以利用这个)
 
 - `(5, 2)` 表示前面的大，后面的小，返回值为空。
+
+
+
+示例：
+
+>利用slice函数格式化金钱
+
+```js
+formatMoney(money) {
+  let numStr = String(money).split('.'); // 先将金额小数整数分开
+  let numInt = numStr[0];
+  let numDec = numStr[1] > 0 ? '.' + numStr[1] : '.'; // 如果又小数就加一个小数点，没有就放一个点就行了
+
+  numDec = numDec.padEnd(3, '0'); // 判断小数点后是否有2位，没有补零
+
+  let resultInt = '';
+  while (numInt.length > 3) {
+    resultInt = ',' + numInt.slice(-3) + resultInt; // 截取后三位并且并接,
+    numInt = numInt.slice(0, -3); // 原来去除后面3位
+  }
+  return numInt + resultInt + numDec; // 拼接 小于等于3位数 + 分割好的 + 小数
+}
+```
+
+
+
+
 
 ### 2、substring()
 

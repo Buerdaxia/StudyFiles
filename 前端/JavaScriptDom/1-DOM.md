@@ -96,6 +96,59 @@ event.stopPropagation();
 
 事件委派：是利用冒泡原理体现的。
 
+示例：
+
+```html
+<ul id="myLinks"> 
+ <li id="goSomewhere">Go somewhere</li> 
+ <li id="doSomething">Do something</li> 
+ <li id="sayHi">Say hi</li> 
+</ul>
+
+<script>
+	// 传统方式，给三个li都要绑定一个事件
+  let item1 = document.getElementById("goSomewhere"); 
+  let item2 = document.getElementById("doSomething"); 
+  let item3 = document.getElementById("sayHi"); 
+  item1.addEventListener("click", (event) => { 
+   location.href = "http:// www.wrox.com"; 
+  }); 
+  item2.addEventListener("click", (event) => { 
+   document.title = "I changed the document's title"; 
+  }); 
+  item3.addEventListener("click", (event) => { 
+   console.log("hi"); 
+  });
+</script>
+
+
+<script>
+  // 利用事件委派（只在祖先上绑定事件，子元素同类型的事件会有祖先元素上来处理）
+  let list = document.getElementById("myLinks"); 
+  list.addEventListener("click", (event) => { 
+   let target = event.target; 
+   switch(target.id) { 
+   // 通过不同id来触发不同事件
+   case "doSomething": 
+   document.title = "I changed the document's title"; 
+   break; 
+   case "goSomewhere": 
+   location.href = "http:// www.wrox.com"; 
+   break; 
+   case "sayHi": 
+   console.log("hi"); 
+   break; 
+   } 
+  });
+</script>
+```
+
+
+
+
+
+
+
 #### 事件的绑定
 
 ##### 方法一：对象.事件 = function() {}
@@ -267,6 +320,62 @@ W3C综合了两个公司的方案，将事件传播分成了三个阶段
 5. 跟随逻辑改变
 
 事件有很多例如（**单击双击，键盘，滚轮，鼠标移入移出**等等）
+
+
+
+### 一些HTML5的好玩儿事件
+
+一：**contextmenu事件**
+
+简单场景，现代计算机系统或者软件，都会发现**右击鼠标**都会展示展示一个`menu`出来，而这个事件就是右击鼠标这个动作
+
+
+
+一串代码试验来by 高级程序设计
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>contextmenu</title>
+</head>
+
+<script>
+  window.addEventListener("load", (event) => {
+    let div = document.getElementById("myDiv");
+    div.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      let menu = document.getElementById("myMenu");
+      menu.style.left = event.clientX + "px";
+      menu.style.top = event.clientY + "px";
+      menu.style.visibility = "visible";
+    });
+    document.addEventListener("click", (event) => {
+      document.getElementById("myMenu").style.visibility = "hidden";
+    });
+  }); 
+</script>
+
+<body>
+
+  <div id="myDiv">Right click or Ctrl+click me to get a custom context menu.
+    Click anywhere else to get the default context menu.</div>
+  <ul id="myMenu" style="position:absolute;visibility:hidden;background-color: 
+    silver">
+    <li><a href="http://www.somewhere.com"> somewhere</a></li>
+    <li><a href="http://www.wrox.com">Wrox site</a></li>
+    <li><a href="http://www.somewhere-else.com">somewhere-else</a></li>
+  </ul>
+</body>
+
+</html>
+```
+
+>简单解释：就是开始我们自定义了一个列表是隐藏起来的，然后我们在div标签上右击鼠标，通过获取鼠标的位置，在鼠标位置上展示列表(也就是这个menu)
 
 
 

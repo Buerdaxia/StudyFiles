@@ -41,3 +41,22 @@
 
 ```
 
+
+
+## 单独设置
+
+单独在一个页面的syle中设置page即可
+
+示例：
+
+```vue
+...
+<style>
+  page {
+    background: #eee;
+  }
+</style>
+```
+
+
+

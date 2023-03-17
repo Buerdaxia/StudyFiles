@@ -479,8 +479,6 @@ git switch master: 切换到已有的master分支
 
 
 
-
-
 二、当分支的工作完成，切回master并没有被修改，然后将分支内容合并：
 
 ```
@@ -494,6 +492,22 @@ git merge 分支名: 将分支内容合并到当前分支
 ```
 git branch -d 分支名: 删除分支
 ```
+
+
+
+**上面这种普通的merge会把当前分支的所有commit一起合并到master分支中，如果也想把分支上的所有commit汇总成一个可以用以下方式进行merge**
+
+>原因：当功能开发并测试完毕，需要合并到master分支时，如果直接使用`git merge 分支名`，那么该分支下所有的提交都会`merge`到master，由此造成master分支的提交记录冗杂不清晰，特别是需要回滚的时候，就会更加凌乱了。
+
+示例：
+
+```js
+git checkout master // 切回主之
+git merge --squash 分支名称 // 合并分支
+git commit -m '汇总后的一次commit内容' // 最后就只会保留这一句commit
+```
+
+
 
 
 

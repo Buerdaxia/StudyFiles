@@ -229,10 +229,13 @@ export default {
 computed:{
     
     //这是mapState帮我们写的，从state中读取数据（对象写法） 
-  	/*sum就是计算属性，直接使用*/ ...mapState({sum:'sum',school:'school',subject:'subject'}),
-
-    // 数组写法，条件是计算属性名和state中的属性名是一致的
-   ...mapState(['sum','school','subject']),
+  	/*sum就是计算属性，直接使用*/ 
+  ...mapState({sum:'sum',school:'school',subject:'subject'}),
+	...mapState({
+    sum: (state) => state.moudulesName.list // 这个是有modules时的写法
+  })
+  // 数组写法，条件是计算属性名和state中的属性名是一致的
+  ...mapState(['sum','school','subject']),
 
 }
 ```

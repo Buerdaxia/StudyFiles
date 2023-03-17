@@ -623,30 +623,35 @@ props中可以限制的类型：
 
 ```vue
 <template>
-	<!--注意必须要用update事件，才能进行简写-->
-	<children :title.sync="title"></children>
+	<!--注意必须要用update事件，才能进行简写，后面那个是绑定对象中的值-->
+	<children :title.sync="title" :selected.sync="label.selected"></children>
 </template>
 
 <script>
 	export default {
 		data() {
       return {
-        title: '我是title'
+        title: '我是title'，
+        label: {
+        	selected: 0
+      	}
       }
     }
   }
 </script>
 ```
 
-子组件写法不变，emit必须时**update:改变属性**
+子组件写法不变，emit必须是**update:改变属性**
 
 ```vue
 <script>
 	export default {
     methods: {
-			fn() {
-        // 注意这里必须要这样写update后面的值，就是父组件要改变的那个值
-        this.$emit('update:title', newTitle)
+			fn(newVal) {
+        // 注意这里必须要这样写update后面的值，是父组件上.sync前面的那个值
+        this.$emit('update:title', newTitle);
+        
+        this.$emit('update:selected', newVal);
       }
     }
   }
