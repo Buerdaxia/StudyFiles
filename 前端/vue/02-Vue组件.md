@@ -1150,6 +1150,7 @@ element-ui开发的后台项目中，大量使用到了el-table和el-pagination�
     computed: {
       customListeners() {
         let vm = this;
+        // 用浅拷贝，将最后的含有change函数的对象拷贝进$listeners再将$listeners拷贝进一个新对象中并返回
         return Object.assign({},vm.$listeners,{
           /*
           	这里我做一下讲解：其实这里真正绑定到el-cascader的change事件，是下面这个change，我们可以在这个change事件中做各种增强

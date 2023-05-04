@@ -26,7 +26,9 @@
 ```scss
 .el-select {
 	/* width: 70% !important; */
-
+	/*
+  	:nth-child(n + 3)伪类，来控制展示
+  */
 	/deep/ .el-tag.el-tag--info:nth-child(n + 3) {
     /*
     	这个来控制展示数量
@@ -87,4 +89,6 @@ export default {
 >注意点：
 >
 >1.注意操作dom的时机，要么放到mounted生命周期里，要么丢进$nextTick函数中
+>
+>2.如果是多层次的方式(指基于element-ui二次封装)，可以在$listeners中进行扩展change函数具体扩展方式，可以看`vue组件.md`
 
