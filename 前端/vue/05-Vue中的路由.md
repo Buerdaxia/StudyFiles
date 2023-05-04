@@ -760,6 +760,53 @@ router.afterEach((to, from) => {
 // to:中有meta，path等信息，next()是执行跳转
 ```
 
+
+
+#### router.beforeEach的注意点
+
+关于全局前置路由守卫是否会重复触发的问题。
+
+在`router.beforeEach((to,from,next) => {})`中，只有`next()`函数自己单独调用时，不会再次触发beforeEach前置守卫，其他方式都会重复触发
+
+
+
+示例：
+
+```js
+router.beforeEach((to, from, next) => {
+  next(); // 直接调用 不会重复触发
+  
+  next({name: 'login'}); // 会重复调用beforeEach钩子
+  
+  router.replace(); // 也会重复调用beforeEach狗子
+  router.push(); // 也会重复调用
+})
+```
+
+
+
+所以解决方式：
+
+所以说，如果第一次再不调用`next()`情况下，无论如果都是会重复触发`beforeEach`的，所以我们退而求其次，要在到达目的地址后调用一下`next()`来防止继续的重复。
+
+
+
+示例：
+
+```js
+router.beforeEach((to, from, next) => {
+	// 前面的逻辑
+  ...
+  ...
+  // 重点 我们要加一步判断，专门调用next()的
+  if(to.name === '我们想要跳转的界面') {
+    next();
+  }
+})
+```
+
+
+
 ### 独享守卫：
 
 如果导航守卫返回false，则会阻止导航的跳转。

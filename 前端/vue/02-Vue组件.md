@@ -418,8 +418,9 @@ props: {
 			}
 		*/
     
-    
+    // 校验器返回一个布尔值，如果是false会抛出一个警告的
     validator(value) {
+      
       return value > 0 // 自定义验证器
     }
 	}
@@ -664,7 +665,7 @@ props中可以限制的类型：
 
 
 
-### $attrs与$listeners
+### $attrs与$listeners(在扩展组件时和好用）
 
 子孙组件（父-->孙，孙-->父）的传值可以使用`$attrs`和`$listeners`
 
@@ -966,6 +967,8 @@ element-ui开发的后台项目中，大量使用到了el-table和el-pagination�
 
 **错误写法：**
 
+**page-table组件：**
+
 ```vue
 <template>
   <div class="page-table">
@@ -989,11 +992,11 @@ element-ui开发的后台项目中，大量使用到了el-table和el-pagination�
 
 ```
 
-这样封装的副作用：**引用page-table组件的地方无法使用el-table和属性和事件。**
+这样封装的副作用：**引用page-table组件的地方无法使用el-table的属性和事件。**
 
 
 
-解决方案：我们可以利用$attrs和$listeners在用到el-table的地方用v-on和v-bind绑定一下，这样使用page-table的地方可使用所有el-table的属性和事件。
+解决方案：我们可以利用`$attrs`和`$listeners`在用到el-table的地方用v-on和v-bind绑定一下，这样使用`page-table`的地方可使用所有el-table自己自带的属性和事件。
 
 **正确封装：**
 
@@ -1002,6 +1005,8 @@ element-ui开发的后台项目中，大量使用到了el-table和el-pagination�
 <template>
   <div class="page-table">
     <div class="wrapper">
+      
+      <!-- 注意这里的v-bind和v-on可以直接让未定义的props和emits穿透进来 -->
       <el-table
           ref="elTable"
           v-bind="$attrs"
@@ -1022,6 +1027,159 @@ element-ui开发的后台项目中，大量使用到了el-table和el-pagination�
 </template>
 
 ```
+
+
+
+#### $attrs和$listeners应用二(简化增强方法)
+
+在对一些UI组件库进行二次封装时，传统的增强一个UI组件自身的方法，一般为下面这些步骤
+
+1. 父组件中传递相关方法
+2. 在子组件中对方法进行增强
+3. 再传递给UI组件
+
+
+
+示例：
+
+>要求：现在我们二次封装一个my-cascader组件，要求二次封装el-cascader组件，增强一下el-cascader自带的change事件(注意：默认change事件只会返回一个数组)，我们的组件要求change事件的参数返回一个用逗号拼接的字符串xxx,xxx
+
+**传统封装方式**
+
+`my-cascader`组件调用
+
+```vue
+<template>
+	<div>
+    <my-cascader @change="change"></my-cascader>
+  </div>
+</template>
+
+<script>
+	export default {
+		data() {
+      return {
+        options2: [
+          {
+            value: 1,
+            label: '选项一',
+            children: [
+              {
+                value: 'shejiyuanze',
+                label: '设计原则'
+              }
+            ]
+          }
+				]
+      }
+    },
+    methods: {
+      change(val) {
+        console.log('change事件被调用', val);
+      }
+    }
+  }
+</script>
+```
+
+
+
+`my-cascader`组件分装
+
+```vue
+<template>
+	
+	<el-cascader v-bind="$attrs" v-on="$listeners" @change="inhenceChange">
+  
+  </el-cascader>
+
+</template>
+
+<script>
+	export default {
+    data() {
+      return {
+        
+      }
+    },
+    methods: {
+      inhenceChange(value) {
+        if(value instanceof Array ) {
+          let result = value.join(',');
+          this.$emit('change', result);
+        }
+        return this.$emit('change', value);
+      }
+    }
+  }
+</script>
+```
+
+
+
+
+
+***
+
+
+
+**如果用$listeners来简化的写法**
+
+>注意：调用`my-cascader`是一致的，这里只展示一下`my-cascader`封装的不同
+
+
+
+`my-cascader`通过$listeners简化的封装
+
+```vue
+<template>
+	
+	<el-cascader v-bind="$attrs" v-on="customListeners">
+  
+  </el-cascader>
+
+</template>
+
+<script>
+	export default {
+    data() {
+      return {
+        
+      }
+    },
+    computed: {
+      customListeners() {
+        let vm = this;
+        return Object.assign({},vm.$listeners,{
+          /*
+          	这里我做一下讲解：其实这里真正绑定到el-cascader的change事件，是下面这个change，我们可以在这个change事件中做各种增强
+          */ 
+          change(value) {
+            vm.inhenceChange(value);
+          }
+        })
+      }
+    }
+    methods: {
+      inhenceChange(value) {
+        if(value instanceof Array ) {
+          let result = value.join(',');
+          this.$emit('change', result);
+        }
+        return this.$emit('change', value);
+      }
+    }
+  }
+</script>
+```
+
+
+
+
+
+
+
+
 
 
 

@@ -23,6 +23,15 @@
 
 
 
+## 原则(qec)
+
+1. mutations中只进行修改操作，不要出现逻辑行为，且不能进行异步操作
+2. actions中可以进行异步操作，将一些逻辑层面的内容全放到actions中
+3. mutations多模块时不建议有同名的mutations函数，如果要开启命名空间来进行区分
+4. getter就是当作computed属性来理解
+
+
+
 ## 关键
 
 **vuex是和界面一起有关联的，当界面一刷新就会刷新vuex中的数据**
@@ -340,6 +349,9 @@ const personOptions = {
 this.$store.state.personAbout.personList;
 //方式二：借助mapState读取：
 ...mapState('personAbout',['personList']);
+...mapState({
+  personList: state => state.personAbout.personList
+})
 ```
 
 4）开启命名空间后，组件中读取getters数据：
@@ -491,5 +503,44 @@ export default {
   }
 
 // 然后这个categoryList就可以使用啦
+```
+
+
+
+
+
+## 七：注意点（mutations如何互相调用）
+
+注意，在vuex3中一个mutations中是不能调用另一个mutations方法的。
+
+原则上来说，mutations只是用来修改state的方法，不要在里面书写逻辑操作。
+
+那么如何来做呢？
+
+我建议，**写一个actions方法（进行逻辑调用mutations）**，在actions中，可以调用mutations的方法，并且还支持异步操作，所以在actions中来顺序调用mutations方法是非常可取的。
+
+
+
+示例：
+
+```js
+export default {
+  
+  mutations: {
+    f1(){
+      ...
+    },
+    f2() {
+			...
+    }
+  },
+  actions: {
+    f3({commit}) {
+      commit('f2');
+      ...
+      commit('f1');
+    }
+  }
+}
 ```
 

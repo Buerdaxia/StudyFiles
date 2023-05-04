@@ -93,3 +93,62 @@ vue2:
 为了增强组件的通用性，请不要给组件单纯的绑定一个事件，这样会让组件丧失复用性，会降低组件的可用度。
 
 **让要触发的事件通过自定义事件传递到组件中（@xxx），组件触发事件（$emit）**，这样可以提高组件的复用性
+
+
+
+示例：
+
+**父组件**
+
+```vue
+<template>
+	<!--  这里就为子组件绑定了一个click事件， 并且这个click事件是可以随时改的 -->
+	<child v-for="(item, index) in list" :key="index" @click="go(item)"></child>
+</template>
+
+<script>
+  import child from '@/components/child.vue';
+	export default {
+    component: {
+      child
+    },
+    data() {
+      return {
+        list: []
+      }
+    },
+    methods: {
+      go(item) {
+        ...
+      }
+    }
+  }
+</script>
+```
+
+
+
+**子组件**
+
+```vue
+<template>
+	<!-- 这样直接触发绑定的事件， 更加灵活 -->
+	<div @click="$emit('click')">
+    ...
+  </div>
+</template>
+
+<script>
+	...
+</script>
+```
+
+
+
+
+
+
+
+## 第五点：细小化封装（我自己总结的）
+
+例如有一个**列表组件list**，我们最好去分装列表组件的**每一项item**，而不是去选择封装整个列表。因为我们可以通过v-for将整个列表渲染出来，并且更容易绑定事件（**结合上面第四项**）

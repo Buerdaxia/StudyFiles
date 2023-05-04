@@ -1,5 +1,6 @@
 # prettier插件配置
 
+```json
 {
 
   // 主题
@@ -214,6 +215,9 @@
 //   "window.zoomLevel": 1
 
 // } 
+```
+
+
 
 ## vue中在根目录下创建.prettierrc
 

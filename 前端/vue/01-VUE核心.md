@@ -843,6 +843,50 @@ const vm = new Vue({
 
 
 
+## 计算属性注意点(从接口请求数据)
+
+注意：如果计算的计算依赖，是从接口中请求过来的数据（第一时间：还没有这个数据）**这时，一定要先判断一下数据是否存在，再去使用**。否则就会报错
+
+示例：
+
+```vue
+<template>
+	<div>
+    ...
+  </div>
+</template>
+
+<script>
+	export default {
+    data() {
+      return {
+				list: []        
+      }
+    },
+    computed() {
+      listItem() {
+        return list.item[0]; // 注意此时list.item暂时还没有，这样写就会报错，因为undefined[0]肯定是会报错的
+        
+        // 正确写法 要用if判断一下
+        if(list.item) {
+          return list.item[0];
+        }
+      }
+    },
+    created() {
+      this._init(); // 请求数据
+    },
+    methods: {
+      _init() {
+        this.$request('....').them(res => {
+          this.list = res.data;
+        })
+      }
+    }
+  }
+</script>
+```
+
 
 
 
