@@ -17,3 +17,15 @@
 </lyl-search-col>
 ```
 
+
+
+>注意，如果用了grid的mixins，要求要GE，startTm和LE，endTm需要在dataMode里设置一下
+>
+>```js
+>dataMode: {
+>  crtTm: 'BT',
+>  startTm: 'GE',
+>  endTm: 'LE'
+>}
+>```
+

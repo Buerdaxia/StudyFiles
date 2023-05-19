@@ -1446,6 +1446,7 @@ this.$options.setTitle
 
 定义插件：
 
+```js
 对象.install = function (Vue, options) {
 
 ​	//1. 添加全局过滤器
@@ -1465,6 +1466,25 @@ this.$options.setTitle
 ​	Vue.prototype.$myMethod = function (){...}
 
 }
+```
+
+
+
+
+
+使用：
+
+```js
+import Vue from 'vue';
+import plugIn from 'xxx';
+Vue.use(plugIn);
+```
+
+
+
+
+
+
 
 ## scoped样式
 
@@ -1752,7 +1772,7 @@ export default {
 
 
 
-## 关于自定义组件的双向绑定v-model
+## 关于自定义组件的双向绑定v-model(重要)
 
 原理：
 
@@ -1768,169 +1788,146 @@ export default {
 <input type="text" :value="val" @input="input" />
 ```
 
-所以说：自定义组件绑定`v-model`时呢，也是在本质上绑定一个**变量+一个方法**，只不过这两个是固定的
+所以说：自定义组件绑定`v-model`时呢，也是在本质上绑定一个**变量+一个方法(要理解props和$emits)**，这里需要介绍一个不常用的属性`model`
 
-变量：`model-value` 子组件中修改为`modelValue`
 
-方法：`update:model-value`子组件接收时修改为`update:modelValue`
 
-比如现在有一个自定义组件`<Dialog>`
+**model属性简介：**
 
-```html
-<Dialog v-model="value"></Dialog>
+>**允许一个自定义组件在使用 v-model 时定制 prop 和 event**。默认情况下**，一个组件上的 v-model 会把 value 用作 prop 且把 input 用作 event**，但是一些输入类型比如单选框和复选框按钮可能想使用 value prop 来达到不同的目的。使用 model 选项可以回避这些情况产生的冲突。
+>
+>----本段摘自vue官网
+>
+>自己补充：所以在使用时，需要在props中声明：`value`，并且需要用`$emit`去触发`input`事，这样一个完整的v-model就基本实现了
+
+
+
+
+
+
+
+自定义组件`model`使用示例:
+
+```js
+model: {
+    prop: 'myValue', // 默认是value
+    event: 'myInput', // 默认是input
+}
 ```
 
-在上述自定义组件中使用`v-model`后，vue会帮助我们修改为以下内容
 
-```vue
-<Dialog :model-value="value" @update:model-value="value = $event"></Dialog>
-<!-- 注意这里的update:model-value是可以传递参数的-->
 
-<!--子组件通过props和emits接收属性和方法，这两个时固定的 -->
-props:['modelValue'],
-emits:['update:modelValue']
-```
+这里来简单看一下默认情况下的示例：
 
-具体的使用：(**vue2版本**)
-
-父组件：
+**子组件封装：**
 
 ```vue
 <template>
-	<Dialog v-model="value"></Dialog>
+	<!-- 讲解一下这里:value的作用，:value的作用是当在父组件修改v-model的值时，改组件也会跟着改变，真正的双向绑定 -->
+	<input type="text" :value="value" @input="changeValue" />
 </template>
+
 <script>
-	import Dialog from 'xxx',
-  export default {
-  	name: 'APP',
-    components: {
-      Dialog
-    },
+export default {
+	// 默认写法
+	// model: {
+	// 	prop: 'value', // 默认是value
+	// 	event: 'input' // 默认是input  
+	// },
+	props: {
+		value: {} // 注意这个value的props是必须要声明的，具体类型是外面的双向绑定的值的类型
+	},
+	data() {
+		return {};
+	},
+	methods: {
+		changeValue($event) {
+			this.$emit('input', $event.target.value); // 注意这里必须要触发一个input事件，并且要将改变的值传递出去**只能有一个参数**
+		}
+	}
+};
+</script>
+
+```
+
+
+
+**父组件中使用：**
+
+```vue
+<template>
+  <div style="margin: 20px;">
+    <h3>自定义组件双向绑定: {{ customModelValue }}</h3>
+
+    <custom-model v-model="customModelValue"></custom-model>
+	
+    <button @click="customModelValue += 1;">值+1</button>
+    
+  </div>
+</template>
+
+<script>
+	export default {
     data() {
       return {
-        value: '123'
+        customModelValue: ''
       }
     }
   }
 </script>
 ```
 
-子组件：
+
+
+这样简单封装：一个使用默认`model`的自定义组件就封装好了，十分简单无论是在输入框中输入还是通过点击值进行修改，绑定的`customModelValue`都会跟着改变，并且`input`框内的值也会变动。
+
+![组件v-model-01](./../../前端图片/vue核心/组件v-model-01.gif)
+
+---
+
+
+
+**使用自定义的`model`来进行封装**
+
+>具体的封装过程基本一致，就是将默认的model属性值修改一下，但是我们接受的props和$emit触发的方法也要随之改变
+
+子组件封装：
 
 ```vue
 <template>
-	<input type="text" :value="modelValue" @input="inputChange($event)"/>
+	<!-- 讲解一下这里:value的作用，:value的作用是当在父组件修改v-model的值时，改组件也会跟着改变，真正的双向绑定 -->
+	<input type="text" :value="value" @input="changeValue" />
 </template>
+
 <script>
 export default {
-  name: 'Dialog',
-  /*子组件要接收父组件绑定的v-model*/
-  props: ['modelValue'],
-  emits: ['update:modelValue'],// 绑定父组件的触发方法，格式必须写成这样
-  methods: {
-    inputChange(e) {
-      this.$emit('update:modelValue', e.target.value)
-    }
-  }
-}
+	model: {
+	 	prop: 'MyValue', // 默认是value
+	 	event: 'MyInput' // 默认是input  
+	},
+	props: {
+    // 默认写法，写value
+    //value: {}
+		MyValue: {} // 注意这里需要和model中声明的prop值一样，具体类型是外面的双向绑定的值的类型
+	},
+	data() {
+		return {};
+	},
+	methods: {
+		changeValue($event) {
+      // 默认写法，触发input
+      // this.$emit('input', $event.target.value); 
+			this.$emit('MyInput', $event.target.value); // 注意这里这里触发的事件名称是和model中一致，并且要将改变的值传递出去**只能有一个参数**
+		}
+	}
+};
 </script>
+
 ```
 
 
 
-更优秀的写法利用计算属性
 
-```vue
-<template>
-	<input v-model="modelValue" />
-</template>
-<script>
-export default {
-  name: 'Dialog',
-  props: ['modelValue'],
-  emits: ['update:modelValue'],// 绑定父组件的触发方法，格式必须写成这样
-  computed: {
-    modelValue: {
-      get() {
-        return this.modelValue
-      },
-      set(value) {
-        this.$emit('update:modelValue', value)
-      }
-    }
-  }
-  }
-}
-</script>
-```
-
-
-
-**vue3.0加上element-plus版本**
-
-父组件：
-
-```vue
-<template>
-<Dialog v-model="dialogVisible"></Dialog>
-</template>
-<script setup>
-  import { ref } from 'vue'
-  import Dialog from './components/dialog'
-  const dialogVisible = ref(false)
-</script>
-```
-
-
-
-子组件
-
-```vue
-<template>
-<!-- 千万要注意这里的:model-value,如果使用v-model就会报错，说不允许修改-->
-  <el-dialog
-    :model-value="dialogVisible"
-    title="Tips"
-    width="30%"
-    @close="handleClose"
-  >
-    <span>This is a message</span>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleClose">Cancel</el-button>
-        <el-button type="primary" @click="handleClose">Confirm</el-button>
-      </span>
-    </template>
-  </el-dialog>
-</template>
-
-<script setup>
-import { defineEmits, defineProps, computed } from 'vue'
-const emits = defineEmits(['update:modelValue'])
-const prop = defineProps({
-  dialogVisible: Boolean
-})
-// 创建了一个计算属性
-const dialogVisible = computed({
-  // 获取时，就直接返回props中的数据
-  get() {
-    return prop.dialogVisible
-  },
-  // 修改时，我们调用父组件方法
-  set(val) {
-    emits('update:modelValue', false)
-  }
-})
-
-// 关闭时，就直接修改值，妙啊！！(●'◡'●)
-const handleClose = () => {
-  dialogVisible.value = false
-}
-</script>
-
-<style></style>
-
-```
 
 
 

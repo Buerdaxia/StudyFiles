@@ -195,6 +195,7 @@ git diff 文件名:可以看到文件变动的内容
 ```
 git log :可以看到历史变动记录
 会返回详细的变动（一大串内容）--查询后输入字母q退出
+comit 46f985c90ca252dbc6d698c7c18ba6ed72ec2f99 这一串就是commit id
 
 git log --pretty=oneline:简化版
 ```
@@ -209,6 +210,7 @@ git log --pretty=oneline:简化版
 
 ```
 git reset --hard HEAD^:回退到上个版本
+
 ```
 
 
@@ -218,6 +220,34 @@ git reflog:记录了每一次命令 第一位数字就是commit id，可以根�
 
 git reset --hard xxxxx:叉叉为commit id
 ```
+
+
+
+### 版本回退+修改远端commit
+
+第一步，先将版本回退到指定版本
+
+```
+git reset --hard xxxx;
+```
+
+
+
+第二步，通过强制提交，直接覆盖
+
+```
+git push -f
+```
+
+
+
+这时，再查看git log 会发现之前提交的commit都会被删了
+
+**注意：**
+
+一定要小心使用，一定要回退到正确的版本，否则删了就找不回来了
+
+
 
 
 

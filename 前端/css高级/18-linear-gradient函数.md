@@ -75,8 +75,8 @@ background: linear-gradient(to left top, blue, red);
 
 // 上面这种写法的意思就是
 // 第一个105deg向105deg方向进行渐变
-// 第二个:白色占到50%
-// 第三个：橘色orangered占到50%
+// 第二个:白色渐变到前50%
+// 第三个：橘色orangered渐变后面的到50%
 
 
 ```

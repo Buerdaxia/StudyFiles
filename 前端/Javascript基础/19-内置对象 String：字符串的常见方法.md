@@ -366,7 +366,7 @@ console.log(str.padEnd(8, 'bar'));//  foobarba
 
 ## 获取指定位置的字符
 
-### 1、charAt(index)
+### 1、`charAt(index)`
 
 语法：
 
@@ -376,7 +376,9 @@ console.log(str.padEnd(8, 'bar'));//  foobarba
 
 解释：返回字符串指定位置的字符。这里的 `str.charAt(index)`和`str[index]`的效果是一样的。
 
-注意：字符串中第一个字符的下标是 0。如果参数 index 不在 [0, string.length) 之间，该方法将返回一个空字符串。
+注意：**字符串中第一个字符的下标是 0。如果参数 index 不在 `[0, string.length) `之间，该方法将返回一个空字符串**。
+
+上面这一点就很重要，通过所以来访问字符串，如果索引index不`[0, string.length) `之间，将会返回一个**undefined**所以推荐在访问字符串的单个字符时，还是**建议通过该方法**
 
 **代码举例**：
 
