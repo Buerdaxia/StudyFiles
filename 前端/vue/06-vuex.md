@@ -276,6 +276,9 @@ methods: {
     ...mapMutations({increment: 'JIA',decrement: 'JIAN'}),
     // 数组写法 条件函数名和mutations中一致
     ...mapMutations(['JIA','JIAN']),
+      
+     // 如果模块化了，第一个参数是模块名称, 后面一致
+     ...mapMutations('user', ['xx'])
 }
 ```
 

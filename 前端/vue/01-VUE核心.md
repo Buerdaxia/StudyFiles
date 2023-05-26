@@ -1018,6 +1018,42 @@ watch: {
 
 
 
+### 监听`vuex`的值
+
+注意，watch的功能非常强大，它是支持监听vuex的值的
+
+示例：
+
+```vue
+<template>
+...
+</template>
+<script>
+  import {mapState} from 'vuex';
+  export default {
+    computed: {
+      ...mapState('user', ['userInfo'])
+    },
+    watch: {
+      userInfo(newValue, oldValue) {
+        xxx
+      },
+      'userInfo.id': { // 监听某一个属性
+        handler(new, old) {
+          xxxx
+        }
+      }
+    }
+  }
+</script>
+```
+
+
+
+
+
+
+
 
 
 ## 计算属性与监视属性之间的区别
