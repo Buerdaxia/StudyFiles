@@ -535,7 +535,7 @@ props中可以限制的类型：
 
 首先：由于单向数据流模式的限制，子组件是不能修改传递进来的`props`的，如果我们想要传递进来的`props`可以修改该怎么办呢？
 
-方法：子组件自身在data或者computed中维护数据，默认值等于传入的`props`属性，在`<template>`模板中，绑定`data`中维护的数据即可。
+方法：**子组件自身在data或者computed中维护数据**，默认值等于传入的`props`属性，在`<template>`模板中，绑定`data`中维护的数据即可。
 
 
 
@@ -1557,7 +1557,7 @@ this.$nextTick(_ => {
 
 3）使用方式：
 
-（1）默认插槽
+### （1）默认插槽
 
 ```vue
 使用组件时：
@@ -1572,7 +1572,7 @@ this.$nextTick(_ => {
 	</template>
 ```
 
-（2）具名插槽：
+### （2）具名插槽：
 
 ```vue
 使用组件时
@@ -1602,69 +1602,98 @@ this.$nextTick(_ => {
 
 
 
-（3）作用域插槽：（比较麻烦的）很重要，vue中许多默认的组件身上的方法，都是通过作用域插槽暴露出来的
+>无论是，默认插槽，还是具名插槽，他们的作用域都是父组件(既调用或使用组件的位置)，这意味着，他们是无法访问子组件数据的只能访问父组件的数据
+>
+>但是有些情况，我们想要在父组件中利用插槽来访问子组件数据，这里就需要下面的作用域插槽了
 
-1)理解：数据在组件自身，**但是根据数据生成的结构需要组件的使用者决定。**(`games`数据在`Category`组件中，但使用数据所遍历出来的结构由`App`(父组件)决定)
 
-2)具体编码：
+
+
+
+
+
+### （3）作用域插槽：（比较麻烦的）很重要
+
+1)理解：数据在组件自身(**指子组件**)，**但是根据数据生成的结构需要组件的使用者决定(指父组件)。**
+
+示例：
 
 ```vue
-父组件：
-    <Category title="游戏">
-      <template scope="at">
-      	//一个ul
-        <ul>
-            <li v-for="(item,index) in at.games" :key="index">{{item}}</li>
-        </ul>
-      </template>
-    </Category>
-    <Category title="游戏">
-      <template scope="at">
-      	//一个ol
-        <ol>
-            <li v-for="(item,index) in at.games" :key="index">{{item}}</li>
-        </ol>
-      </template>
-    </Category>
-    <Category title="游戏">
-    
- 
-子组件：
-	<template>
-//:games="games"将数据传给插槽使用者
-		<slot :games="games">插槽默认内容</slot>
-	</template>
-
-<script>
-	export default{
-	name: 'Category',
-    data() {
-        return {
-            games:['英雄联盟','穿越火线'...]
-        }
-    }
-}
-</script>
+<!-- <MyComponent> 的模板 -->
+<div>
+  <slot :text="greetingMessage" :count="1"></slot>
+</div>
 ```
 
-2）数据在组件自身中使用：
+当需要接收插槽 props 时，默认插槽和具名插槽的使用方式有一些小区别。下面我们将先展示默认插槽如何接受 props，通过子组件标签上的 `v-slot` 指令，直接接收到了一个插槽 props 对象：
 
-通过slot-scope接收了当前作用域的数据。
-
-通过scope.row获取这一行的数据
-
-```html
-//放在表格中 获取当先一行的数据
-<template slot-scope="scope">
-{{scope.row}}
-</template>
+```vue
+<MyComponent v-slot="slotProps">
+  <!-- 注意：接受的时候还能结构{text, cound} 可以理解为函数 -->
+  {{ slotProps.text }} {{ slotProps.count }}
+</MyComponent>
 ```
+
+
+
+>可以简单理解，给<slot>标签传递了props，然后再去使用
+
+
+
+**具名的作用域插槽**
+
+具名作用域插槽的工作方式也是类似的，插槽 props 可以作为 `v-slot` 指令的值被访问到：`v-slot:name="slotProps"`。当使用缩写时是这样：
+
+```vue
+<MyComponent>
+  <template #header="headerProps">
+    {{ headerProps }}
+  </template>
+
+  <template #default="defaultProps">
+    {{ defaultProps }}
+  </template>
+
+  <template #footer="footerProps">
+    {{ footerProps }}
+  </template>
+</MyComponent>
+
+<!-- 未缩写版本 -->
+<MyComponent>
+  <template v-slot:header="headerProps">
+    {{ headerProps }}
+  </template>
+
+  <template v-slot:default="defaultProps">
+    {{ defaultProps }}
+  </template>
+
+  <template v-slot:footer="footerProps">
+    {{ footerProps }}
+  </template>
+</MyComponent>
+```
+
+向具名插槽中传入 props：
+
+```vue
+<slot name="header" message="hello"></slot>
+```
+
+
+
+注意：插槽上的 `name` 是一个 Vue 特别保留的 attribute，不会作为 props 传递给插槽。因此最终 `headerProps` 的结果是 `{ message: 'hello' }`。
+
+
 
 
 
 ### 插槽组件传递数据
 
 使用场景：数据是在组件自身维护的，但是页面是在父元素中，想要即将页面解构通过`slot`传递过去，这时候我们就可以用这个技术。
+
+>可以理解为slot的props
 
 在子组件的<slot>中将数据暴露出去，在父组件中要传递的标签包裹<template>并用`v-solt:xx`进行接收
 
@@ -1959,165 +1988,6 @@ emits:['update:search', 'update:query']
 ```
 
 注意：注意emits和props都有修改
-
-
-
-
-
-## 组件传送`teleport`
-
-有时候有一些组件，本身的存在就是没有父组件，是依赖于`body`标签或什么的进行定位的，这个时候就需要`<teleport to="选择器">`了
-
-注意：想要传送到什么位置，更具to属性内容有关
-
-例如：消息提示框组件，就是基于`body`定位
-
-示例：(消息提示框组件)
-
-```vue
-<template>
-	<!--就直接会将个组件整个结构传送到</body>头上-->
-	<Teleport to="body">
-		<div v-if="show" class="alertBox">
-			<div class="closeIcon" @click="show = false">x</div>
-			<div class="content">
-				<slot>消息提示框组件</slot>
-			</div>
-		</div>
-	</Teleport>
-</template>
-<script>
-export default {
-	data() {
-		return {
-			show: true
-		};
-	}
-};
-</script>
-<style scoped>
-.alertBox {
-	width: 350px;
-	height: 80px;
-	border: 1px solid hsl(280, 100%, 50%);
-	border-radius: 8px;
-
-	position: absolute;
-	right: 12px;
-	bottom: 12px;
-}
-</style>
-
-```
-
-
-
-### `teleport`的多次传送
-
-注意：`<teleport>`标签支持多次传送，指的就是，可以重复的将结构多次传入到`to`指定的位置，会不断追加进结构中
-
-示例：用`teleport`创建一个消息提示组件，并会不断消失。
-
->第一步，在根html中创建一个容器来存放我们的消息提示组件
-
-index.html中追加：
-
-```html
-<body>
-  <div id="app"></div>
-  <div id="messages"></div>
-  <script type="module" src="/src/main.js"></script>
-</body>
-```
-
-
-
->第二步，在App.vue中设置全局样式，让我们的消息提示组件排列顺序没有太大问题
-
-App.vue：
-
-```vue
-<template>
-	<div class="container">
-		<AlertBox v-for="(msg, index) in msgs" :key="index">
-			{{ msg }}
-		</AlertBox>
-		<button @click="msgs.push(`这是一段啊消息${msgs.length}`)">点我+1</button>
-	</div>
-</template>
-<script>
-import AlertBox from './components/AlertBox.vue';
-export default {
-	components: { AlertBox },
-	data() {
-		return {
-			msgs: []
-		};
-	}
-};
-</script>
-
-<style>
-#messages {
-	position: absolute;
-	right: 12px;
-	bottom: 12px;
-	display: flex;
-	/* 每次添加进来的标签都放到上面 */
-	flex-direction: column-reverse;
-	gap: 12px;
-}
-</style>
-
-```
-
-
-
->第三步：编写消息提示组件
-
-`AlertBox.vue`:
-
-```vue
-<template>
-	<Teleport to="#messages">
-		<div v-if="show" class="alertBox">
-			<div class="closeIcon" @click="show = false">x</div>
-			<div class="content">
-				<slot>消息提示框组件</slot>
-			</div>
-		</div>
-	</Teleport>
-</template>
-<script>
-import { onMounted } from 'vue';
-
-export default {
-	data() {
-		return {
-			show: true
-		};
-	},
-
-	mounted() {
-    /*挂载2s自动关闭*/
-		setTimeout(() => {
-			this.show = false;
-		}, 2000);
-	}
-};
-</script>
-<style scoped>
-.alertBox {
-	width: 350px;
-	height: 80px;
-	border: 1px solid hsl(280, 100%, 50%);
-	border-radius: 8px;
-
-	/* position: absolute; */
-}
-</style>
-
-```
 
 
 
