@@ -4,6 +4,14 @@
 
 
 
+
+
+1. state
+2. getter
+3. action（pinia中去除了vuex中的mutations，并且action既可以同步也能够异步）
+
+
+
 **可以完美的和`vue3`的`composition API`结合使用**（太强大辣┭┮﹏┭┮）
 
 
@@ -104,5 +112,103 @@ console.log('pinia', counterStore);
 		</div>
 	</main>
 </template>
+```
+
+
+
+## 方法
+
+## `storeToRefs()`
+
+作用：这个方法和`vue3`中的`toRefs()`功能是一致的，都是为了方便解构操作还能不丢失响应性
+
+
+
+示例：
+
+```vue
+<script setup>
+import {onMounted} from 'vue';
+// 导入store方法
+import {useCounterStore} from '@/stores/counter';
+
+// 从pinia中引入方法
+import {storeToRefs} from 'pinia';
+  
+// 执行方法得到实例对象
+const counterStore = useCounterStore();
+
+// 直接结构赋值 (会有响应式丢失的问题)
+// const {count, doubleCount} = counterStore;
+
+// 保持数据响应式 (使用storeToRefs)
+const {count, doubleCount} = storeToRefs(counterStore);
+
+// 注意：方法，从原本store对象中结构出来即可
+const {increment} = counterStore;
+
+  
+  
+  
+onMounted(() => {
+	// 调用store中的异步action
+	counterStore.getList();
+});
+
+console.log('pinia', counterStore);
+</script>
+
+<template>
+	<header>
+		<div class="wrapper"></div>
+	</header>
+
+	<main>
+		<div>
+			<button @click="increment">点我+1</button>
+		</div>
+		<div>计算值:{{ count }}</div>
+		<div>双倍值:{{ doubleCount }}</div>
+
+		<div>
+			<ul>
+				<!-- 获取list值，并直接渲染 -->
+				<li v-for="item in counterStore.list" :key="item.id">
+					{{ item.name }}
+				</li>
+			</ul>
+		</div>
+	</main>
+</template>
+
+<style scoped>
+header {
+	line-height: 1.5;
+}
+
+.logo {
+	display: block;
+	margin: 0 auto 2rem;
+}
+
+@media (min-width: 1024px) {
+	header {
+		display: flex;
+		place-items: center;
+		padding-right: calc(var(--section-gap) / 2);
+	}
+
+	.logo {
+		margin: 0 2rem 0 0;
+	}
+
+	header .wrapper {
+		display: flex;
+		place-items: flex-start;
+		flex-wrap: wrap;
+	}
+}
+</style>
+
 ```
 

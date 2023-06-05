@@ -589,7 +589,7 @@ function myAxios(axiosConfig, customOptions, loadingOptions) {
 			if (custom_options.loading) {
 				LoadingInstance._count++; // 累加loading层数
         
-        //** 这里就解决了上述问题的第一点：只创建一个Loading实例
+        //** 这里就解决了上述问题的第一点：只创建一个Loading实例 只有=1时才创建一个实例，其他时候不变
 				if (LoadingInstance._count === 1) {
 					LoadingInstance._target = ElLoading.service(loadingOptions); // 调用ElLoading.service创建一个加载实例，这个加载实例身上有close方法来关闭加载
 				}
