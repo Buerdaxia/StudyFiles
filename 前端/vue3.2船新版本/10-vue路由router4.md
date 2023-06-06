@@ -19,6 +19,10 @@ import PageOne from './components/PageOne.vue';
 import PageTwe from './components/PageTwe.vue';
 import PageThree from './components/PageThree.vue';
 
+/*
+	createRouter:创建router实例对象
+	createWebHistory: 创建history模式路由
+*/
 import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
@@ -65,7 +69,9 @@ app.mount('#app');
 
 
 
-使用：<router-link>和<router-view>功能是不会改变的
+**使用：<router-link>和<router-view>功能是不会改变的**
+
+注意：路由是要有出口的，出口就是`router-link`或这`router-view`标签，**每个层级对应自己的出口**
 
 ```vue
 <template>
@@ -79,6 +85,53 @@ app.mount('#app');
 	</div>
 </template>
 ```
+
+
+
+## 默认二级路由
+
+直接将二级路由的path属性置空，当一级路由被访问时，默认会加载path为空的二级路由：
+
+示例：
+
+```js
+//router/index.js
+import {createRouter, createWebHistory} from 'vue-router';
+
+import Login from '@/views/Login/index.vue';
+import Layout from '@/views/Layout/index.vue';
+import Home from '@/views/Home/index.vue';
+import Category from '@/views/Category/index.vue';
+
+const router = createRouter({
+	history: createWebHistory(import.meta.env.BASE_URL),
+	routes: [
+		{ // 一级路由
+			path: '/',
+			component: Layout, 
+			children: [ // 二级路由
+				{
+					path: '', // 置空的作用：当父路径被访问时(/)，直接会访问该路径
+					component: Home
+				},
+				{
+					path: 'category',
+					component: Category
+				}
+			]
+		},
+		{
+			path: '/login',
+			component: Login
+		}
+	]
+});
+
+export default router;
+
+```
+
+
 
 
 

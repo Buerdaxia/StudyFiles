@@ -276,7 +276,6 @@ function addPending(config) {
 //  判断重复请求
 const pendingMap = new Map();
 
-// const controller = new AbortController();
 /**
  *
  * @param {*} config
@@ -340,7 +339,7 @@ function removePending(config) {
 
 ---
 
-**axios版本0.22以上的封装：**
+**axios版本0.22以上的封装：（暂时还有问题，请使用上面版本还需要研究一下）**
 
 示例：
 
