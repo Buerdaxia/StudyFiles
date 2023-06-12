@@ -24,10 +24,32 @@ java 执行命令
 
 ## JDK组成
 
+JDK：就是Java开发工具包（Java development Kit）
+
+
+
 * JVM（Java Virtual Machine）：Java虚拟机，真正运行Java程序的地方
 * 核心类库：Java自带的程序，给程序员使用(调用)
 * JRE（Java Runtime Environment）：Java的运行环境
 * JDK（Java Development kit） ：Java开发工具包（包括以上所有）例如javac、java
+
+
+
+
+
+## JRE组成
+
+JRE：Java运行时环境（Java runtime environment）
+
+
+
+* JVM
+* 核心类库
+* 运行工具
+
+
+
+编译后：需要运行时，就需要一个JRE即可，有JRE就可以运行
 
 
 

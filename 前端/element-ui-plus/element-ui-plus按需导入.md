@@ -135,7 +135,9 @@ export default defineConfig({
 
 # 手动按需导入
 
-创建`plugins.js`文件引入想要的组件：
+## 方式一：循环use
+
+ 创建`plugins.js`文件引入想要的组件：
 
 ```js
 // elment-plus.js
@@ -172,6 +174,53 @@ app.use(router);
 elComp.forEach(item => {
   app.use(item)
 })
+
+
+app.mount('#app');
+
+```
+
+
+
+
+
+## 方式二：写成plugins方式
+
+
+
+示例：
+
+```js
+// plugins/elementPlus/index.js
+import {ElButton} from 'element-plus';
+
+export const elementPlugin = {
+	install(app) {
+		app.use(ElButton);
+	}
+};
+
+```
+
+
+
+在main.js中直接引入并use：
+
+```js
+// main.js
+import './assets/main.css';
+
+import {createApp} from 'vue';
+
+import 'element-plus/dist/index.css'; // 引入全局样式文件
+import {elementPlugin} from './plugins/elementPlus/index.js'; // 引入暴露的插件
+
+import App from './App.vue';
+
+const app = createApp(App);
+
+// 然后直接use
+app.use(elementPlugin);
 
 
 app.mount('#app');

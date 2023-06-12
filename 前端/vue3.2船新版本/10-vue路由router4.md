@@ -139,6 +139,23 @@ export default router;
 
 由于vue3.2版本使用setup函数，无法访问到this，所以像this.$route、this.$router都无法访问，这时就需要俩API来帮我们拿到这俩变量。
 
+
+
+
+
+### 模板访问$route，$router
+
+注意，这俩，和vue2是一样的，在模板`template`中，是可以直接访问的：
+
+示例：
+```vue
+<template>
+	<RouterView to="/"  :key="$route.fullPath"></RouterView>
+</template>
+```
+
+
+
 ### 访问route对象
 
 通过`useRoute`来获取route对象，相当于`this.$route`
@@ -215,6 +232,40 @@ export default {
 
 
 
+## 路由生命周期
+
+### `onBeforeRouteUpdate()`
+
+作用：当路由更新时自动触发
+
+示例：
+
+```vue
+<script setup>
+import {onBeforeRouteUpdate} from 'vue-router';
+onBeforeRouteUpdate(to => {
+	console.log('路由改变了', to);
+});
+</script>
+```
+
+
+
+### `onBeforeRouteLeave()`
+
+作用：当离开时自动触发自动触发
+
+示例：
+
+```vue
+<script setup>
+import {onBeforeRouteLeave} from 'vue-router';
+onBeforeRouteLeave(() => {
+	console.log('离开了当前路由页面了');
+});
+</script>
+```
+
 
 
 ## 动态路由匹配
@@ -245,11 +296,28 @@ this.$route.params.postId
 
 
 
-## 路由不刷新问题(同组件跳转)
+## 路由不刷新问题(同组件跳转，路由缓存)
 
 基本上是针对动态路由匹配。
 
 问题：**当路由组件的数据，公用同一个组件时**，如果再组件中进行跳转，就会发现，虽然URL改变了，但是组件中的内容不会发生改变。
+
+示例：
+
+```js
+// router.js
+[
+  {
+    path: '/users/:id',
+    name: 'users',
+    component: user
+  }
+]
+```
+
+注意：**当用户从`/users/123456`跳转到`/users/abcde`时，就会出现路由缓存问题**
+
+
 
 这个问题的原因是什么？
 
@@ -257,7 +325,9 @@ vue对这种同组件之间的路由跳转，只是数据发生改变时，不�
 
 
 
-解决方式：通过watch来监听，this.$route.params的变化，当params变化我就重新获取数据
+解决方式：
+
+一：通过watch来监听，this.$route.params的变化，当params变化我就重新获取数据
 
 ```js
 watch() {
@@ -269,7 +339,79 @@ watch() {
     immediate: true
   }
 }
+
+// 有时候一些特殊场景我们也可以用watchEffect()来帮助我们自动收集依赖
 ```
+
+
+
+二：让组件实例不复用，强制销毁重建
+
+可以给`router-view`标签添加`key`属性
+
+```vue
+<RouterView :key="$route.fullPath"></RouterView>
+```
+
+缺点：这样写太过于粗暴，可能会让一些接口造成浪费
+
+
+
+原因：`key`属性常常是和v-for结合使用的，但是他还有一个作用**就是它可以用于强制替换一个元素/组件而不是复用它**
+
+所以有些地方很有用：
+
+* 在适当的时候触发组件的生命周期钩子
+* 触发过渡
+
+
+
+三：利用路由自身的钩子函数`onBeforeRouteUpdate`
+
+`onBeforeRouteUpdate`钩子函数是当路由变化后会被调用：
+
+```vue
+<script setup>
+import {onMounted, ref} from 'vue';
+import {useRoute, onBeforeRouteUpdate} from 'vue-router';
+import {getCategoryAPI} from '@/apis/category.js';
+import {getBannerAPI} from '@/apis/home.js';
+import GoodsItem from '../Home/components/GoodsItem.vue';
+
+const categoryData = ref({});
+const bannerList = ref([]);
+const route = useRoute();
+
+// 修改一下接受参数
+const getCateGory = async (params = route.params) => {
+	const {data: res} = await getCategoryAPI(params.id);
+	categoryData.value = res.result;
+};
+
+// 获取banner
+const getBanner = async () => {
+	const {data: res} = await getBannerAPI({distributionSite: '2'});
+	bannerList.value = res.result;
+};
+
+// 路由改变时，讲改变参数传如
+onBeforeRouteUpdate(to => {
+	getCateGory(to.params);
+	console.log('路由改变了', to);
+});
+
+onMounted(() => {
+	getCateGory();
+	getBanner();
+});
+</script>
+```
+
+
+
+示例讲解：上面的利用`onBeforeRouteUpdate()`来触发获取分类数据，`banner`数据都是一致的所以不需要多次重复请求来浪费性能
+
+
 
 
 
@@ -714,7 +856,7 @@ beforeRouteLeave (to, from, next) {
 
 ## 通过路由控制页面滚动行为
 
-通过`scrollBehavior(to, from, savedPosition)`函数来控制
+**通过`scrollBehavior(to, from, savedPosition)`函数来控制**
 
 参数：to、from和路由守卫一致
 
