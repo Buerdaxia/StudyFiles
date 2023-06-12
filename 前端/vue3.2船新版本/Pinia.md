@@ -2,7 +2,7 @@
 
 建议直接官方文档，官方文档很细(●'◡'●)
 
-
+https://pinia.vuejs.org/zh/
 
 
 
@@ -19,8 +19,6 @@
 
 
 ## 核心步骤
-
-
 
 
 
@@ -211,4 +209,32 @@ header {
 </style>
 
 ```
+
+
+
+
+
+
+
+## 使用遵循原理
+
+遵循理念：**和数据相关的所有操作（state, action）都要放到Pinia中，组件只负责触发action函数**
+
+
+
+>注意：action就是方法也有可能是调用接口的方法，because pinia中的action是可以异步的
+
+
+
+
+
+# 持久化插件(pinia-plugin-persistedstate)
+
+可以直接去官网查看：https://prazdevs.github.io/pinia-plugin-persistedstate/
+
+提供了很多配置项，很好使用。
+
+
+
+运行机制：设置store时，会自动把数据同步进localStorage，取数据时优先从localStorage中获取。
 

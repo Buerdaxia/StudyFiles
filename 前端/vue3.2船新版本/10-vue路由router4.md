@@ -8,6 +8,24 @@
 yarn add vue-router@4
 ```
 
+
+
+## 注意点
+
+注意：`vue-router composition API`只能在`setup`中使用，如果想要在别的`.js`文件中去使用`router`需要这样引入：
+
+```js
+// http.js
+import router from '@/router/index.js';
+
+```
+
+>哪里会用到呢？一般都是在自定义http.js中也就是自行封装axios时会用到
+
+
+
+
+
 ## 基本使用
 
 和router3使用的区别不是特别大：
