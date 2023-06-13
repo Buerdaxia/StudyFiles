@@ -238,3 +238,20 @@ header {
 
 运行机制：设置store时，会自动把数据同步进localStorage，取数据时优先从localStorage中获取。
 
+注意：**这里是每一次修改都会写进localStorage，每一次！每一次！！每一次！！！**
+
+所以像是我们退出登录想要把localStorage的用户信息清除掉的操作，我们只需要初始化赋值一下就完事儿了
+
+示例：
+
+```js
+// stores/user.js 的一部分内容
+// 退出时清除用户信息
+const clearUserInfo = () => {
+  // 直接恢复初始化
+  userInfo.value = {};
+  // 注意这里可以不用下面这一步，因为用了持久化插件，始终会在localStorage中保存最新赋值，所以直接初始化一下就没了
+  // window.localStorage.removeItem('user');
+};
+```
+

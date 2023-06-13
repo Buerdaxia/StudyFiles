@@ -554,8 +554,14 @@ export function getListAPI(paramsList) {
 
 ```js
 import axios from 'axios';
-// 注意如果是自动导入，这段引入代码就不用写了
+// 注意如果是自动导入，需要这样写
+import 'element-plus/theme-chalk/el-loading.css';
 import { ElLoading } from 'element-plus';
+
+// 如果是手动按需导入 需要这样写
+import { ElLoading } from 'element-plus';
+
+
 
 // **核心一：先创建一个对象保存loading实例，和请求接口数
 const LoadingInstance = {
