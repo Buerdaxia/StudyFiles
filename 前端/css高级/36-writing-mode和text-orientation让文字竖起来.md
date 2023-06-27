@@ -28,6 +28,14 @@
 
 让0123456789数值排列
 
+```html
+<div class="vertical">
+  0123456789
+</div>
+```
+
+
+
 ![image-20230317154445650](C:\Users\10854\Desktop\clone\StudyFiles\前端图片\css高级\19滚动数字-2.png)
 
 2.text-orientation: upright
@@ -36,10 +44,62 @@
 
 ![19滚动数字-3](C:\Users\10854\Desktop\clone\StudyFiles\前端图片\css高级\19滚动数字-3.png)
 
+代码：
+
+```vue
+<template>
+	<div class="vertical">
+    0123456789
+  </div>
+</template>
+
+<style lang="scss" scoped>
+  .vertical {
+    writing-mode：vertical-lr;
+    text-orientation: upright;
+  }
+</style>
+```
+
+
+
 
 
 3.通过transform来上下移动
 
+```scss
+transform: translateY(...);
+```
+
 
 
 4.通过transition属性来获得动画过渡效果，最后overflow：hidden隐藏掉多余的就可以了
+
+
+
+一个比较全的代码：
+
+```scss
+.father {
+  // 外面要设置overflow:hidden;
+  overflow: hidden;
+  .child {
+    font-size: 40px;
+    font-family: Roboto, Roboto-Black;
+    font-weight: 600;
+    /* line-height: 47px; */
+    color: #ffeb7b;
+    /* @include gradientText(linear-gradient(180deg, #24deff, #26ddfe)); */
+    writing-mode: vertical-lr;
+    text-orientation: upright;
+    letter-spacing: 10px;
+    transform: translateY(46%);
+    /* 公式translateY(${46 - 10 * item}% */
+    transition: transform 10s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+```
+
+
+
