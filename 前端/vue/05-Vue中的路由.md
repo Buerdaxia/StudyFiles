@@ -691,6 +691,68 @@ VueRouter.prototype.push = function(location, resolve, reject) {
 
 
 
+### 缓存指定组件(页面组件)
+
+这里的实例时`SPA`应用的
+
+我们还可以利用`route.meta`属性，来动态控制我们想要缓存的页面级组件
+
+`router/index.js`
+
+```js
+// 现在路由中配置meta属性
+import Vue from 'vue';
+import Router from 'vue-router';
+Vue.use(Router);
+
+export default new Router({
+	routes: [
+		{
+			path: '/',
+			redirect: {name: 'home'}
+		},
+		{
+			path: `/home`,
+			name: `home`,
+			meta: {
+				keepAlive: true
+			},
+			component: resolve => {
+				require(['@/page/home/home'], resolve);
+			}
+		},
+    ]
+})
+
+```
+
+
+
+在到`router-link`标签，利用`v-if`来判断我们是否要加上`keep-alive`标签
+
+`App.vue`:
+
+```vue
+<template>
+	<div id="app">
+		<!-- <Transition name="fade-right" mode="out-in"> -->
+		<KeepAlive>
+			<router-view v-if="$route.meta.keepAlive" />
+		</KeepAlive>
+		<router-view v-if="!$route.meta.keepAlive" />
+		<!-- </Transition> -->
+	</div>
+</template>
+
+<script>
+export default {
+	name: 'App'
+};
+</script>
+```
+
+
+
 ## 两个船新的生命周期钩子
 
 1）左右：路由组件所**独有的两个钩子**，用于捕获路由组件激活的状态
