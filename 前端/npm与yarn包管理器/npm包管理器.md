@@ -16,6 +16,10 @@ npm（全程Node package Manager，即node包管理器），是Node.js默认的�
 
 使用淘宝镜像：`npm config set registry https://registry.npm.taobao.org`
 
+上面那个镜像已经老了，**用新版本**:`npm config set registry https://registry.npmmirror.com/`
+
+
+
 ## 项目初始化
 
 如果想要一个项目被npm管理
