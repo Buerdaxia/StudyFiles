@@ -335,7 +335,9 @@ true
 
 **深克隆：**
 
-​	基本数据类型拷贝过来，字符串复用，引用数据类型会重新创建新的
+​	基本数据类型拷贝过来，字符串复用(复用串池中记录的)，引用数据类型会重新创建新的
+
+我们可以使用一些工具来帮我们实现(●'◡'●)
 
 ![深克隆](C:\Users\10854\Desktop\clone\StudyFiles\后端\java基础\assets\深克隆.png)
 
@@ -760,3 +762,28 @@ public class ObjectsDemo02 {
 ```
 
 注：了解性的方法可以可以作为扩展视频进行下发。
+
+
+
+
+
+## Objects.equals方法的细节
+
+原因：
+
+在上面的Object类中的方法，我们一般没有处理对象为null的情况，一旦一个对象为null时，再调用上面Object.equals方法时，就会报空指针异常的
+
+源码：
+
+```java
+public static boolean equals(Object a, Object b) {
+    return (a == b) || (a != null && a.equals(b));
+}
+```
+
+分析：
+
+1. 先会直接判断两个对象是否指向同一地址值，是直接返回true
+2. 然后判断a是否为null，如果为null则返回false
+3. 之后再**调用a身上的`equals`方法**（注意，这里一般我们都会重写一个对象身上的equals方法(请看上面Object类中重写equals方法)，如果没重写，就是调用Object.equals方法）
+
