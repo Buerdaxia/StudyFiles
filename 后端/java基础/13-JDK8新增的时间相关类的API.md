@@ -17,6 +17,13 @@
 
 
 
+注意：
+
+1. JDK8的对于时间处理的相关方法，都是不会影响原对象，如果有修改的操作，都是创建一个新的对象
+2. 
+
+
+
 ## Date类
 
 
@@ -60,21 +67,15 @@ System.out.println(zoneId1);//Asia/Pontianak
 
 | 函数                                                         | 功能                                                         |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| static Instant now()                                         | 获取当前时间的Instant对象(标准时间不带时区，获取国内时间需要+8小时) |
-| static Instant ofXxxx(long epochMilli)                       | 根据(秒/毫秒/纳秒)获取Instant对象详情看下面👇                 |
-| static Instant Instant.ofEpochMilli(long epochMilli)         | 根据(毫秒)获取Instant对象                                    |
-| Instant.ofEpochSecond(long epochSecond);                     | 根据(秒)获取Instant对象                                      |
-| Instant.ofEpochSecond(long epochSecond, long nanoAdjustment); | 根据(秒 + 纳秒)获取Instant对象，第一个参数秒，第二个参数纳秒 |
+| **static** Instant now()                                     | 获取当前时间的Instant对象(标准时间不带时区，获取国内时间需要+8小时) |
+| **static** Instant ofXxxx(long epochMilli)                   | 根据(秒/毫秒/纳秒)获取Instant对象详情看下面👇                 |
+| **static** Instant Instant.ofEpochMilli(long epochMilli)     | 根据(毫秒)获取Instant对象                                    |
+| **static** Instant Instant.ofEpochSecond(long epochSecond);  | 根据(秒)获取Instant对象                                      |
+| **static** Instant Instant.ofEpochSecond(long epochSecond, long nanoAdjustment); | 根据(秒 + 纳秒)获取Instant对象，第一个参数秒，第二个参数纳秒 |
 | ZonedDateTime atZone(ZoneIdzone)                             | 指定时区                                                     |
 | boolean isxxx(Instant otherInstant)                          | 判断系列的方法                                               |
-| Instant minusXxx(long millisToSubtract)                      | 减少时间系列的方法                                           |
-| Instant plusXxx(long millisToSubtract)                       | 增加时间系列的方法                                           |
-
-
-
-
-
-
+| Instant minusXxx(long millisToSubtract)                      | 减少时间系列的方法(返回新的对象)                             |
+| Instant plusXxx(long millisToSubtract)                       | 增加时间系列的方法(返回新的对象)                             |
 
 
 
@@ -122,10 +123,10 @@ boolean result2 = instant4.isAfter(instant5);
 System.out.println(result2);//false
 
 //6.Instant minusXxx(long millisToSubtract) 减少时间系列的方法
-Instant instant6 =Instant.ofEpochMilli(3000L);
+Instant instant6 =Instant.ofEpochMilli(3000L); // 减少毫秒
 System.out.println(instant6);//1970-01-01T00:00:03Z
 
-Instant instant7 =instant6.minusSeconds(1);
+Instant instant7 =instant6.minusSeconds(1); // 减少秒
 System.out.println(instant7);//1970-01-01T00:00:02Z
 
 ```
@@ -133,6 +134,20 @@ System.out.println(instant7);//1970-01-01T00:00:02Z
 
 
 ### ZoneDateTime  带时区的时间
+
+
+
+| 函数                                | 功能                                      |
+| ----------------------------------- | ----------------------------------------- |
+| static ZonedDateTime now()          | 获取当前时间的ZonedDateTime对象（带时区） |
+| static ZonedDateTime ofXxxx(。。。) | 获取指定时间的ZonedDateTime对象           |
+| ZonedDateTime withXxx(时间)         | 减少时间系列的方法                        |
+| ZonedDateTime minusXxx(时间)        | 减少时间系列的方法                        |
+| ZonedDateTime plusXxx(时间)         | 增加时间系列的方法                        |
+
+细节：
+
+1. JDK8新增的时间对象都是不可变的，如果我们对原对象进行修改了，都是返回一个全新的（再次强调）
 
 ```java
 /*
@@ -147,8 +162,7 @@ ZonedDateTime now = ZonedDateTime.now();
 System.out.println(now);
 
 //2.获取指定的时间对象(带时区)1/年月日时分秒纳秒方式指定
-ZonedDateTime time1 = ZonedDateTime.of(2023, 10, 1,
-                                       11, 12, 12, 0, ZoneId.of("Asia/Shanghai"));
+ZonedDateTime time1 = ZonedDateTime.of(2023, 10, 1, 11, 12, 12, 0, ZoneId.of("Asia/Shanghai"));
 System.out.println(time1);
 
 //通过Instant + 时区的方式指定获取时间对象
@@ -179,11 +193,21 @@ System.out.println(time5);
 
 ### DateTimeFormatter   用于时间的格式化和解析
 
+
+
+| 函数                                     | 功能               |
+| ---------------------------------------- | ------------------ |
+| static DateTimeFormatter ofPattern(格式) | 获取格式对象       |
+| String format(时间对象)                  | 按照指定方式格式化 |
+|                                          |                    |
+
+
+
 ```java
 /*
-            static DateTimeFormatter ofPattern(格式) 获取格式对象
-            String format(时间对象) 按照指定方式格式化
-        */
+    static DateTimeFormatter ofPattern(格式) 获取格式对象
+    String format(时间对象) 按照指定方式格式化
+*/
 //获取时间对象
 ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Shanghai"));
 
