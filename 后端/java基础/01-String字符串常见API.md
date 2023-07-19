@@ -630,7 +630,8 @@ StringBuilder 可以看成是一个容器，创建之后里面的内容是可变
 
 1. 拼接字符串（**append**）
 2. 反转字符串（**reverse**）
-3. 其他方法不是很常用
+3. 插入字符串（iinsert）
+4. 其他方法不是很常用
 
 优势：
 
@@ -870,7 +871,7 @@ System.out.println(str);//[aaa, bbb, ccc]
 第一种，直接进行的拼接，不包含变量：
 
 ```java
-String str = "a"+ "b" + "c";
+String str = "a" + "b" + "c";
 ```
 
 **这一种拼接方式，编译时会进行优化，直接优化成**

@@ -223,38 +223,31 @@ System.out.println(dtf1.format(time));
 
 
 
+具体相关API：
+
+with方法类似于JDK7中的set方法
+
+![13-JDK8时间类相关API01](./imgs/13-JDK8时间类相关API01.jpg)
+
+
+
 ### LocalDate  年、月、日
+
+注意：该方法只能获取到年月日
 
 ```java
 //1.获取当前时间的日历对象(包含 年月日)
 LocalDate nowDate = LocalDate.now();
 //System.out.println("今天的日期:" + nowDate);
+
 //2.获取指定的时间的日历对象
 LocalDate ldDate = LocalDate.of(2023, 1, 1);
 System.out.println("指定日期:" + ldDate);
 
 System.out.println("=============================");
 
-//3.get系列方法获取日历中的每一个属性值//获取年
-int year = ldDate.getYear();
-System.out.println("year: " + year);
-//获取月//方式一:
-Month m = ldDate.getMonth();
-System.out.println(m);
-System.out.println(m.getValue());
-
-//方式二:
-int month = ldDate.getMonthValue();
-System.out.println("month: " + month);
 
 
-//获取日
-int day = ldDate.getDayOfMonth();
-System.out.println("day:" + day);
-
-//获取一年的第几天
-int dayofYear = ldDate.getDayOfYear();
-System.out.println("dayOfYear:" + dayofYear);
 
 //获取星期
 DayOfWeek dayOfWeek = ldDate.getDayOfWeek();
@@ -277,13 +270,64 @@ System.out.println(minusLocalDate);
 //plus开头的方法表示增加，只能增加年月日
 LocalDate plusLocalDate = ldDate.plusDays(1);
 System.out.println(plusLocalDate);
+```
 
+
+
+获取年：
+
+```java
+//3.get系列方法获取日历中的每一个属性值//获取年
+int year = ldDate.getYear();
+System.out.println("year: " + year);
+```
+
+获取月：
+
+```java
+//获取月//方式一:
+Month m = ldDate.getMonth(); // 注意这里获取的月是一个对象
+System.out.println(m);
+System.out.println(m.getValue());
+
+//方式二:
+int month = ldDate.getMonthValue();
+System.out.println("month: " + month);
+```
+
+获取日：
+
+```java
+//获取日
+int day = ldDate.getDayOfMonth();
+System.out.println("day:" + day);
+```
+
+
+
+获取一年中的第几天：
+
+```java
+//获取一年的第几天
+int dayofYear = ldDate.getDayOfYear();
+System.out.println("dayOfYear:" + dayofYear);
+```
+
+
+
+
+
+小栗子：
+```java
 //-------------
 // 判断今天是否是你的生日
 LocalDate birDate = LocalDate.of(2000, 1, 1);
 LocalDate nowDate1 = LocalDate.now();
 
+// 1.获取生日日期封装为月日对象
 MonthDay birMd = MonthDay.of(birDate.getMonthValue(), birDate.getDayOfMonth());
+// 2.把今天的时间封装为月日对象
+// from方法，把一个实现TemporalAccessor接口的对象变成月日对象
 MonthDay nowMd = MonthDay.from(nowDate1);
 
 System.out.println("今天是你的生日吗? " + birMd.equals(nowMd));//今天是你的生日吗?
@@ -291,24 +335,22 @@ System.out.println("今天是你的生日吗? " + birMd.equals(nowMd));//今天�
 
 
 
+
+
 ### LocalTime  时、分、秒
+
+注意：
+
+1. 该方法只能获取修改时、分、秒
+2. 由于这个类只关注与时分秒所以它比较精确，在一些只关注时分秒且要求精确时间的场景就可以使用这个方法
+
+
 
 ```java
 // 获取本地时间的日历对象。(包含 时分秒)
 LocalTime nowTime = LocalTime.now();
 System.out.println("今天的时间:" + nowTime);
 
-int hour = nowTime.getHour();//时
-System.out.println("hour: " + hour);
-
-int minute = nowTime.getMinute();//分
-System.out.println("minute: " + minute);
-
-int second = nowTime.getSecond();//秒
-System.out.println("second:" + second);
-
-int nano = nowTime.getNano();//纳秒
-System.out.println("nano:" + nano);
 System.out.println("------------------------------------");
 System.out.println(LocalTime.of(8, 20));//时分
 System.out.println(LocalTime.of(8, 20, 30));//时分秒
@@ -328,7 +370,35 @@ System.out.println(nowTime.plusHours(10));
 
 
 
-### LocalDateTime  年、月、日、时、分、秒
+获取时、分、秒、纳秒：
+
+```java
+int hour = nowTime.getHour();//时
+System.out.println("hour: " + hour);
+
+int minute = nowTime.getMinute();//分
+System.out.println("minute: " + minute);
+
+int second = nowTime.getSecond();//秒
+System.out.println("second:" + second);
+
+int nano = nowTime.getNano();//纳秒
+System.out.println("nano:" + nano);
+```
+
+
+
+
+
+### LocalDateTime  年、月、日、时、分、秒（常用）
+
+注意：
+
+1. LocalDateTime可以转换成LocalTime对象或者LocalDate对象
+
+![13-JDK8时间类相关API02](./imgs/13-JDK8时间类相关API02.jpg)
+
+
 
 ```java
 // 当前时间的的日历对象(包含年月日时分秒)
@@ -366,7 +436,7 @@ System.out.println(lt.getSecond());
 
 
 
-### Duration  时间间隔（秒，纳，秒）
+### Duration  时间间隔（纳秒，毫秒，秒）
 
 ```java
 // 本地日期时间对象。
@@ -377,8 +447,9 @@ System.out.println(today);
 LocalDateTime birthDate = LocalDateTime.of(2000, 1, 1, 0, 0, 0);
 System.out.println(birthDate);
 
+// Duration秒、纳秒、毫秒的相差对象
 Duration duration = Duration.between(birthDate, today);//第二个参数减第一个参数
-System.out.println("相差的时间间隔对象:" + duration);
+System.out.println("相差的时间间隔对象:" + duration); //PT206410H1M25.3514946S
 
 System.out.println("============================================");
 System.out.println(duration.toDays());//两个时间差的天数
@@ -392,6 +463,8 @@ System.out.println(duration.toNanos());//两个时间差的纳秒数
 
 ### Period  时间间隔（年，月，日）
 
+
+
 ```java
 // 当前本地 年月日
 LocalDate today = LocalDate.now();
@@ -401,19 +474,30 @@ System.out.println(today);
 LocalDate birthDate = LocalDate.of(2000, 1, 1);
 System.out.println(birthDate);
 
+// period时间间隔对象
 Period period = Period.between(birthDate, today);//第二个参数减第一个参数
 
 System.out.println("相差的时间间隔对象:" + period);
-System.out.println(period.getYears());
-System.out.println(period.getMonths());
-System.out.println(period.getDays());
+System.out.println(period.getYears()); // 相差年份
+System.out.println(period.getMonths()); // 相差月份
+System.out.println(period.getDays()); // 相差天数
 
+// 获取时间间隔总共有多少个月
 System.out.println(period.toTotalMonths());
 ```
 
 
 
-### ChronoUnit  时间间隔（所有单位）
+### ChronoUnit  时间间隔（所有单位）（常用）
+
+
+
+**注意:**
+
+1. 这个类计算出出来的数值，是**总数值**
+2. between方法接受的参数只要是**JDK8的时间对象**都可以例如LocalDate对象、LocalTime对象、LocalDateTime对象，都行
+
+
 
 ```java
 // 当前时间
@@ -422,6 +506,7 @@ System.out.println(today);
 // 生日时间
 LocalDateTime birthDate = LocalDateTime.of(2000, 1, 1,0, 0, 0);
 System.out.println(birthDate);
+
 
 System.out.println("相差的年数:" + ChronoUnit.YEARS.between(birthDate, today));
 System.out.println("相差的月数:" + ChronoUnit.MONTHS.between(birthDate, today));
@@ -440,244 +525,27 @@ System.out.println("相差的千年数:" + ChronoUnit.MILLENNIA.between(birthDat
 System.out.println("相差的纪元数:" + ChronoUnit.ERAS.between(birthDate, today));
 ```
 
-# 第五章  包装类
 
-## 5.1 概述
 
-Java提供了两个类型系统，基本类型与引用类型，使用基本类型在于效率，然而很多情况，会创建对象使用，因为对象可以做更多的功能，如果想要我们的基本类型像对象一样操作，就可以使用基本类型对应的包装类，如下：
+## isLeapYear()判断闰年
 
-| 基本类型 | 对应的包装类（位于java.lang包中） |
-| -------- | --------------------------------- |
-| byte     | Byte                              |
-| short    | Short                             |
-| int      | **Integer**                       |
-| long     | Long                              |
-| float    | Float                             |
-| double   | Double                            |
-| char     | **Character**                     |
-| boolean  | Boolean                           |
-
-## 5.2 Integer类
-
-- Integer类概述
-
-  包装一个对象中的原始类型 int 的值
-
-- Integer类构造方法及静态方法
-
-| 方法名                                  | 说明                                   |
-| --------------------------------------- | -------------------------------------- |
-| public Integer(int   value)             | 根据 int 值创建 Integer 对象(过时)     |
-| public Integer(String s)                | 根据 String 值创建 Integer 对象(过时)  |
-| public static Integer valueOf(int i)    | 返回表示指定的 int 值的 Integer   实例 |
-| public static Integer valueOf(String s) | 返回保存指定String值的 Integer 对象    |
-| static string tobinarystring(int i)     | 得到二进制                             |
-| static string tooctalstring(int i)      | 得到八进制                             |
-| static string toHexstring(int i)        | 得到十六进制                           |
-| static int parseInt(string s)           | 将字符串类型的整数转成int类型的整数    |
-
-- 示例代码
+示例：
 
 ```java
-//public Integer(int value)：根据 int 值创建 Integer 对象(过时)
-Integer i1 = new Integer(100);
-System.out.println(i1);
+LocalDate ld = LocalDate.of(2001, 3, 1);
+//把时间往前减一天
+LocalDate ld2 = ld.minusDays(1);
+//获取这一天是一个月中的几号
+int day2 = ld2.getDayOfMonth();
+System.out.println(day2); 
 
-//public Integer(String s)：根据 String 值创建 Integer 对象(过时)
-Integer i2 = new Integer("100");
-//Integer i2 = new Integer("abc"); //NumberFormatException
-System.out.println(i2);
-System.out.println("--------");
-
-//public static Integer valueOf(int i)：返回表示指定的 int 值的 Integer 实例
-Integer i3 = Integer.valueOf(100);
-System.out.println(i3);
-
-//public static Integer valueOf(String s)：返回保存指定String值的Integer对象 
-Integer i4 = Integer.valueOf("100");
-System.out.println(i4);
+// jdk8自带一个判断闰年平年的方法U•ェ•*U
+//true:闰年
+//false:平年
+System.out.println(ld.isLeapYear());
 ```
 
-```java
-/*
-            public static string tobinarystring(int i) 得到二进制
-            public static string tooctalstring(int i) 得到八进制
-            public static string toHexstring(int i) 得到十六进制
-            public static int parseInt(string s) 将字符串类型的整数转成int类型的整数
- */
 
-//1.把整数转成二进制，十六进制
-String str1 = Integer.toBinaryString(100);
-System.out.println(str1);//1100100
-
-//2.把整数转成八进制
-String str2 = Integer.toOctalString(100);
-System.out.println(str2);//144
-
-//3.把整数转成十六进制
-String str3 = Integer.toHexString(100);
-System.out.println(str3);//64
-
-//4.将字符串类型的整数转成int类型的整数
-//强类型语言:每种数据在java中都有各自的数据类型
-//在计算的时候，如果不是同一种数据类型，是无法直接计算的。
-int i = Integer.parseInt("123");
-System.out.println(i);
-System.out.println(i + 1);//124
-//细节1:
-//在类型转换的时候，括号中的参数只能是数字不能是其他，否则代码会报错
-//细节2:
-//8种包装类当中，除了Character都有对应的parseXxx的方法，进行类型转换
-String str = "true";
-boolean b = Boolean.parseBoolean(str);
-System.out.println(b);
-```
-
-## 5.3 装箱与拆箱
-
-基本类型与对应的包装类对象之间，来回转换的过程称为”装箱“与”拆箱“：
-
-- **装箱**：从基本类型转换为对应的包装类对象。
-- **拆箱**：从包装类对象转换为对应的基本类型。
-
-用Integer与 int为例：（看懂代码即可）
-
-基本数值---->包装对象
-
-```java
-Integer i = new Integer(4);//使用构造函数函数
-Integer iii = Integer.valueOf(4);//使用包装类中的valueOf方法
-```
-
-包装对象---->基本数值
-
-```java
-int num = i.intValue();
-```
-
-## 5.4 自动装箱与自动拆箱
-
-由于我们经常要做基本类型与包装类之间的转换，从Java 5（JDK 1.5）开始，基本类型与包装类的装箱、拆箱动作可以自动完成。例如：
-
-```java
-Integer i = 4;//自动装箱。相当于Integer i = Integer.valueOf(4);
-i = i + 5;//等号右边：将i对象转成基本数值(自动拆箱) i.intValue() + 5;
-//加法运算完成后，再次装箱，把基本数值转成对象。
-```
-
-## 5.5 基本类型与字符串之间的转换
-
-### 基本类型转换为String
-
-- 转换方式
-- 方式一：直接在数字后加一个空字符串
-- 方式二：通过String类静态方法valueOf()
-- 示例代码
-
-```java
-public class IntegerDemo {
-    public static void main(String[] args) {
-        //int --- String
-        int number = 100;
-        //方式1
-        String s1 = number + "";
-        System.out.println(s1);
-        //方式2
-        //public static String valueOf(int i)
-        String s2 = String.valueOf(number);
-        System.out.println(s2);
-        System.out.println("--------");
-    }
-}
-```
-
-### String转换成基本类型 
-
-除了Character类之外，其他所有包装类都具有parseXxx静态方法可以将字符串参数转换为对应的基本类型：
-
-- `public static byte parseByte(String s)`：将字符串参数转换为对应的byte基本类型。
-- `public static short parseShort(String s)`：将字符串参数转换为对应的short基本类型。
-- **`public static int parseInt(String s)`：将字符串参数转换为对应的int基本类型。**
-- **`public static long parseLong(String s)`：将字符串参数转换为对应的long基本类型。**
-- `public static float parseFloat(String s)`：将字符串参数转换为对应的float基本类型。
-- `public static double parseDouble(String s)`：将字符串参数转换为对应的double基本类型。
-- `public static boolean parseBoolean(String s)`：将字符串参数转换为对应的boolean基本类型。
-
-代码使用（仅以Integer类的静态方法parseXxx为例）如：
-
-- 转换方式
-  - 方式一：先将字符串数字转成Integer，再调用valueOf()方法
-  - 方式二：通过Integer静态方法parseInt()进行转换
-- 示例代码
-
-```java
-public class IntegerDemo {
-    public static void main(String[] args) {
-        //String --- int
-        String s = "100";
-        //方式1：String --- Integer --- int
-        Integer i = Integer.valueOf(s);
-        //public int intValue()
-        int x = i.intValue();
-        System.out.println(x);
-        //方式2
-        //public static int parseInt(String s)
-        int y = Integer.parseInt(s);
-        System.out.println(y);
-    }
-}
-```
-
-> 注意:如果字符串参数的内容无法正确转换为对应的基本类型，则会抛出`java.lang.NumberFormatException`异常。
-
-## 5.6 底层原理
-
-建议：获取Integer对象的时候不要自己new，而是采取直接赋值或者静态方法valueOf的方式
-
-因为在实际开发中，-128~127之间的数据，用的比较多。如果每次使用都是new对象，那么太浪费内存了。
-
-所以，提前把这个范围之内的每一个数据都创建好对象，如果要用到了不会创建新的，而是返回已经创建好的对象。
-
-```java
-//1.利用构造方法获取Integer的对象(JDK5以前的方式)
-/*Integer i1 = new Integer(1);
-        Integer i2 = new Integer("1");
-        System.out.println(i1);
-        System.out.println(i2);*/
-
-//2.利用静态方法获取Integer的对象(JDK5以前的方式)
-Integer i3 = Integer.valueOf(123);
-Integer i4 = Integer.valueOf("123");
-Integer i5 = Integer.valueOf("123", 8);
-
-System.out.println(i3);
-System.out.println(i4);
-System.out.println(i5);
-
-//3.这两种方式获取对象的区别(掌握)
-//底层原理：
-//因为在实际开发中，-128~127之间的数据，用的比较多。
-//如果每次使用都是new对象，那么太浪费内存了
-//所以，提前把这个范围之内的每一个数据都创建好对象
-//如果要用到了不会创建新的，而是返回已经创建好的对象。
-Integer i6 = Integer.valueOf(127);
-Integer i7 = Integer.valueOf(127);
-System.out.println(i6 == i7);//true
-
-Integer i8 = Integer.valueOf(128);
-Integer i9 = Integer.valueOf(128);
-System.out.println(i8 == i9);//false
-
-//因为看到了new关键字，在Java中，每一次new都是创建了一个新的对象
-//所以下面的两个对象都是new出来，地址值不一样。
-/*Integer i10 = new Integer(127);
-        Integer i11 = new Integer(127);
-        System.out.println(i10 == i11);
-
-        Integer i12 = new Integer(128);
-        Integer i13 = new Integer(128);
-        System.out.println(i12 == i13);*/
-```
 
 # 第六章：算法小题
 
@@ -895,7 +763,8 @@ public class Test5 {
         //获取这一天是一个月中的几号
         int day2 = ld2.getDayOfMonth();
         System.out.println(day2);
-
+				
+      	// jdk8自带一个判断闰年平年的方法U•ェ•*U
         //true:闰年
         //false:平年
         System.out.println(ld.isLeapYear());
