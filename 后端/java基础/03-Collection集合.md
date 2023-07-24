@@ -15,15 +15,15 @@ Collection集合概述
 
 具体构成：
 
-![03-Collection集合体系](C:\Users\UserName\Desktop\web前端学习\StudyFiles\后端\java基础\imgs\03-Collection集合体系.PNG)
+![03-Collection集合体系](./imgs/03-Collection集合体系.PNG)
 
 
 
 
 
-常见的相关方法：
+## 常见的相关方法：
 
-![03-Collection集合方法](C:\Users\UserName\Desktop\web前端学习\StudyFiles\后端\java基础\imgs\03-Collection集合方法.PNG)
+![03-Collection集合方法](./imgs/03-Collection集合方法.PNG)
 
 小细节：
 
@@ -105,15 +105,11 @@ public class A02_CollectionDemo2 {
 
 常用方法：
 
-![03-Collection集合iterator](C:\Users\UserName\Desktop\web前端学习\StudyFiles\后端\java基础\imgs\03-Collection集合iterator.PNG)
-
-
+![03-Collection集合iterator](./imgs/03-Collection集合iterator.PNG)
 
 遍历图解：
 
-![03-Collection集合iterator遍历图解](C:\Users\UserName\Desktop\web前端学习\StudyFiles\后端\java基础\imgs\03-Collection集合iterator遍历图解.PNG)
-
-
+![03-Collection集合iterator遍历图解](./imgs/03-Collection集合iterator遍历图解.PNG)
 
 代码示例：
 
@@ -249,9 +245,7 @@ public class MyCollectonDemo1 {
 
 ### Lambda表达式遍历
 
-![03-Collection集合lambda表达式遍历](C:\Users\UserName\Desktop\web前端学习\StudyFiles\后端\java基础\imgs\03-Collection集合lambda表达式遍历.PNG)
-
-
+![03-Collection集合lambda表达式遍历](./imgs/03-Collection集合lambda表达式遍历.PNG)
 
 代码示例：
 
@@ -343,7 +337,7 @@ public class A05_CollectionDemo5 {
 
 List集合实现了Collection接口所以拥有Collection接口的方法，但自己由于拥有索引的存在，自己也拥有一些特殊方法：
 
-![03-Collection集合List特有方法](C:\Users\UserName\Desktop\web前端学习\StudyFiles\后端\java基础\imgs\03-Collection集合List特有方法.PNG)
+![03-Collection集合List特有方法](./imgs/03-Collection集合List特有方法.PNG)
 
 代码示例：
 
@@ -466,7 +460,7 @@ public class A02_ListDemo2 {
 
 和iterator几乎一模一样，有一个非常关键的add方法特有
 
-![03-Collection集合List遍历listiterator](C:\Users\UserName\Desktop\web前端学习\StudyFiles\后端\java基础\imgs\03-Collection集合List遍历listiterator.PNG)
+![03-Collection集合List遍历listiterator](./imgs/03-Collection集合List遍历listiterator.PNG)
 
 这里有几个比较有意思的方法，想previous和previousIndex和next，nextIndex刚好相反
 
@@ -544,6 +538,49 @@ public class A03_ListDemo3 {
 如果遍历时想要操作索引，可以使用普通for遍历
 
 
+
+
+
+### ArrayList
+
+本质基于数组
+
+数组的特点：
+
+1. 存储内存空间连续，通过地址确定数组，再通过索引就能够获得元素
+2. **查找快，删除新增较慢**
+
+
+
+ArrayList的具体内容可以看一下外面`03-ArrayList.md`
+
+
+
+### LinkedList
+
+本质基于链表
+
+链表的特点：
+
+1. 链表中每个结点都是独立的对象，在内存中是不连续的，每个结点包含数据值和下一个结点的地址
+2. 链表**查询慢**（相对于数组，因为无论查哪一个都要从头开始找），但是**新增删除相对快，查询首位元素时极快**
+3. 双向链表针对查询第几个元素时的情况，查询效率有一定提升（相对于单向链表）
+
+
+
+LinkedList独有的API：
+
+![03-Collection集合LinkedListAPI](./imgs/03-Collection集合LinkedListAPI.PNG)
+
+>tips:
+>
+>其实上面的方法用的较少，一般都会使用Collection集合和List上的方法
+
+
+
+添加结点的底层：
+
+![03-Collection集合LinkedList添加结点底层](./imgs/03-Collection集合LinkedList添加结点底层.PNG)
 
 
 
