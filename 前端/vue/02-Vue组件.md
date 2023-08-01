@@ -625,7 +625,11 @@ props中可以限制的类型：
 ```vue
 <template>
 	<!--注意必须要用update事件，才能进行简写，后面那个是绑定对象中的值-->
+	<!-- 注意.sync前面的这个名称不一定和后面一直，只要和update:title一样就可以 -->
 	<children :title.sync="title" :selected.sync="label.selected"></children>
+
+	<!-- 写法2 -->
+	<children :name1.sync="title" :name2.sync="label.selected"></children>
 </template>
 
 <script>
@@ -653,6 +657,12 @@ props中可以限制的类型：
         this.$emit('update:title', newTitle);
         
         this.$emit('update:selected', newVal);
+        
+        
+        // 写法二：
+        // 核心保持update后的值和.sync前的值一致即可
+        this.$emit('update:name1', newTitle);
+        this.$emit('update:name2', newVal);
       }
     }
   }
