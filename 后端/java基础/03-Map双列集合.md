@@ -168,7 +168,7 @@ public class A02_MapDemo2 {
 
 核心：
 
-1. 通过`entrySet`获取每一对儿键值对
+1. 通过`entrySet`获取每一对儿键值对（会返回一个Set集合，里面装着每组键值对）
 2. 通过`getKey`方法获得键
 3. `getValue`方法获得值
 
