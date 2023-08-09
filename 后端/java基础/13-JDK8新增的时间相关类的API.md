@@ -187,7 +187,7 @@ System.out.println(time5);
 
 
 
-## 日期格式化类SimpleDateFormat
+## 日期格式化类
 
 
 
@@ -195,11 +195,11 @@ System.out.println(time5);
 
 
 
-| 函数                                     | 功能               |
-| ---------------------------------------- | ------------------ |
-| static DateTimeFormatter ofPattern(格式) | 获取格式对象       |
-| String format(时间对象)                  | 按照指定方式格式化 |
-|                                          |                    |
+| 函数                                                         | 功能                                        |
+| ------------------------------------------------------------ | ------------------------------------------- |
+| ofPattern(String pattern)：DateTimeFormatter                 | 静态方法 ，返回一个指定字符串格式的格式化器 |
+| format(TemporalAccessor t) ：注：LocalDate、LocalTime、LocalDateTime继承自TemporalAccessor | 格式化一个日期、时间，返回字符串            |
+| parse(CharSequence text)                                     | 将指定格式的字符序列解析为一个日期、时间    |
 
 
 
