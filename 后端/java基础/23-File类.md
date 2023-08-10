@@ -557,8 +557,20 @@ public class Test3 {
 ### 练习4：删除多级文件夹
 
 需求： 如果我们要删除一个有内容的文件夹
-	   1.先删除文件夹里面所有的内容
-           2.再删除自己
+
+1. 先删除文件夹里面所有的内容
+2. 再删除自己
+
+
+
+还是这套套路：
+
+```
+// 一：进入src
+// 二：遍历
+// 三：判断
+// 四：判断
+```
 
 代码示例：
 
@@ -567,7 +579,8 @@ public class Test4 {
     public static void main(String[] args) {
         /*
            删除一个多级文件夹
-           如果我们要删除一个有内容的文件夹
+           
+           如果我们要删除一个有内容的文件夹核心
            1.先删除文件夹里面所有的内容
            2.再删除自己
         */
@@ -585,6 +598,9 @@ public class Test4 {
         //1.先删除文件夹里面所有的内容
         //进入src
         File[] files = src.listFiles();
+      	
+      	// 注意，这里还可以做一下files的非null判断
+      
         //遍历
         for (File file : files) {
             //判断,如果是文件，删除
@@ -608,49 +624,49 @@ public class Test4 {
 代码示例：
 
 ```java
+package Test3;
+
+import java.io.File;
+
 public class Test5 {
     public static void main(String[] args) {
-       /*需求：
-            统计一个文件夹的总大小
-      */
+        // 统计一个文件夹的总大小
 
+        File src = new File("D:\\aaa");
+        System.out.println(getFolderSize(src));
 
-        File file = new File("D:\\aaa\\src");
-
-        long len = getLen(file);
-        System.out.println(len);//4919189
     }
 
-    /*
-    * 作用：
-    *       统计一个文件夹的总大小
-    * 参数：
-    *       表示要统计的那个文件夹
-    * 返回值：
-    *       统计之后的结果
-    *
-    * 文件夹的总大小：
-    *       说白了，文件夹里面所有文件的大小
-    * */
-    public static long getLen(File src){
-        //1.定义变量进行累加
-        long len = 0;
-        //2.进入src文件夹
+    /**
+     * 作用：
+     *      统计文件夹的总大小
+     * @param src 文件夹路径
+     * @return
+     */
+    public static long getFolderSize(File src) {
+
+        long size = 0L;
+
         File[] files = src.listFiles();
-        //3.遍历数组
+
+        // 空判断
+        if(files == null) {
+            return 0L;
+        }
         for (File file : files) {
-            //4.判断
-            if(file.isFile()){
-                //我们就把当前文件的大小累加到len当中
-                len = len + file.length();
-            }else{
-                //判断，如果是文件夹就递归
-                len = len + getLen(file);
+            if(file.isFile()) {
+              	// 是文件，直接加上
+                size += file.length();
+            }else {
+              	// 否则是文件夹，递归累加
+                size += getFolderSize(file);
             }
         }
-        return len;
+
+        return size;
     }
 }
+
 ```
 
 ### 练习6：统计文件个数
@@ -664,85 +680,83 @@ public class Test5 {
 代码示例：
 
 ```java
-public class Test6 {
-    public static void main(String[] args) throws IOException {
-        /*
-            需求：统计一个文件夹中每种文件的个数并打印。（考虑子文件夹）
-            打印格式如下：
-            txt:3个
-            doc:4个
-            jpg:6个
-        */
-        File file = new File("D:\\aaa\\src");
-        HashMap<String, Integer> hm = getCount(file);
-        System.out.println(hm);
+package Test3;
+
+import java.io.File;
+import java.util.HashMap;
+
+public class Test7 {
+    public static void main(String[] args) {
+        File src = new File("D:\\aaa");
+        HashMap<String, Integer> fileMap = getCount(src);
+
+        System.out.println(fileMap);
     }
 
-    /*
-    * 作用：
-    *       统计一个文件夹中每种文件的个数
-    * 参数：
-    *       要统计的那个文件夹
-    * 返回值：
-    *       用来统计map集合
-    *       键：后缀名 值：次数
-    *
-    *       a.txt
-    *       a.a.txt
-    *       aaa（不需要统计的）
-    *
-    *
-    * */
-    public static HashMap<String,Integer> getCount(File src){
-        //1.定义集合用来统计
-        HashMap<String,Integer> hm = new HashMap<>();
-        //2.进入src文件夹
+
+    /**
+     * 作用：
+     *      统计一个文件夹中每种文件的数量
+     * @param src
+     * @return
+     *
+     * a.txt
+     * a.a.txt
+     * a(没有后缀名的不统计)
+     */
+    public static HashMap<String, Integer> getCount(File src) {
+        // 1.定义集合来统计
+        HashMap<String, Integer> hm = new HashMap<>();
+
+        // 2.进入src
         File[] files = src.listFiles();
-        //3.遍历数组
+
+        // 3.遍历
         for (File file : files) {
-            //4.判断，如果是文件，统计
-            if(file.isFile()){
-                //a.txt
+
+            // 4.判断如果是文件，统计
+            if(file.isFile()) {
+                // 获取后缀名
                 String name = file.getName();
+                // 注意split中的是正则表达式
+                // 这里写\\.的原因是，.在正则中表示匹配任意字符，但是此时我们需要字符.
+                // 所以利用转义字符\去掉.在正则中的本身意义，转换为普普通通的字符.
                 String[] arr = name.split("\\.");
-                if(arr.length >= 2){
-                    String endName = arr[arr.length - 1];
-                    if(hm.containsKey(endName)){
-                        //存在
-                        int count = hm.get(endName);
+                if(arr.length >= 2) {
+                    String fileType = arr[arr.length - 1];
+
+                    if(hm.containsKey(fileType)) {
+                        // 存在，数量+1
+                        Integer count = hm.get(fileType);
                         count++;
-                        hm.put(endName,count);
-                    }else{
-                        //不存在
-                        hm.put(endName,1);
+                        hm.put(fileType, count);
+                    } else {
+                        // 如果不存在，创建
+                        hm.put(fileType, 1);
                     }
                 }
-            }else{
-                //5.判断，如果是文件夹，递归
-                //sonMap里面是子文件中每一种文件的个数
-                HashMap<String, Integer> sonMap = getCount(file);
-                //hm:  txt=1  jpg=2  doc=3
-                //sonMap: txt=3 jpg=1
-                //遍历sonMap把里面的值累加到hm当中
-                Set<Map.Entry<String, Integer>> entries = sonMap.entrySet();
-                for (Map.Entry<String, Integer> entry : entries) {
-                    String key = entry.getKey();
-                    int value = entry.getValue();
-                    if(hm.containsKey(key)){
-                        //存在
-                        int count = hm.get(key);
-                        count = count + value;
-                        hm.put(key,count);
-                    }else{
-                        //不存在
-                        hm.put(key,value);
+            } else {
+                // 如果是文件夹 递归
+                // 还要和原本值进行求和统计
+                HashMap<String, Integer> childFolder = getCount(file);
+                childFolder.forEach((key, value) -> {
+                    if(hm.containsKey(key)) {
+                        // 存在，和原来的值相加
+                        Integer count = hm.get(key);
+                        count += value;
+                        hm.put(key, count);
+                    } else {
+                        // 如果不存在，创建
+                        hm.put(key, value);
                     }
-                }
+                });
             }
         }
+
         return hm;
     }
 }
+
 ```
 
 
