@@ -645,7 +645,7 @@ public class StringDemo11 {
 }
 ```
 
-## 3.StringBuilder
+## 3.StringBuilder(线程不安全)
 
 StringBuilder 可以看成是一个容器，创建之后里面的内容是可变的。
 
@@ -805,7 +805,27 @@ public class StringBuilderDemo7 {
 
 ```
 
-## 4. StringJoiner
+
+
+
+
+# 4.StringBuffer(线程安全的)
+
+StringBuffer中的方法和StringBuilder中一毛一样，唯一区别就是StringBuffer是线程安全的，他在方法上都添加了`synchronized`关键字加上锁了，来保证代码同步
+
+
+
+**浓缩为：StringBuffer是StringBuilder的线程安全版本**
+
+
+
+>tips：
+>
+>注意不能无脑用StringBuffer，虽然它线程安全，但是它效率也会变慢，所以如果不是多线程就用StringBuilder，多线程情况下再使用StringBuffer
+
+
+
+# 5.StringJoiner
 
 * StringJoiner跟StringBuilder一样，也可以看成是一个容器，创建之后里面的内容是可变的。
 * 作用：提高字符串的操作效率，而且代码编写特别简洁，但是目前市场上很少有人用。 
