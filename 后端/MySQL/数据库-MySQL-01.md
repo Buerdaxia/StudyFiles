@@ -1006,7 +1006,7 @@ drop table if exists tb_emp;  -- 在删除表时，表中的全部数据也会�
 
 
 
-## 3. 数据库操作-DML
+## 3. 数据库操作-DML(重要)
 
 DML英文全称是Data Manipulation Language(数据操作语言)，用来对数据库中表的数据记录进行增、删、改操作。
 
@@ -1061,6 +1061,10 @@ values (null, 'zhirou', '123', '周芷若', 2, '1.jpg', 1, '2010-01-01', now(), 
 
 案例3：批量向tb_emp表的username、name、gender字段插入数据
 
+>now()：
+>
+>now函数获得当前系统时间
+
 ~~~mysql
 insert into tb_emp(username, name, gender, create_time, update_time)
 values ('weifuwang', '韦一笑', 1, now(), now()),
@@ -1071,7 +1075,9 @@ values ('weifuwang', '韦一笑', 1, now(), now()),
 
 ![image-20221206002807531](assets/image-20221206002807531.png)
 
-Insert操作的注意事项：
+
+
+**Insert操作的注意事项：**
 
 1. 插入数据时，指定的字段顺序需要与值的顺序是一一对应的。
 
@@ -1105,11 +1111,11 @@ update tb_emp set entrydate='2010-01-01',update_time=now();
 
 ![image-20221206004425527](assets/image-20221206004425527.png)
 
-> 注意事项:
->
-> 1. 修改语句的条件可以有，也可以没有，如果没有条件，则会修改整张表的所有数据。
->
-> 2. 在修改数据时，一般需要同时修改公共字段update_time，将其修改为当前操作时间。
+注意事项:
+
+1. 修改语句的条件可以有，也可以没有，如果没有条件，**则会修改整张表的所有数据。**
+
+2. 在修改数据时，一般需要同时修改公共字段update_time，将其修改为当前操作时间。
 
 
 
@@ -1133,13 +1139,15 @@ delete from tb_emp where id = 1;
 delete from tb_emp;
 ```
 
-> 注意事项:
->
-> ​	• DELETE 语句的条件可以有，也可以没有，如果没有条件，则会删除整张表的所有数据。
->
-> ​	• DELETE 语句不能删除某一个字段的值(可以使用UPDATE，将该字段值置为NULL即可)。
->
-> ​	• 当进行删除全部数据操作时，会提示询问是否确认删除所有数据，直接点击Execute即可。 
+
+
+注意事项:
+
+1. DELETE 语句的条件可以有，也可以没有，如果没有条件，**则会删除整张表的所有数据。**（不安全操作）
+
+2. DELETE 语句**不能删除某一个字段的值**(可以使用UPDATE，将该字段值置为NULL即可)。
+
+3. 当进行删除全部数据操作时，会提示询问是否确认删除所有数据，直接点击Execute即可。 
 
 
 
@@ -1173,3 +1181,4 @@ delete from tb_emp;
 
 
 
+ 
