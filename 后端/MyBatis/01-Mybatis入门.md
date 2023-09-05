@@ -203,7 +203,7 @@ application.properties:
 ```properties
 #驱动类名称
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-#数据库连接的url
+#数据库连接的url（末尾就是数据库名字）
 spring.datasource.url=jdbc:mysql://localhost:3306/mybatis
 #连接数据库的用户名
 spring.datasource.username=root
@@ -231,7 +231,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
-@Mapper
+@Mapper // 加上mapper注解，在运行时，会自动生成改接口的实现类对象(代理对象)，并且会交给IOC容器
 public interface UserMapper {
     
     //查询所有用户数据
@@ -261,7 +261,7 @@ public interface UserMapper {
 @SpringBootTest
 public class MybatisQuickstartApplicationTests {
 	
-    @Autowired
+    @Autowired // 依赖注入方式，获取到IOC容器中的mapper生成的对象
     private UserMapper userMapper;
 	
     @Test
@@ -528,19 +528,21 @@ public class JdbcTest {
 
 
 
-### 3.2 产品
+### 3.2 实现
 
 要怎么样实现数据库连接池呢？
 
-- 官方(sun)提供了数据库连接池标准（javax.sql.DataSource接口）
+官方(sun)提供了数据库连接池标准（javax.sql.DataSource接口）
 
-  - 功能：获取连接 
+- 功能：获取连接 
 
-    ~~~java
-    public Connection getConnection() throws SQLException;
-    ~~~
+  ~~~java
+  public Connection getConnection() throws SQLException;
+  ~~~
 
-  - 第三方组织必须按照DataSource接口实现
+- 第三方组织必须按照**DataSource接口实现**
+
+
 
 常见的数据库连接池：
 
@@ -614,16 +616,20 @@ Lombok是一个实用的Java类库，可以通过简单的注解来简化和消�
 
 ![image-20221210164641266](assets/image-20221210164641266.png)
 
-> 通过注解的形式自动生成构造器、getter/setter、equals、hashcode、toString等方法，并可以自动化生成日志变量，简化java开发、提高效率。
+> 通过注解的形式自动生成构造器、getter/setter、equals、hashcode、toString等方法，并可以自动化生成日志变量，简化java开发（简化实体类开发直接用注解就可以了）、提高效率。
 
-| **注解**            | **作用**                                                     |
-| ------------------- | ------------------------------------------------------------ |
-| @Getter/@Setter     | 为所有的属性提供get/set方法                                  |
-| @ToString           | 会给类自动生成易阅读的  toString 方法                        |
-| @EqualsAndHashCode  | 根据类所拥有的非静态字段自动重写 equals 方法和  hashCode 方法 |
-| @Data               | 提供了更综合的生成代码功能（@Getter  + @Setter + @ToString + @EqualsAndHashCode） |
-| @NoArgsConstructor  | 为实体类生成无参的构造器方法                                 |
-| @AllArgsConstructor | 为实体类生成除了static修饰的字段之外带有各参数的构造器方法。 |
+
+
+>红色注解比较**常用**
+
+| **注解**                                     | **作用**                                                     |
+| -------------------------------------------- | ------------------------------------------------------------ |
+| @Getter/@Setter                              | 为所有的属性提供get/set方法                                  |
+| @ToString                                    | 会给类自动生成易阅读的  toString 方法                        |
+| @EqualsAndHashCode                           | 根据类所拥有的非静态字段自动重写 equals 方法和  hashCode 方法 |
+| <b style="color:red">@Data</b>               | 提供了更综合的生成代码功能（@Getter  + @Setter + @ToString + @EqualsAndHashCode） |
+| <b style="color:red">@NoArgsConstructor</b>  | 为实体类生成无参的构造器方法                                 |
+| <b style="color:red">@AllArgsConstructor</b> | 为实体类生成除了static修饰的字段之外带有各参数的构造器方法。 |
 
 
 
