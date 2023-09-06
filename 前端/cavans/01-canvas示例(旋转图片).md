@@ -88,3 +88,40 @@ export default {
 ```
 
 注意：canvas拿到的文件格式是base64的，需要转换一下
+
+
+
+
+
+## rotata方法
+
+该方法也建议去MDN上查询
+
+基础语法：
+
+```js
+void ctx.rotate(angle);
+```
+
+
+
+参数：
+
+angle：顺时针旋转的**弧度**。如果你想通过角度值计算，可以使用公式： `degree * Math.PI / 180` 。
+
+
+
+
+
+## drawImage方法
+
+该方法可以去MDN上查
+
+基础语法：
+
+```js
+drawImage(image, dx, dy);
+drawImage(image, dx, dy, dWidth, dHeight);
+drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+```
+
