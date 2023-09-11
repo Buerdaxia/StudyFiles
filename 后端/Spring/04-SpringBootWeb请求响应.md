@@ -609,7 +609,7 @@ Postman测试：
 
 
 
-### 1.6 JSON参数(重点)
+### 1.6 JSON参数(重点,POST请求)
 
 在学习前端技术时，我们有讲到过JSON，而在前后端进行交互时，如果是比较复杂的参数，前后端通过会使用JSON格式的数据进行传输。 （JSON是开发中最常用的前后端数据交互方式）
 
@@ -1794,4 +1794,178 @@ public class EmpDaoA implements EmpDao {
 
 
 
+
+
+
+## 4. 请求相关注解
+
+### 4.1 @RequestMapping
+
+作用：标识请求路径和请求方法
+
+基础语法：
+
+```java
+@requestMapping(value="/depts", method="POST")
+```
+
+
+
+
+
+可以被下面几个mapping简化：
+
+1. @GetMapping("接口路径")
+2. @PostMapping("接口路径")
+3. @DeleteMapping("接口路径")
+4. @PatchMapping("接口路径")
+5. @PutMapping("接口路径")
+
+对应着不同的请求方式
+
+
+
+
+
+作用：
+
+一：如果写在`controller`的方法中，就是上面的基本功能
+
+
+
+二：如果写在`controller`的类上，就是为了统一加上请求路径
+
+```java
+// 一个完整的请求路径，是类上的@RequestMapping的value属性 + 方法上的 @RequestMapping的value属性
+
+@Slf4j // 简写获取日志对象的注解
+@RestController // 是controller和responseBody的整合
+@RequestMapping("/user")
+public class DeptController {
+  @RequestMapping("/list")
+  public void test() {
+    // 完整请求路径为 /user/list
+    ...
+  }
+  
+  @RequestMapping("/ids")
+  public void test2() {
+    // 完整请求路径为 /user/ids
+    ...
+  }
+}
+```
+
+
+
+### 4.2 @requestParam
+
+常用作用：可以指定参数默认值
+
+
+
+`controller`层代码：
+
+```java
+package com.itheima.controller;
+
+/*
+* 员工管理controller
+* */
+
+import com.itheima.pojo.PageBean;
+import com.itheima.pojo.Result;
+import com.itheima.service.EmpService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@Slf4j
+@RestController
+public class EmpController {
+
+    @Autowired
+    private EmpService empService;
+		
+    @GetMapping("/emps")
+    public Result page(@RequestParam(defaultValue = "1") Integer page,
+                       @RequestParam(defaultValue = "10") Integer pageSize) {
+            // 通过@RequestParam来设置参数默认值
+          log.info("分页查询，参数{}，{}", page, pageSize); // {}是占位符
+
+        // 调用service分页查询
+        PageBean pageBean = empService.page(page, pageSize);
+
+        return Result.success(pageBean);
+    }
+}
+
+```
+
+
+
+
+
+### 4.3 @DateTimeFormat
+
+作用：用于指定前端传递的时间参数格式类型
+
+语法：
+
+```
+@DateTimeFormat(pattern = "yyyy-MM-dd")
+// 后面是具体类型
+```
+
+
+
+
+
+代码示例：
+
+```java
+package com.itheima.controller;
+
+/*
+* 员工管理controller
+* */
+
+import com.itheima.pojo.PageBean;
+import com.itheima.pojo.Result;
+import com.itheima.service.EmpService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Slf4j
+@RestController
+public class EmpController {
+
+    @Autowired
+    private EmpService empService;
+		
+    @GetMapping("/emps")
+    public Result page(String name, Short gender,
+                       @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+                       @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end,
+                       @RequestParam(defaultValue = "1") Integer page,
+                       @RequestParam(defaultValue = "10") Integer pageSize) {
+        // 通过@RequestParam来设置参数默认值
+        // 通过@DateTimeFormat来指定前端传递日期格式
+        // 调用service分页查询
+        PageBean pageBean = empService.page(page, pageSize);
+
+        return Result.success(pageBean);
+    }
+}
+
+```
 
