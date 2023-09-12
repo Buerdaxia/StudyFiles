@@ -1,3 +1,23 @@
+# 文件上传
+
+文件上传是一个合理的项目中，必不可少的内容一般有以下几个小猪一点
+
+
+
+前端注意点：
+
+1. 表单中`enctype`属性为`multipart/form-data`
+2. 表单提交方式为`post`
+3. 表单中`input`标签的type属性值为`file`
+
+
+
+服务端：(`spring` 框架中)
+
+1. 需要`MultipartFile`的API
+
+
+
 ## 1. 文件上传
 
 在我们完成的新增员工功能中，还存在一个问题：没有头像(图片缺失)
@@ -192,15 +212,17 @@ public class UploadController {
 代码实现：
 
 1. 在服务器本地磁盘上创建images目录，用来存储上传的文件（例：E盘创建images目录）
-2. 使用MultipartFile类提供的API方法，把临时文件转存到本地磁盘目录下
+2. 使用`MultipartFile`类提供的`API`方法，把临时文件转存到本地磁盘目录下
 
-> MultipartFile 常见方法： 
->
-> - String  getOriginalFilename();  //获取原始文件名
-> - void  transferTo(File dest);     //将接收的文件转存到磁盘文件中
-> - long  getSize();     //获取文件的大小，单位：字节
-> - byte[]  getBytes();    //获取文件内容的字节数组
-> - InputStream  getInputStream();    //获取接收到的文件内容的输入流
+**`MultipartFile` 常见方法： **
+
+> - `String  getOriginalFilename();`  //获取原始文件名
+>- `void  transferTo(File dest);`     //将接收的文件转存到磁盘文件中
+> - `long  getSize();`     //获取文件的大小，单位：字节
+> - `byte[]  getBytes();`    //获取文件内容的字节数组
+> - `InputStream  getInputStream();`    //获取接收到的文件内容的输入流
+
+
 
 ~~~java
 @Slf4j
@@ -303,7 +325,7 @@ spring.servlet.multipart.max-request-size=100MB
 
 
 
-### 1.3 阿里云OSS
+### 1.3 阿里云`OSS`
 
 #### 1.3.1 准备
 
@@ -327,7 +349,7 @@ spring.servlet.multipart.max-request-size=100MB
 
 
 
-那我们学习使用这类云服务，我们主要学习什么呢？其实我们主要学习的是如何在项目当中来使用云服务完成具体的业务功能。而无论使用什么样的云服务，阿里云也好，腾讯云、华为云也罢，在使用第三方的服务时，操作的思路都是一样的。
+那我们学习使用这类云服务，我们主要学习什么呢？其实我们主要学习的是如何在项目当中来使用云服务完成具体的业务功能。而无论使用什么样的云服务，阿里云也好，腾讯云、华为云也罢，在使用第三方的服务时，**操作的思路**都是一样的。
 
 ![image-20221229093911113](assets/image-20221229093911113.png)
 
@@ -488,7 +510,7 @@ public class AliOssTest {
 > 在新增员工的时候，上传员工的图像，而之所以需要上传员工的图像，是因为将来我们需要在系统页面当中访问并展示员工的图像。而要想完成这个操作，需要做两件事：
 >
 > 1. 需要上传员工的图像，并把图像保存起来（存储到阿里云OSS）
-> 2. 访问员工图像（通过图像在阿里云OSS的存储地址访问图像）
+> 2. 访问员工图像（**通过图像在阿里云OSS的存储地址访问图像**）
 >    - OSS中的每一个文件都会分配一个访问的url，通过这个url就可以访问到存储在阿里云上的图片。所以需要把url返回给前端，这样前端就可以通过url获取到图像。
 
 
@@ -551,7 +573,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-@Component
+@Component // 加上注解，进行控制反转（由于我们是在spring框架中，所以工具类也可以用IOC、DI方式来进行管理）
 public class AliOSSUtils {
     private String endpoint = "https://oss-cn-shanghai.aliyuncs.com";
     private String accessKeyId = "LTAI5t9MZK8iq5T2Av5GLDxX";
@@ -598,8 +620,8 @@ import java.io.IOException;
 @Slf4j
 @RestController
 public class UploadController {
-
-    @Autowired
+		
+    @Autowired // 注入工具类实例
     private AliOSSUtils aliOSSUtils;
 
     @PostMapping("/upload")
@@ -680,7 +702,7 @@ public class AliOSSUtils {
 
 
 
-因为application.properties是springboot项目默认的配置文件，所以springboot程序在启动时会默认读取application.properties配置文件，而我们可以使用一个现成的注解：@Value，获取配置文件中的数据。
+因为application.properties是springboot项目默认的配置文件，所以springboot程序在启动时会默认读取application.properties配置文件，而我们可以使用一个现成的注解：**@Value，获取配置文件中的数据。**
 
 @Value 注解通常用于外部配置的属性注入，具体用法为： @Value("${配置文件中的key}")
 

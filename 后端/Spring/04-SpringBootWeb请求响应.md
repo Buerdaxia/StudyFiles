@@ -1568,7 +1568,7 @@ public class EmpDaoA implements EmpDao {
 
 | 注解        | 说明                 | 位置                                                   |
 | ----------- | -------------------- | ------------------------------------------------------ |
-| @Component  | 声明bean的基础注解   | 不属于以下三类时使用（一些工具类）                     |
+| @Component  | 声明bean的基础注解   | 不属于以下三类时使用（**一些工具类**）                 |
 | @Controller | @Component的衍生注解 | 标注在控制层类上(controller)                           |
 | @Service    | @Component的衍生注解 | 标注在业务层类上(service)                              |
 | @Repository | @Component的衍生注解 | 标注在数据访问层类上(dao)(由于与mybatis整合，使用较少) |

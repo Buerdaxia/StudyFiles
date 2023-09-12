@@ -12,9 +12,17 @@ data: {
 
 
 
+**注意点：**
+
+1. 表单上传的编码格式必须为`multipart/form-data`，也就是`form`标签中的`enctype`属性的值
+2. 提交方式必须是`POST`
+3. `<input />`标签中的`type`属性，必须为`file`
 
 
-通过表单上传文件：
+
+
+
+## 通过表单上传文件
 
 ```html
 <form action="http://localhost:8000/goods/upload" method="post" enctype="multipart/form-data">
