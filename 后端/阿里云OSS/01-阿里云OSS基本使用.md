@@ -709,7 +709,8 @@ public class AliOSSUtils {
 ~~~java
 @Component
 public class AliOSSUtils {
-
+		// 注意别导错包了，是spring框架的，别导成lombok的了	
+  
     @Value("${aliyun.oss.endpoint}")
     private String endpoint;
     
