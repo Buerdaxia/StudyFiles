@@ -589,7 +589,23 @@ xxxx 代码
 
 用`git log --graph`命令可以看到分支合并图。
 
-​	
+
+
+第二种方式：在有`<<<<<<< HEAD`，`=======`，`>>>>>>> new_branch`的文件进行手动修改，然后再进行提交操作，接下来就会保留现在提交的这一步操作
+
+```
+git add .
+git commit -m 'xxx'
+git pull
+git push
+// 提交操作
+```
+
+不管怎样，**最终改好的文件会原封不动地提交到仓库中**。另外需要注意，最后**不要忘了删掉三行分隔线**，即：`<<<<<<< HEAD`，`=======`，`>>>>>>> new_branch`(手动修改需要手动去除)
+
+
+
+
 
 ### 分支策略
 
@@ -699,3 +715,18 @@ git stash apply stash@{0}: 恢复指定stash
 
 这就是多人协作的工作模式，一旦熟悉了，就非常简单。
 
+
+
+
+
+## `http`方式拉去代码或提交代码失败
+
+问题一：拉去大文件造成提交或拉去失败，curl的postBuffer默认值太小，增大缓存配置就好了
+
+```
+git config --global http.postBuffer 1048576000
+```
+
+问题二：`Git error: RPC failed; curl 56 LibreSSL SSL_read: SSL_ERROR_SYSCALL, errno 54`
+
+这个问题解决办法，就是换成SSH方式拉取代码

@@ -333,6 +333,10 @@ public class Student {
 
 ## Stream流的收集操作【应用】
 
+**collect** 将java.util.stream .Collector中的各种收集器作为参数， 用于将流的元素累积为汇总结果，**这里可以直接用官方提供的Collectors类，里面的提供的方法非常丰富，比如可以把流中的数据汇总成各种集合，求最大值，最小值，求和，分组，求平均数等等**
+
+
+
 - 概念
 
   对数据使用Stream流的方式操作完毕后,可以把流中的数据收集到集合中
@@ -421,3 +425,402 @@ public class Student {
   	}
   }
   ```
+
+
+
+
+
+### collect收集操作详解
+
+1.（常用）collect()
+collect 方法的功能是将 Stream 中数据转换为最终的结果
+
+#### 例1-基础用法
+
+```java
+List list= Arrays.asList("a", "b", "c", "d");
+
+List collect =list.stream().map(String::toUpperCase).collect(Collectors.toList());
+System.out.println(collect); 
+//输出
+[A, B, C, D]
+
+数组所有元素，按某种规律计算：
+List num = Arrays.asList(1,2,3,4,5);
+List collect1 = num.stream().map(n -> n * 2).collect(Collectors.toList());
+System.out.println(collect1); 
+//输出
+[2, 4, 6, 8, 10]
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+```
+
+
+
+#### 例2-转换不同类型
+
+```java
+Stream<String> stream = Stream.of("hello", "world", "helloworld");
+//转成ArrayList
+ArrayList<String> list = stream.collect(Collectors.toCollection(ArrayList::new));
+//转成TreeSet
+TreeSet<String> treeSet = stream.collect(Collectors.toCollection(TreeSet::new));
+1
+2
+3
+4
+5
+```
+
+
+
+#### 例3-拼接字符串:
+
+```java
+Stream<String> stream = Stream.of("hello", "world", "helloworld");
+        String s = stream.collect(Collectors.joining(","));
+        System.out.println(s);
+//输出
+hello,world,helloworld
+1
+2
+3
+4
+5
+```
+
+
+
+#### 例4-Collectors.mapping 映射
+
+```java
+List<Employee> list = new ArrayList<>();
+list.add(new Employee("张三", 33));
+list.add(new Employee("李四", 28));
+list.add(new Employee("王五", 25));
+list.add(new Employee("赵六", 40));
+list.add(new Employee("孙七", 18));
+String nameList = list.stream().collect(Collectors.mapping(Employee::getName, Collectors.joining(",")));
+System.out.println(nameList);
+//输出结果
+张三,李四,王五,赵六,孙七
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+```
+
+
+
+#### 例5-Collectors.minBy 比较取小
+
+```java
+Employee employee = list.stream().collect(Collectors.minBy(Comparator.comparingInt(Employee::getAge))).get();
+System.out.println(employee);
+//输出结果
+Employee(name=孙七, age=18)
+1
+2
+3
+4
+```
+
+
+
+#### 例6-Collectors.maxBy 比较取大
+
+```java
+Employee employee = list.stream().collect(Collectors.minBy(Comparator.comparingInt(Employee::getAge))).get();
+System.out.println(employee);
+//输出结果
+Employee(name=赵六, age=40)
+1
+2
+3
+4
+```
+
+#### 例7-Collectors.summarizingInt 年龄求和，
+
+此外还有summarizingDouble与summarizingLong，用法一致。
+
+```java
+long sum = list.stream().collect(Collectors.summarizingInt(Employee::getAge)).getSum();
+System.out.println(sum);
+//输出结果
+144
+1
+2
+3
+4
+```
+
+#### 例8-Collectors.averagingInt 年龄求平均值
+
+此外还有averagingDouble与averagingLong，用法一致。
+
+```java
+Double avgAge = list.stream().collect(Collectors.averagingInt(Employee::getAge));
+System.out.println(avgAge);
+//输出结果
+28.8
+1
+2
+3
+4
+```
+
+#### 例9-Collectors.groupingBy分组，整理出的结果以Map的形式展现。
+
+```java
+List<Employee> list = new ArrayList<>();
+list.add(new Employee("张三", 20));
+list.add(new Employee("李四", 20));
+list.add(new Employee("王五", 30));
+list.add(new Employee("赵六", 30));
+list.add(new Employee("孙七", 40));
+Map<Integer, List<Employee>> employeeMap = list.stream().collect(Collectors.groupingBy(Employee::getAge));
+for (Integer age : employeeMap.keySet()) {
+    System.out.println(age+"年龄组有");
+    employeeMap.get(age).stream().forEach(System.out::println);
+}
+//输出结果
+20年龄组有
+Employee(name=张三, age=20)
+Employee(name=李四, age=20)
+40年龄组有
+Employee(name=孙七, age=40)
+30年龄组有
+Employee(name=王五, age=30)
+Employee(name=赵六, age=30)
+
+```
+
+
+
+#### 例10-Collectors.partitioningBy 条件分组
+
+整理出的结果以Map的形式展现，key为Boolean类型，true一组，false一组。
+
+```java
+List<Employee> list = new ArrayList<>();
+list.add(new Employee("张三", 33));
+list.add(new Employee("李四", 28));
+list.add(new Employee("王五", 25));
+list.add(new Employee("赵六", 40));
+list.add(new Employee("孙七", 18));
+//年龄是否大于30
+Map<Boolean, List<Employee>> employeeMap = list.stream().collect(Collectors.partitioningBy(k -> k.getAge().compareTo(30) > 0));
+for (Boolean b : employeeMap.keySet()) {
+    System.out.println(b ? "大于30的有" : "小于30的有");
+    employeeMap.get(b).stream().forEach(System.out::println);
+}
+//输出结果
+小于30的有
+Employee(name=李四, age=28)
+Employee(name=王五, age=25)
+Employee(name=孙七, age=18)
+大于30的有
+Employee(name=张三, age=33)
+Employee(name=赵六, age=40)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+```
+
+
+
+#### 例11-（常用）Collectors.toMap 将结果转换成Map
+
+
+
+注意：**可能会导致key重复的情况，需自行配置规则防止重复key报错。**
+
+```java
+List<Employee> list = new ArrayList<>();
+list.add(new Employee("张三", 33));
+list.add(new Employee("李四", 28));
+list.add(new Employee("王五", 25));
+list.add(new Employee("赵六", 40));
+list.add(new Employee("孙七", 18));
+//年龄是否大于30
+Map<String, Employee> employeeMap = list.stream().collect(Collectors.toMap(k -> k.getName(), v -> v, (o1, o2) -> o1));
+for (String name : employeeMap.keySet()) {
+    System.out.println(name + "年龄是:" + employeeMap.get(name).getAge() + "岁");
+}
+//输出结果
+孙七年龄是:18岁
+李四年龄是:28岁
+张三年龄是:33岁
+王五年龄是:25岁
+赵六年龄是:40岁
+```
+
+>by:
+>
+>CSDN: 小宋爱秋天
+
+
+
+
+
+### 2.（常用）forEach()方法
+迭代流中的每一个数据，等同于for循环
+
+```java
+Random random = new Random();
+random.ints().limit(10).forEach(System.out::println);
+
+List<String> items = Arrays.asList("a","b","c","d","e");
+items.forEach(item->System.out.println(item));
+//输出 a,b,c,d,e
+1
+2
+3
+4
+5
+6
+```
+
+### 3.find相关的操作
+**findAny查找任何一个就返回 Optional**
+
+```java
+List<String> strings = Arrays.asList("abc", "dd", "DD", "dd", "abcd","cc", "jkl");
+String result = strings.stream().filter(str -> str.equals("dd"))
+                .findAny()
+                .orElse(null);
+System.out.println(result);
+//输出 dd
+1
+2
+3
+4
+5
+6
+```
+
+
+
+
+
+**findFirst查找到第一个就返回 Optional**
+
+```java
+List<String> strings = Arrays.asList("abc", "dd", "DD", "dd", "abcd","cc", "jkl");
+String result = strings.stream().filter(str -> str.equals("dd"))
+                .findFirst()
+                .orElse(null);
+System.out.println(result);
+//输出 dd
+1
+2
+3
+4
+5
+6
+```
+
+
+
+
+
+**anyMatch匹配上任何一个则返回Boolean**
+
+```java
+List<String> strings = Arrays.asList("abc", "dd", "DD", "dd", "abcd","cc", "jkl");
+Boolean result = strings.stream().anyMatch(str -> str.equals("dd"));
+System.out.println(result);
+//输出 true
+1
+2
+3
+4
+```
+
+
+
+
+
+**allMatch匹配所有的元素则返回Boolean**
+
+```java
+List<String> strings = Arrays.asList("abc", "dd", "DD", "dd", "abcd","cc", "jkl");
+Boolean result = strings.stream().allMatch(str -> str.equals("dd"));
+System.out.println(result);
+//输出 false
+1
+2
+3
+4
+```
+
+
+
+**noneMatch检查在所需位置是否没有带有必需字符的元素，返回Boolean**
+
+```java
+List<String> strings = Arrays.asList("abc", "dd", "DD", "dd", "abcd","cc", "jkl");
+Boolean result = strings.stream().noneMatch(str -> str.equals("ff"));
+System.out.println(result);
+//输出 true
+1
+2
+3
+4
+```
+
+
+
+### 4.reduce()
+它可以把一个Stream的所有元素按照聚合函数聚合成一个结果
+
+
+
+```java
+// 0代表初始值 如果不传0 则使用第一个元素作为初始值,acc是计算值,n 是每个元素
+int sum = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9).reduce(0, (acc, n) -> acc + n);
+System.out.println(sum); // 45
+
+//不传初始值的情况下，返回的是Optional类型的结果
+List<Integer> numList = Arrays.asList(1,2,3,4,5);
+Optional<Integer> result = numList.stream().reduce((a, b) -> a + b);
+System.out.println(result.get());
+```
+
+————————————————
+原文链接：https://blog.csdn.net/u012062957/article/details/126106571

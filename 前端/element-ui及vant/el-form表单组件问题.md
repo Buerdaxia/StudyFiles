@@ -86,7 +86,11 @@ html部分：
 
 **动态表单，必须要给每一个`el-form-item`来绑定一个`key`值。防止它表单验证时候出现重复验证的问题**
 
-**2022-10-25：呃，改正一下，这个key绑不绑都可以(⊙﹏⊙)**
+
+
+
+
+**2022-10-25：呃，改正一下，这个key绑不绑都可以(⊙﹏⊙)，最好还是绑定一下，**
 
 一般都是拿时间来当key值：
 
@@ -116,6 +120,24 @@ let dataForm = {
 
 
 
+**校验失效的处理方法二：是在动态表单的v-for循环处，通过v-if进行判断，当所有要渲染字段从接口返回后，再进行渲染**
+
+```vue
+<template>
+	<div>
+    <el-form>
+  		<template v-if="dataForm.fieldList.length > 0">
+				<el-form-item v-for="(item, index) in dataForm.fieldList"></el-form-item>
+			</template>
+  	</el-form>
+  </div>
+</template>
+```
+
+
+
+
+
 ## 问题四：如果自定义label
 
 我们可以使用el-form-item的插槽，来自定义label
@@ -137,4 +159,116 @@ let dataForm = {
   </lyl-form-item>
 </template>
 ```
+
+
+
+
+
+## 问题四：动态表单无法输入值问题
+
+有时候会遇到这样一个情况，表单要渲染的表单项内容，**是从接口进行返回的，需要等待接口返回完成后再进行渲染**，等待接口返回后，我们根据接口返回的内容，往`dataForm`数据中填入对应的表单项绑定的内容(v-model绑定的参数)，**会发现表单项怎么也不能进行输入**
+
+
+
+问题原因：丢失响应性了
+
+解决办法：在往`dataForm`中添加属性时使用`this.$set`
+
+注意：**任何层级的新加属性都要通过`this.$set`来进行添加**
+
+
+
+代码示例：
+
+```vue
+<script>
+	export default {
+    methods: {
+      		getField() {
+            this.loading = true; // 加载
+            this.showForm = false; // 置动态表单渲染标识为false 注意点1：表单渲染标识
+            let id = this.dataForm.germplasmId;
+            this.$http.get(`${this.fieldUrl}?id=${id}`).then(({data: res}) => {
+              this.loading = false;
+              if (res.code !== 0) {
+                return this.$message.error(res.msg);
+              }
+
+              this.fieldList = res.data.list;
+
+              // 测试重写
+              this.dataForm.fieldList = [];
+              // 1.在fieldList中添加填写字段
+              this.fieldList.forEach(item => {
+                // 这里要判断一下是多选还是其他（多选是数组，其他是字符串）
+                if (item.fieldType == 2) {
+                  // 多选
+                  this.$set(item, 'vModel', []);  // 注意点2：这里添加了一个字段，我们就用this.$set
+                  // item.vModel = [];
+                } else { 
+                  this.$set(item, 'vModel', ['']);  // 注意点2：这里添加了一个字段，我们就用this.$set
+                  // item.vModel = '';
+                }
+
+                this.dataForm.fieldList.push(item); // 注意点3：这里为什么可以不用this.$set是应为push被重写过可以使用
+              });
+              // this.$set(this.dataForm, 'fieldList', list);
+
+              // 如果是编辑，需要将详情返回的值填入对应字段的vModel中
+              if (this.dataForm.id) {
+                for (let i = 0; i < this.dataForm.fieldList.length; i++) {
+                  let isExist = false;
+                  for (let j = 0; j < this.dataForm.breedingDataDetailsVoList.length; j++) {
+                    if (
+                      this.dataForm.fieldList[i].id == this.dataForm.breedingDataDetailsVoList[j].fieldId
+                    ) {
+                      if (
+                        this.dataForm.breedingDataDetailsVoList[j].answerList &&
+                        this.dataForm.breedingDataDetailsVoList[j].answerList.length == 0
+                      ) {
+                        // 如果返回的是空数组，说明从未填写过，需要重写判断并填入初始值
+                        if (this.dataForm.fieldList[i].fieldType == 2) {
+                          // 多选
+                          this.$set(this.dataForm.fieldList[i], 'vModel', []);
+                        } else {
+                          // 其他
+                          this.$set(this.dataForm.fieldList[i], 'vModel', ['']);
+                        }
+                      } else {
+                        // id对应了
+                        this.$set(
+                          this.dataForm.fieldList[i],
+                          'vModel',
+                          this.dataForm.breedingDataDetailsVoList[j].answerList
+                        );
+                      }
+                      // 置存在标记为true
+                      isExist = true;
+                      break;
+                    }
+                  }
+                  if (!isExist) {
+                    // 如果没有字段list和详情返回数据没有对应起来，就自定义一个vModel
+                    if (this.dataForm.fieldList[i].fieldType == 2) {
+                      // 多选
+                      this.$set(this.dataForm.fieldList[i], 'vModel', []);
+                    } else {
+                      // 其他
+                      this.$set(this.dataForm.fieldList[i], 'vModel', ['']);
+                    }
+                  }
+                }
+              }
+              // console.log('表单字段', this.dataForm.fieldList);
+              this.showForm = true; // 等待数据全部初始化完毕后，再渲染
+            });
+          },
+    }
+  }
+</script>
+```
+
+
+
+
 
