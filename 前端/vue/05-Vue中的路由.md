@@ -1143,7 +1143,7 @@ const routes = [
 
 
 
-## route.matched方法
+## route.matched属性(面包屑常用使用)
 
 叫做给定路由当前标准化路由数组，就是获取当前访问路由的所有路由规则，返回的是一个数组
 
@@ -1165,3 +1165,4 @@ const router = new VueRouter({
 ```
 
 如果当前访问的路由为`/foo/bar`，在当前路由组件中调用`this.$route.matched`方法会直接获取一个完整的对象的`routes`的副本，一般可以丢在面包屑中使用
+
