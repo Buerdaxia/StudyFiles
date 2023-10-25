@@ -74,6 +74,20 @@ export default  new Vuex.Store({
     state:state
 });
 
+
+// 或者酱紫写
+const store = new Vuex.Store({
+  state: {
+    count: 0
+  },
+  mutations: {
+    increment (state) {
+      state.count++
+    }
+  }
+})
+
+export default store;
 ```
 
 2)`main.js`引入`store`配置项
@@ -545,5 +559,113 @@ export default {
     }
   }
 }
+```
+
+
+
+
+
+## 八：自定义持久化插件
+
+官网上是这样解释vuex插件的：
+
+Vuex 的 store 接受 `plugins` 选项，这个选项暴露出每次 mutation 的钩子。Vuex 插件就是一个函数，它接收 store 作为唯一参数：
+
+```js
+const myPlugin = store => {
+  // 当 store 初始化后调用
+  store.subscribe((mutation, state) => {
+    // 每次 mutation 之后调用
+    // mutation 的格式为 { type, payload }
+  })
+}
+```
+
+然后像这样使用：
+
+```js
+const store = new Vuex.Store({
+  // ...
+  plugins: [myPlugin]
+})
+```
+
+
+
+我们常常需要将vuex的数据保存进本地的localstorage中，我们可以自定义一个插件来帮助我们保存
+
+
+
+
+
+第一步：封装插件
+
+`store/presist.js`
+
+```js
+/*
+  vuex插件的调用时机：
+  在每次vuex刷新时，都会调用
+  vuex在每次页面刷新时也会刷新
+*/
+
+export default function persistState(store) {
+	/**
+	 * @param {mutation} 访问mutation信息
+	 * @param {state} 修改后的state
+	 */
+	store.subscribe((mutation, state) => {
+		// store.subscribe 监听mutations触发
+		window.localStorage.setItem('vuex', JSON.stringify(state));
+	});
+
+	// 状态的还原，每次插件代码执行就还原一次
+
+	const prevState = window.localStorage.getItem('vuex');
+	if (prevState) {
+		// 调用store.replaceState替换所有状态
+		store.replaceState(JSON.parse(prevState));
+	}
+}
+
+```
+
+
+
+第二步：到store的入口文件index.js中引入
+
+`store/index.js`
+
+```js
+import Vue from "vue";
+import Vuex from 'vuex';
+// 引入
+import persistState from './presist';
+Vue.use(Vuex);
+
+
+const store = new Vuex.Store({
+  // 注册使用
+  plugins: [persistState],
+  state: {
+    breadCrumbData: [
+      // {
+      //   name: 'home',
+      //   query: {},
+      //   params: {},
+      //   meta: '首页',
+      //   actived: true
+      // }
+    ]
+  },
+  actions: {
+		....
+  },
+  mutations: {
+		...
+  }
+})
+
+export default store;
 ```
 

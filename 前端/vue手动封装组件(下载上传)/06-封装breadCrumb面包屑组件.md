@@ -231,3 +231,323 @@ export default {
 
 
 ## 方式三：利用vuex+localstorage
+
+目前介绍的这个是我自定义的一个面包屑组件。
+
+效果：
+
+![bread-02](./assets/bread-02.gif)
+
+
+
+核心思路：
+
+1. 使用vuex来保存route对象，并配合持久化插件保存进localstorage中，保证刷新正常
+2. 监听$route，将跳转的route对象保存进vuex中
+3. 自定义面包屑组件，渲染vuex的数据即可
+
+
+
+
+
+
+
+### 实现代码
+
+面包屑组件封装：
+
+`qBreadCrumb:`
+
+```vue
+<template>
+  <div class="breadCrumb">
+    <div
+      v-for="(item, index) in breadCrumbData"
+      :key="index"
+      class="breadCrumb-item"
+      :class="{actived: item.actived}"
+      @click="change(item)"
+    >
+      <div class="text">{{ item.meta }}</div>
+      <div @click.stop="deleteBreadCrumbItem(item)" class="icon">x</div>
+    </div>
+  </div>
+</template>
+<script>
+import {mapActions, mapState} from 'vuex';
+export default {
+	name: 'qBreadCrumb',
+	data() {
+		return {};
+	},
+	computed: {
+		...mapState(['breadCrumbData'])
+	},
+	watch: {
+		$route: {
+			handler() {
+				// console.log('111', this.$route);
+				this.addBreadAction(this.$route);
+			},
+			immediate: true
+		}
+	},
+	methods: {
+		...mapActions(['addBreadAction', 'deleteAction']),
+		deleteBreadCrumbItem(route) {
+			this.deleteAction(route);
+			// 删除时要做一个校验（如果删除的是已经激活的，我们要跳转到末尾）
+			if (route.name === this.$route.name) {
+				let length = this.breadCrumbData.length;
+				if (length > 0) {
+					this.$router.replace({
+						name: this.breadCrumbData[length - 1].name,
+						query: this.breadCrumbData[length - 1].query,
+						params: this.breadCrumbData[length - 1].params
+					});
+				}
+			}
+
+			// 直接跳转置最后一个
+			// this.$router.replace(this.breadCrumbData[this.breadCrumbData.length - 1]);
+			console.log('结果', this.breadCrumbData);
+
+			// 最后再做一个校验校验面包屑里还有没有数据如果没有就跳转到home
+			if (this.breadCrumbData.length == 0) {
+				this.$router.replace({
+					name: 'home'
+				});
+			}
+		},
+		change(item) {
+			this.$router.push({
+				name: item.name
+			});
+		}
+	}
+};
+</script>
+
+<style scoped>
+.breadCrumb {
+	height: 40px;
+	border: 1px solid #333;
+	display: flex;
+	align-items: center;
+	padding: 5px;
+}
+
+.breadCrumb-item {
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 5px 10px;
+	padding-right: 5px;
+	border-radius: 4px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+	cursor: pointer;
+	transition: all 0.2s;
+}
+.breadCrumb-item:not(:last-child) {
+	margin-right: 10px;
+}
+
+.breadCrumb-item:hover {
+	transform: scale(1.05);
+	box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.icon {
+	margin-left: 5px;
+	/* border: 1px solid red; */
+	width: 15px;
+	height: 15px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+	transition: all 0.2s;
+}
+
+.icon:hover {
+	background: #eee;
+}
+.actived .icon:hover {
+	background: #999;
+}
+
+.actived {
+	background: #337ab7;
+	color: #fff;
+}
+</style>
+
+```
+
+
+
+vuex代码：
+
+`store/breadcrumb.js`
+
+```js
+import Vue from "vue";
+import Vuex from 'vuex';
+// 引入自定义的持久化插件
+import persistState from './presist';
+Vue.use(Vuex);
+
+
+const store = new Vuex.Store({
+  // 注册使用
+  plugins: [persistState],
+  state: {
+    breadCrumbData: [
+      // {
+      //   name: 'home',
+      //   query: {},
+      //   params: {},
+      //   meta: '首页',
+      //   actived: true
+      // }
+    ]
+  },
+  actions: {
+    addBreadAction({ state, commit }, route) {
+      console.log('state', state);
+      console.log('传入的route', route);
+      if (!state.breadCrumbData) {
+        return;
+      }
+      // 先判断state中是否拥有
+      let found = state.breadCrumbData.find((item) => {
+        return item.name === route.name
+      })
+
+      if (!found) {
+        let breadcrumbItem = {
+          name: route.name,
+          query: route.query,
+          params: route.params,
+          meta: route.meta,
+          actived: true
+        }
+        commit('resetActived');
+        commit('add', breadcrumbItem);
+      } else {
+        // 如果找到了
+        commit('resetActived');
+        commit('change', route)
+      }
+    },
+
+    deleteAction({ state, commit }, route) {
+      if (!state.breadCrumbData) {
+        return;
+      }
+
+      let index = state.breadCrumbData.findIndex((item) => {
+        return item.name === route.name
+      })
+
+      commit('delete', index);
+
+      return index;
+    }
+  },
+  mutations: {
+    add(state, item) {
+      state.breadCrumbData.push(item);
+    },
+    // 重置激活状态
+    resetActived(state) {
+
+      state.breadCrumbData.forEach((item) => {
+        item.actived = false
+      })
+    },
+
+    // 激活状态方法
+    change(state, route) {
+      let found = state.breadCrumbData.find((item) => {
+        return item.name === route.name
+      })
+      found.params = route.params;
+      found.query = route.query;
+      found.meta = route.meta;
+      found.actived = true;
+    },
+
+    // 删除方法
+    delete(state, index) {
+      state.breadCrumbData.splice(index, 1);
+    }
+  }
+})
+
+export default store;
+```
+
+
+
+持久化插件代码:
+
+`store/presist.js`
+
+```js
+/*
+  vuex插件的调用时机：
+  在每次vuex刷新时，都会调用
+  vuex在每次页面刷新时也会刷新
+*/
+
+export default function persistState(store) {
+  /**
+   * @param {mutation} 访问mutation信息
+   * @param {state} 修改后的state
+   */
+  store.subscribe((mutation, state) => {
+    // store.subscribe 监听mutations触发
+    window.localStorage.setItem('vuex', JSON.stringify(state));
+  });
+
+  // 状态的还原，每次插件代码执行就还原一次
+
+  const prevState = window.localStorage.getItem('vuex');
+  if (prevState) {
+    // 调用store.replaceState替换所有状态
+    store.replaceState(JSON.parse(prevState));
+  }
+}
+```
+
+
+
+面包屑使用：
+
+`App.vue`
+
+```vue
+<template>
+	<div>
+    <qBreadCrumb></qBreadCrumb>
+  </div>
+</template>
+```
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+1. 自定义的样式，刷新也可以使用，也能够传递params和query参数
+
+
+
+**缺点：**
+
+1. 编写麻烦，一般作为长期通用组件使用
+2. 依赖于vuex

@@ -624,6 +624,14 @@ methods: {
 
 ### 编程式导航的小问题
 
+**问题一出现的原因**：
+
+由于vue-router3.0及以上版本使用的回调形式都改为了Promise API的形式了，返回的是一个Promise。也就是说push和replace都是Promise类型
+
+而Promise的回调函数resolve和reject，必须传其中一个，否则会报错。如果路由地址跳转相同，且没有捕获到错误，控制台始终会出现上图所出现的问题。
+
+
+
 问题一：编程式导航，进行多次路由跳转(参数不改变)，多次执行会抛出NavigationDuplicated异常
 
 解决方式：在push传递参数时，后面跟两个处理函数(一个成功回调，一个失败的回调)
@@ -638,7 +646,7 @@ methods: {
           k: this.keyword
         }
       }, () => { }, () => { })
-      // 就是在push末尾添加俩函数
+      // 就是在push末尾添加俩函数，第一个resolve第二个reject函数
 ```
 
 还有个根本解决方式，重写以下VueRouter的push方法
@@ -666,6 +674,24 @@ VueRouter.prototype.push = function(location, resolve, reject) {
 }
 
 // replace方法重写和push一致，就是把push改为replace
+// 备份一份VueRouter的replace方法
+let originReplace = VueRouter.prototype.replace
+
+// 重写以下push方法
+VueRouter.prototype.replace = function (location, resolve, reject) {
+  // 如果传了resolve和rejecte就调用
+  if (resolve && reject) {
+    originReplace.call(this, location, resolve, reject)
+  } else {
+    // 如果没传，我们自己传递俩函数
+    originReplace.call(
+      this,
+      location,
+      () => { },
+      () => { }
+    )
+  }
+}
 ```
 
 
