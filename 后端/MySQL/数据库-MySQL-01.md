@@ -362,6 +362,11 @@ create database [ if not exists ] 数据库名;
 create database itcast;
 ```
 
+>注意：表中如果有中文，我们在创建数据库时还需要指定一下字符集
+>
+>```mysql
+>create database itcast character set utf8mb4 collate utf8mb4_general_ci;
+
 命令行执行效果如下：
 
 ![image-20220829124219427](assets/image-20220829124219427.png) 
