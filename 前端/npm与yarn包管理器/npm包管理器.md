@@ -162,3 +162,15 @@ better_sqlite3_binary_host_mirror=https://registry.npmmirror.com/-/binary/better
 
 ```
 
+
+
+
+
+
+
+## 全局位置
+
+`C:\Windows\System32\node_modules`
+
+还会把系统变量设置为`C:\Windows\System32\node_modules\.bin`
+
