@@ -941,11 +941,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Api(tags = "用户管理接口")
-@RequiredArgsConstructor
+@RequiredArgsConstructor // 这个注解是添加有参构造函数
 @RestController
 @RequestMapping("users")
 public class UserController {
-
+		
+  	// 这里通过构造函数将userService自动导入的(替代了@Autowired)
     private final IUserService userService;
 
     @PostMapping

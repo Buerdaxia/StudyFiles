@@ -264,6 +264,10 @@ this.$off();
 
 7）注意：通过`this.$ref.xxx.$on('things',回调)`绑定自定义事件时，回调要么配置在父元素的methods中，要么用箭头函数，否则this指向会有问题。
 
+
+
+
+
 **ref属性（重要，拿来获取元素的）**
 
 1）被用来给元素或者子组件注册引用信息（id的替代者）
@@ -321,9 +325,45 @@ export default {
 
 
 
+#### $emits的高级用法
+
+注意`this.$emits('自定义事件名', 参数)`，这里的参数，还能够**传递函数哦**
+
+**使用时机：**
+
+1. 出现在自己封装组件时
+2. 当自己封装的组件上的一些方法需要使用者(父组件)来控制调用时机时，我们就可以这样传递函数过去
 
 
 
+例如：
+
+我们自己封装的一个验证码组件，组件的倒计时功能(用户点击后倒计时)，我们的组件本身是不知道什么时候要开始的，需要父组件发送了接口且成功时才进行倒计时，这是我们就可以向外暴露一个函数，当父组件接口返回成功时，再调用我们的函数
+
+```js
+//发送验证码
+sendCode() {
+  this.buttonNum = this.time
+  var _this = this
+  this.$emit('sendCode', function(result) {
+    // console.log('sendCode', result)
+    if(result){
+      //成功，开始倒计时
+      _this.timeChange()
+    }else{
+      //失败,重置回0
+      _this.buttonNum = 0
+      _this.buttonLabel = _this.defaultLabel
+    }
+  })
+  // this.buttonNum = this.time
+  // this.timeChange()
+},
+```
+
+
+
+**父组件的自定义事件和上面一致，如果既要接受子组件的参数又要传递参数，请参考上面的$event的使用**
 
 
 

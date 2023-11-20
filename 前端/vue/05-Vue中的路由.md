@@ -277,7 +277,14 @@ this.$router.push({
 
 
 
+### query参数的缺陷
 
+当路由模式是hash模式时，刷新页面query参数全部会丢失
+
+解决办法：
+
+1. **利用vuex或localstorage缓存当前路由**
+2. **使用params参数**
 
 
 
@@ -373,7 +380,7 @@ this.$router.push({
 
 
 
-## 路由的params参数
+## 路由的params参数(重要)
 
 1）配置路由，声明接收params参数
 

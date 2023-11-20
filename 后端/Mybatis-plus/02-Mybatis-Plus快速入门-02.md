@@ -629,6 +629,9 @@ void testPageQuery() {
 
 这里用到了分页参数，**Page**，即可以支持分页参数，也可以支持排序参数。常见的API如下：
 
+第一种：
+>把查询条件构建在分页对象中(例如排序条件)
+
 ```java
 int pageNo = 1, pageSize = 5;
 // 分页参数
@@ -638,6 +641,27 @@ page.addOrder(new OrderItem("balance", false));
 
 userService.page(page);
 ```
+
+第二种写法：
+
+>把查询条件构建在wrapper中(例如排序条件)
+
+```java
+// 构造分页构造器
+Page pageInfo = new Page(page, pageSize);
+// 构造条件构造器
+LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper();
+// 添加一个构造条件
+queryWrapper.like(StrUtil.isNotEmpty(name), Employee::getUsername, name);
+// 再添加一个排序条件
+queryWrapper.orderByDesc(Employee::getUpdateTime);
+
+// 执行查询
+employeeService.page(pageInfo, queryWrapper);// 会直接处理好，将内容封装进pageInfo
+
+```
+
+
 
 
 

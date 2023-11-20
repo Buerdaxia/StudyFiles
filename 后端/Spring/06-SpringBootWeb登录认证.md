@@ -1064,7 +1064,7 @@ public class DemoFilter implements Filter {
 
 
 
-在定义完Filter之后，Filter其实并不会生效，还需要完成Filter的配置，Filter的配置非常简单，只需要在Filter类上添加一个注解：@WebFilter，并指定属性urlPatterns，通过这个属性指定过滤器要拦截哪些请求
+在定义完Filter之后，Filter其实并不会生效，还需要完成Filter的配置，Filter的配置非常简单，只需要在Filter类上添加一个注解：`@WebFilter`，并指定属性`urlPatterns`，通过这个属性指定过滤器要拦截哪些请求
 
 ~~~java
 @WebFilter(urlPatterns = "/*") //配置过滤器要拦截的请求路径（ /* 表示拦截浏览器的所有请求 ）
@@ -1088,7 +1088,7 @@ public class DemoFilter implements Filter {
 }
 ~~~
 
-当我们在Filter类上面加了@WebFilter注解之后，接下来我们还需要在**启动类**上面加上一个注解@ServletComponentScan，通过这个@ServletComponentScan注解来开启SpringBoot项目对于Servlet组件的支持。
+当我们在Filter类上面加了`@WebFilter`注解之后，接下来我们还需要在**启动类**上面加上一个注解`@ServletComponentScan`，通过这个`@ServletComponentScan`注解来开启SpringBoot项目对于Servlet组件的支持。**
 
 ~~~java
 @ServletComponentScan
@@ -1140,7 +1140,7 @@ Filter过滤器的快速入门程序我们已经完成了，接下来我们就�
 
 
 
-过滤器当中我们拦截到了请求之后，如果希望继续访问后面的web资源，就要执行放行操作，放行就是调用 FilterChain对象当中的doFilter()方法，在调用doFilter()这个方法之前所编写的代码属于放行之前的逻辑。
+过滤器当中我们拦截到了请求之后，如果希望继续访问后面的web资源，就要执行放行操作，**放行就是调用 FilterChain对象当中的doFilter()方法，在调用doFilter()这个方法之前所编写的代码属于放行之前的逻辑。**
 
 在放行后访问完 web 资源之后还会回到过滤器当中，回到过滤器之后如有需求还可以执行放行之后的逻辑，放行之后的逻辑我们写在doFilter()这行代码之后。
 
@@ -1506,7 +1506,7 @@ public class XbcFilter implements Filter {
 
 ~~~java
 @Slf4j
-@WebFilter(urlPatterns = "/*") //拦截所有请求
+@WebFilter(urlPatterns = "/*") //拦截所有请求 urlPatterns设置拦截请求路径
 public class LoginCheckFilter implements Filter {
 
     @Override
@@ -2111,7 +2111,7 @@ public class WebConfig implements WebMvcConfigurer {
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //处理异常
+    //处理异常（这里捕获所有异常）
     @ExceptionHandler(Exception.class) //指定能够处理的异常类型
     public Result ex(Exception e){
         e.printStackTrace();//打印堆栈中的异常信息
@@ -2149,9 +2149,167 @@ public class GlobalExceptionHandler {
 
 
 
+### 3.4 第二种写法
+
+使用这三个注解：
+
+* `@ControllerAdvice(annotations = {RestController.class, Controller.class})`：这个注解需要手动指定一下那些注解标记的需要被拦截下来，上面这种写法指有`RestController`和`Controller`的注解类会被拦截
+* `@ResponseBody`为了返回JSON格式数据要加这个注解
+* `@ExceptionHandler`  //指定可以捕获哪种类型的异常进行处理
+
+示例：
+
+```java
+package com.itheima.reggie.common;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
+import 
+import java.sql.SQLIntegrityConstraintViolationException;
+
+/**
+ * 全局异常处理
+ */
+
+@ControllerAdvice(annotations = {RestController.class, Controller.class})
+@ResponseBody
+@Slf4j
+public class GlobalExceptionHandler {
+    /**
+     * 异常处理，
+     * @return
+     */
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public R<String> exceptionHandler(SQLIntegrityConstraintViolationException ex) {
+        log.error(ex.getMessage());
+        if(ex.getMessage().contains("Duplicate entry")) {
+            // 如果有重复的，就直接这样返回
+            String[] str = ex.getMessage().split(" ");
+            String msg = str[2] + "已存在";
+            return R.error(msg);
+          	// 这里截取了一下SQL返回的异常信息，然后组织了一下响应数据
+        }
+        return R.error("未知错误");
+    }
+}
+
+```
 
 
 
 
 
+
+
+## 4.PATH_MATCHER路径比较器
+
+有时候出现这种情况，在Filter中，我们想要比较两个路径，但是其中一个路径中包含通配符
+
+例如下面两个路径(String)：
+
+```
+/backend/**
+
+/backend/index.html
+```
+
+如果单纯用字符串方法比较，那么这两个是匹配不上的，但是我们知道，`**`是代表通配符的意思，**正常情况下应当是匹配的上的**，那么就需要springboot提供的一个路径比较器来帮我们比较路径
+
+
+
+示例代码如下：
+
+>注意：
+>
+>核心关键是看里面的check方法，其他的不是该章节的重点
+
+```java
+package com.itheima.reggie.filter;
+
+import com.alibaba.fastjson.JSON;
+import com.itheima.reggie.common.R;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.AntPathMatcher;
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * 检查用户是否已经完成登录过滤器
+ */
+@Slf4j
+@WebFilter(filterName = "loginCheckFilter", urlPatterns = "/*")
+public class LoginCheckFilter implements Filter {
+    // 路径匹配器，支持通配符
+    public static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+    // 注意：这里为什么需要这个路径匹配器，就是应为字符串不支持比对通配符
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+
+        // 向下转型(我们前后端通信使用的是servlet的一个子类httpServlet所以向下转型一下)
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+
+        // 1.获取本次请求的URI
+        String requestURI = request.getRequestURI();
+
+        // 2.判断本次请求是否需要处理
+        // 定义不需要处理的请求路径
+        String[] urls = new String[]{
+                "/employee/login",
+                "/employee/logout",
+                "/backend/**", // 静态资源不处理
+                "/front/**" // 静态资源不处理
+        };
+
+        // 2.判断本次请求是否需要处理
+        boolean check = check(urls, requestURI);
+
+        // 3.如果不需要处理直接放行
+        if(check) {
+            filterChain.doFilter(request, response);
+            return; //让方法结束 后续代码都不需要执行了
+        }
+
+        // 4.判断登录状态，如果已登录，则直接放行
+        if(request.getSession().getAttribute("employee") != null) {
+            // 如果session中存的有信息说明登录了
+            filterChain.doFilter(request, response);
+            return; //让方法结束 后续代码都不需要执行了
+        }
+
+        // 5.如果未登录则返回登录结果，通过输出流方式向客户端页面返回数据
+        response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
+        return; //这个return可蟹可不写
+    }
+
+    /**
+     * 路径匹配，检查本次请求是否需要放行
+     * @param urls
+     * @param requestURI
+     * @return
+     */
+    public boolean check(String[] urls, String requestURI) {
+        for (String url : urls) {
+            // match方法，传入两个参数可以包含通配符**
+            boolean match = PATH_MATCHER.match(url, requestURI);
+            if(match) {
+                // 如果匹配成功，直接返回
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+```
 
