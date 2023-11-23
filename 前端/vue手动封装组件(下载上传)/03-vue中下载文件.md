@@ -81,7 +81,9 @@ handlerExpt() {
 
 ```
 
-
+>注意：
+>
+>上面这种是前端手动规定的文件名，如果后端返回了文件名，那么请看下面的**三**的讲解
 
 
 
@@ -334,4 +336,43 @@ window.open(res.data.url);
 // 有时候下载可能会先打开一下再进行下载，我们可以设置第二个参数
 window.open(res.data.url, '_self'); // 这个就是a标签的target属性值作用也是一样的
 ```
+
+
+
+
+
+# 三：后端返回文件流且包含文件名
+
+后端的文件名一半都是放在响应头的`content-disposition`上，并且会用`encodeURI`方法编码一下，防止中文乱码。
+
+所以我们的目的也很明确了，第一步取出`content-disposition`上的键名，第二步`decodeURI`解码一下即可。
+
+请求头上的文件名格式：
+
+![03-下载文件包含文件名](./assets/03-下载文件包含文件名.png)
+
+
+
+
+
+具体方式：
+
+```js
+download() {
+  this.loading = true;
+  this.$http
+    .get('xxxurl请求路径',
+      {responseType: 'blob'}
+    )
+    .then(res => {
+      this.loading = false;
+    	// 关键是这里的获取请求头上的文件名
+      let fileName = decodeURI(res.headers['content-disposition'].split(';')[1].split('=')[1]);
+    	// 这里我们还是使用了上面讲的插件进行的下载
+      fileDownload(res.data, fileName);
+    });
+}
+```
+
+
 

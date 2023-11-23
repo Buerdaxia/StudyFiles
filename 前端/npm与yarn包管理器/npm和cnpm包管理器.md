@@ -105,6 +105,10 @@ script：下边的命令可以执行，执行方式npm run 命令名
 
 该命令会按照package.json配置文件安装里面所有的module
 
+
+
+**注意：在npm5.0版本后，会强制锁定版本，所以右上角的`~,^`这两个符号在npm中都不会生效，还是会下载后面指定的版本号内容，但是cnpm还是会遵循的(7.1.1版本的cnpm还是会遵循更高版本目前还不清楚)，^5.0.3下载5.x.x最新版本**
+
 ## babel代码转换
 
 ![babel转换](../../前端图片/npm与yarn/babel转换.png)
@@ -170,7 +174,19 @@ better_sqlite3_binary_host_mirror=https://registry.npmmirror.com/-/binary/better
 
 ## 全局位置
 
+**这个位置一般就是使用`-g`的安装路径（除非你安装了nvm），如果有nvm了一般情况下是会安装进对应node版本文件夹下的node_modules中**
+
 `C:\Windows\System32\node_modules`
 
-还会把系统变量设置为`C:\Windows\System32\node_modules\.bin`
+还会把系统变量中添加一条为`C:\Windows\System32\node_modules\.bin`
+
+
+
+这个位置就是可以自己手动下载一些包，然后解压后丢进这里然后就可以使用啦，例如cnpm，去官网下一个包解压下来，然后放进来就行了
+
+
+
+## 如何查看使用的npm使用路径
+
+有时候我们使用了nvm版本管理器，很容易机会将npm搞混乱，我们想检查当前到底使用的是那个文件夹下的版本，可以使用`npm -help`来检查
 
