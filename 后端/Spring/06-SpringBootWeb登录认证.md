@@ -2313,3 +2313,12 @@ public class LoginCheckFilter implements Filter {
 
 ```
 
+
+
+
+
+## 5.使用ThreadLocal存储当前登录用户id(必看)
+
+
+
+请看本文件夹序号为14的内容

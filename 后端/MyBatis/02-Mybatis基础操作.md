@@ -1005,3 +1005,20 @@ MybatisX的安装：
 
 
 
+
+
+# 3. Mybatis的yml配置文件
+
+```yaml
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml # 配置mapper位置
+  type-aliases-package: com.sky.entity # 配置实体位置
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+```
+
+
+

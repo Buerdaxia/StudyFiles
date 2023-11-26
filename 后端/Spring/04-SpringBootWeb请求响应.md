@@ -737,10 +737,15 @@ public class RequestController {
         System.out.println(id+ " : " +name);
         return "OK";
     }
+    
+    // 如果参数名不一致需要再@PathVariable后描述一下路径参数名
+    @RequestMapping("/path/{id}/{name}")
+    public String pathParam2(@PathVariable("id") Integer userId, @PathVariable("name") String userName){
+        System.out.println(id+ " : " +name);
+        return "OK";
+    }
 }
 ~~~
-
-
 
 
 
