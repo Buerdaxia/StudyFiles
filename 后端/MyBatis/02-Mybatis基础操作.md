@@ -452,9 +452,9 @@ class SpringbootMybatisCrudApplicationTests {
 
 
 
-### 1.4.2 主键返回
+### 1.4.2 主键返回(重要)
 
-概念：在数据添加成功后，需要获取插入数据库数据的主键。
+概念：在数据添加成功后，需要获取插入数据库数据的主键，**因为大部分情况，我们设计数据库时，都是让主键自增的，所以只有数据库添加成功当前这条数据后，才会有对应的主键id**
 
 > 如：添加套餐数据时，还需要维护套餐菜品关系表数据。
 >
@@ -466,9 +466,15 @@ class SpringbootMybatisCrudApplicationTests {
 >
 > 在添加套餐的时候，我们需要在界面当中来录入套餐的基本信息，还需要来录入套餐与菜品的关联信息。这些信息录入完毕之后，我们一点保存，就需要将套餐的信息以及套餐与菜品的关联信息都需要保存到数据库当中。其实具体的过程包括两步，首先第一步先需要将套餐的基本信息保存了，接下来第二步再来保存套餐与菜品的关联信息。套餐与菜品的关联信息就是往中间表当中来插入数据，来维护它们之间的关系。而中间表当中有两个外键字段，一个是菜品的ID，就是当前菜品的ID，还有一个就是套餐的ID，而这个套餐的 ID 指的就是此次我所添加的套餐的ID，所以我们在第一步保存完套餐的基本信息之后，就需要将套餐的主键值返回来供第二步进行使用。这个时候就需要用到主键返回功能。
 
+#### 通过注解方式Options
+
 那要如何实现在插入数据之后返回所插入行的主键值呢？
 
 - 默认情况下，执行插入操作时，是不会主键值返回的。如果我们想要拿到主键值，需要在Mapper接口中的方法上添加一个Options注解，并在注解中指定属性useGeneratedKeys=true和keyProperty="实体类属性名"
+
+
+
+注意：**实体类一定要有keyProperty="实体类属性名"这个属性名**
 
 
 
@@ -516,6 +522,23 @@ class SpringbootMybatisCrudApplicationTests {
 ~~~
 
 
+
+#### 写在xml文件中
+
+也可以将上面两个值写在对应的xml文件中：
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.DishMapper">
+		<!-- 这里两个值的对应功能和上面注解是一致的 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into dish (name, category_id, price, image, description, status, create_time, update_time, create_user, update_user)
+            VALUES
+        (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+    </insert>
+</mapper>
+```
 
 
 

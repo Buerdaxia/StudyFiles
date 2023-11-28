@@ -199,7 +199,7 @@ public class DeptServiceImpl implements DeptService {
 
 
 
-#### 1.2.3 Transactional注解
+#### 1.2.3 Transactional注解(重要)
 
 > @Transactional作用：就是在当前这个方法执行开始之前来开启事务，方法执行完毕之后提交事务。如果在这个方法执行的过程当中出现了异常，就会**自动**进行事务的回滚操作。
 >
@@ -218,7 +218,10 @@ public class DeptServiceImpl implements DeptService {
 
 
 
-添加注解的时机：**一般都会选择加在高频次增删改的地方**
+添加注解的时机：
+
+1. **一般都会选择加在高频次增删改的地方**
+2. **一个service中要操作两张及以上的表时，必须要加上@Transactional**
 
 
 

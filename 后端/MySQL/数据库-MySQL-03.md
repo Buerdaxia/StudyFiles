@@ -212,7 +212,7 @@ on emp.dept_id = dept.id;
 
 ## 1.3 外连接
 
-使用场景：<b style="color: green">当需要查出来一张表的所有数据时，即使时空的也要查</b>
+使用场景：<b style="color: green">当需要查出来一张表的所有数据时，即使时空的也要查，还有该表关联的其他表时的相关字段</b>
 
 
 
@@ -221,10 +221,24 @@ on emp.dept_id = dept.id;
 左外连接语法结构：
 
 ```mysql
-select  字段列表   from   表1  left  [ outer ]  join 表2  on  连接条件 ... ;
+select  字段列表(表1.xx, 表2.xx等等)   from   表1  left  [ outer ]  join 表2  on  连接条件 ... ;
 ```
 
-> 左外连接相当于查询表1(左表)的所有数据，当然也包含表1和表2交集部分的数据。
+> 左外连接相当于查询表1(左表)的所有数据，当然也包含表1和表2交集部分的数据(交集数据的内容会根据后面on条件和字段列表来显示)。
+
+示例：
+
+```sql
+select d.*, c.name  from dish d left join category c on d.category_id = c.id;
+
+# 一般我们要是结合mybatis框架来使用的话，还要给相关字段起别名要和我们的VO或者实体Entity对应上
+# select d.*, c.name as categoryName  from dish d left join category c on d.category_id = c.id; 
+# 上面就给c.name起了一个别名 categoryName为了对应VO的
+```
+
+>意思是：查出dish所有字段*，和category的name字段，用category_id和id作为条件
+
+
 
 右外连接语法结构：
 
@@ -263,6 +277,12 @@ from tb_emp AS emp right join  tb_dept AS dept
 > 注意事项：
 >
 > **左外连接和右外连接是可以相互替换的**，只需要调整连接查询时SQL语句中表的先后顺序就可以了。而我们在日常开发使用时，更偏向于左外连接。
+
+
+
+
+
+
 
 
 

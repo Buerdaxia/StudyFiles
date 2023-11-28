@@ -588,14 +588,16 @@ public class AliOSSUtils {
         InputStream inputStream = multipartFile.getInputStream();
 
         // 避免文件覆盖
+      	// 获取原始文件名
         String originalFilename = multipartFile.getOriginalFilename();
-        String fileName = UUID.randomUUID().toString() + originalFilename.substring(originalFilename.lastIndexOf("."));
+        // 通过uuid进行加工，防止存储在OSS中会有重复
+      	String fileName = UUID.randomUUID().toString() + originalFilename.substring(originalFilename.lastIndexOf("."));
 
         //上传文件到 OSS
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ossClient.putObject(bucketName, fileName, inputStream);
 
-        //文件访问路径
+        //文件访问路径 文件访问路径规则 https://BucketName.Endpoint/fileName
         String url = endpoint.split("//")[0] + "//" + bucketName + "." + endpoint.split("//")[1] + "/" + fileName;
 
         // 关闭ossClient
@@ -625,6 +627,7 @@ public class UploadController {
     private AliOSSUtils aliOSSUtils;
 
     @PostMapping("/upload")
+  	// 这里使用spring集成好的上传文件类型MultipartFile，形参名要和前端接口传递参数一致
     public Result upload(MultipartFile image) throws IOException {
         //调用阿里云OSS工具类，将上传上来的文件存入阿里云
         String url = aliOSSUtils.upload(image);

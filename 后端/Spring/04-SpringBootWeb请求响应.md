@@ -383,7 +383,7 @@ Postman测试：
 
 复杂实体对象的封装，需要遵守如下规则：
 
-- **请求参数名与形参对象属性名相同，按照对象层次结构关系即可接收嵌套实体类属性参数。**
+- **请求参数名与形参对象属性名相同，按照对象层次结构关系即可接收嵌套实体类属性参数。对象就是对象，对应数组就创建List<E>**
 
 定义POJO实体类：
 
@@ -427,7 +427,7 @@ public class User {
     private String name;
     private Integer age;
     private Address address; //地址对象
-
+		// private List<Address> address = new ArrayList<>(); // 如果是地址数组的话(这里给了默认值)
     public String getName() {
         return name;
     }
