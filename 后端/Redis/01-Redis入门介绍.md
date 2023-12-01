@@ -28,7 +28,7 @@
 
 
 
-## `Redis`常用命令
+## `Redis`常用命令(Spring Data Redis)
 
 ### 字符串操作命令
 
@@ -47,6 +47,36 @@ Redis字符串类型常用命令：
 
 
 
+`Spring Data Redis`对应命令：
+
+```java
+/**
+ * 操作字符串类型的数据
+ */
+@Test
+public void testString() {
+    // set get setex setnx
+
+    // set
+    redisTemplate.opsForValue().set("city", "北京");
+    // get
+    String city = (String)redisTemplate.opsForValue().get("city");
+    System.out.println(city);
+
+    // setex 可以设置过期时间
+    redisTemplate.opsForValue().set("code", "1234", 1, TimeUnit.MINUTES);
+
+    // setnx不存在的key才能设置
+    redisTemplate.opsForValue().setIfAbsent("lock", "1");
+    redisTemplate.opsForValue().setIfAbsent("lock", "2"); // 这句话应该设置不了
+}
+
+```
+
+
+
+
+
 
 
 ### 哈希操作命令
@@ -60,6 +90,40 @@ Redis hash 是一个string类型的field和value的映射表，**hash特别适�
 | HDEL key field       | 删除存储在哈希表中的指定字段            |
 | HKEYS key            | 获取哈希表中所有字段(field)             |
 | HVALS key            | 获取哈希表中所有的值(value)             |
+
+
+
+`Spring Data Redis`对应命令：
+
+```java
+/**
+ * 操作哈希类型数据
+ */
+@Test
+public void testHash() {
+    // HSET HGET HDEL HKEYS HVALS
+    HashOperations hashOperations = redisTemplate.opsForHash();
+
+    // HSET 设置key-value
+    hashOperations.put("100", "name", "jack");
+    hashOperations.put("100", "age", "18");
+
+    // HGET 获取
+    String name = (String) hashOperations.get("100", "name");
+    System.out.println(name);
+
+    // HKEYS
+    Set keys = hashOperations.keys("100");
+    System.out.println(keys);
+
+    // HVALS
+    List values = hashOperations.values("100");
+    System.out.println(values);
+
+    // HDEL 删除
+    hashOperations.delete("100", "age");
+}
+```
 
 
 
@@ -88,6 +152,41 @@ Redis 列表是简单的**字符串列表**，按照插入顺序排序，常用�
 
 
 
+`Spring Data Redis`对应命令：
+
+```java
+/**
+ * 操作列表类型的数据
+ */
+@Test
+public void testList() {
+    // lpush lrange rpop llen
+
+    ListOperations listOperations = redisTemplate.opsForList();
+
+    // lpush
+    listOperations.leftPushAll("mylist1", "a", "b", "c");
+    listOperations.leftPush("mylist1", "d");
+
+    // lrange
+    List mylist1 = listOperations.range("mylist1", 0, -1);
+    System.out.println(mylist1);
+
+    // rpop
+    String popItem = (String) listOperations.rightPop("mylist1");
+    System.out.println(popItem); //
+
+    // llen
+    Long size = listOperations.size("mylist1");
+    System.out.println(size);
+
+}
+```
+
+
+
+
+
 
 
 ### 集合操作命令
@@ -102,6 +201,51 @@ Redis set是**string类型的无需集合**。集合成员是唯一的，集合�
 | SINTER key1 [key2]         | 返回给定所有集合的交集   |
 | SUNION key1 [key2]         | 返回所有给定集合的并集   |
 | SREM key member1 [member2] | 删除集合中一个或多个成员 |
+
+
+
+
+
+`Spring Data Redis`对应命令：
+
+```java
+/**
+ * 操作集合相关方法
+ */
+@Test
+public void testSet() {
+    SetOperations setOperations = redisTemplate.opsForSet();
+
+    //sadd smembers scard sinter sunion srem
+
+    // sadd
+    setOperations.add("set1", "a", "b", "c", "d");
+    setOperations.add("set2", "a", "b", "x", "y");
+
+    // smembers
+    Set set1 = setOperations.members("set1");
+    System.out.println(set1);
+
+    // scard
+    Long size = setOperations.size("set1");
+    System.out.println(size);
+
+    // sinter
+    Set intersect = setOperations.intersect("set1", "set2");
+    System.out.println(intersect);
+
+    // sunion
+    Set union = setOperations.union("set1", "set2");
+    System.out.println(union);
+
+    // srem
+    setOperations.remove("set1", "a", "b");
+}
+```
+
+
+
+
 
 
 
@@ -229,7 +373,7 @@ public class RedisConfiguration {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
         // 设置Redis的连接工厂对象
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        // 设置Redis key的序列化器（string类型序列化器）
+        // 设置Redis key的序列化器（string类型序列化器） 如果不设置key到时候可能会乱码可读性比较差
         redisTemplate.setKeySerializer(new StringRedisSerializer());
 
         return redisTemplate;
