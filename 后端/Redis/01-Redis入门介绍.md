@@ -281,6 +281,38 @@ Redis的通用命令是不分数据类型的，都可以使用的命令：
 
 
 
+`Spring Data Redis`的操作命令：
+
+```java
+/**
+ * 通用指令操作
+ */
+@Test
+public void testCommon() {
+    //keys exists type del
+
+    Set keys = redisTemplate.keys("*");
+    System.out.println(keys);
+
+    // exists
+    Boolean name = redisTemplate.hasKey("name");
+    Boolean set1 = redisTemplate.hasKey("set1");
+
+    // type
+    for (Object key : keys) {
+        DataType type = redisTemplate.type(key);
+        System.out.println(type.name());
+    }
+
+    // del
+    redisTemplate.delete("mylist1");
+}
+```
+
+
+
+
+
 查询所有set的key：
 
 ```

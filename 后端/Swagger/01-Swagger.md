@@ -217,3 +217,142 @@ protected void addResourceHandlers(ResourceHandlerRegistry registry) {
 在接口文档中的表现形式：
 
 ![@ApiModelProperty02](./assets/@ApiModelProperty02.png)
+
+
+
+
+
+
+
+## 使用swagger进行接口文档分组
+
+有时候，我们常常会开发两个端的接口在同一个后端服务上，例如既有管理端接口，也有用户端接口，这时候我们就希望swagger能帮我们扫描不同的包，来分开两组接口，下面的配置可以帮到你：
+
+
+
+例如我们现在controller包下面分成`admin`和`user`两组分别代表管理端接口和用户端接口：
+
+![01-swagger进行接口分组01](assets/01-swagger进行接口分组01.png)
+
+
+
+我们只需要在配置类中多添加一个包扫描的方法（Docket）就能创建出来第二个分组接口，然后通过`groupName`来指定名称即可：
+
+`config/WebMvcConfiguration.class`
+
+```java
+package com.sky.config;
+
+import com.sky.interceptor.JwtTokenAdminInterceptor;
+import com.sky.json.JacksonObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.text.ExtendedMessageFormat;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.cbor.MappingJackson2CborHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+
+import java.util.List;
+
+/**
+ * 配置类，注册web层相关组件
+ */
+@Configuration
+@Slf4j
+public class WebMvcConfiguration extends WebMvcConfigurationSupport {
+
+    @Autowired
+    private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
+
+    /**
+     * 注册自定义拦截器
+     *
+     * @param registry
+     */
+    protected void addInterceptors(InterceptorRegistry registry) {
+        log.info("开始注册自定义拦截器...");
+        registry.addInterceptor(jwtTokenAdminInterceptor)
+                .addPathPatterns("/admin/**")
+                .excludePathPatterns("/admin/employee/login");
+    }
+
+    /**
+     * 通过knife4j生成接口文档
+     * @return
+     */
+    @Bean
+    public Docket docket1() {
+        log.info("准备生成接口文档...");
+        ApiInfo apiInfo = new ApiInfoBuilder()
+                .title("苍穹外卖项目接口文档")
+                .version("2.0")
+                .description("苍穹外卖项目接口文档")
+                .build();
+        Docket docket = new Docket(DocumentationType.SWAGGER_2)
+                .groupName("管理端接口") // 名字叫管理端接口
+                .apiInfo(apiInfo)
+                .select()
+            	// 这里扫描admin的controller
+                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.admin"))
+                .paths(PathSelectors.any())
+                .build();
+        return docket;
+    }
+
+    /**
+     * 通过knife4j生成接口文档
+     * @return
+     */
+    @Bean
+    public Docket docket2() {
+        log.info("准备生成接口文档...");
+        ApiInfo apiInfo = new ApiInfoBuilder()
+                .title("苍穹外卖项目接口文档")
+                .version("2.0")
+                .description("苍穹外卖项目接口文档")
+                .build();
+        Docket docket = new Docket(DocumentationType.SWAGGER_2)
+                .groupName("用户端接口") // 叫用户端接口
+                .apiInfo(apiInfo)
+                .select()
+            	// 这里扫描user的controller
+                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.user"))
+                .paths(PathSelectors.any())
+                .build();
+        return docket;
+    }
+
+    /**
+     * 设置静态资源映射
+     * @param registry
+     */
+    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        log.info("开始静态资源映射...");
+        registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
+}
+
+```
+
+
+
+
+
+
+
+**效果，就会有两组接口文档辣：**
+
+![01-swagger进行接口分组02](assets/01-swagger进行接口分组02.png)
