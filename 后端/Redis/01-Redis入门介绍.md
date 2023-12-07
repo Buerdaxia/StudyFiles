@@ -279,6 +279,20 @@ Redis的通用命令是不分数据类型的，都可以使用的命令：
 
 >都是操作key相关的(●'◡'●)
 
+查询所有set的key：
+
+```
+keys set*
+```
+
+查询所有的key：
+
+```
+keys *
+```
+
+
+
 
 
 `Spring Data Redis`的操作命令：
@@ -292,6 +306,8 @@ public void testCommon() {
     //keys exists type del
 
     Set keys = redisTemplate.keys("*");
+  	// 查询所有开头为dish_的key
+  	Set keys2 = redisTemplate.keys("dish_*");
     System.out.println(keys);
 
     // exists
@@ -312,18 +328,6 @@ public void testCommon() {
 
 
 
-
-查询所有set的key：
-
-```
-keys set*
-```
-
-查询所有的key：
-
-```
-keys *
-```
 
 
 
