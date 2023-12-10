@@ -433,3 +433,20 @@ ListOperations listOperations = redisTemplate.opsForList();
 ZSetOperations zSetOperations = redisTemplate.opsForZSet();
 ```
 
+
+
+
+
+
+
+## 一些符号的作用
+
+`*`：代表通配符，常常用作匹配key来使用，和mysql中的那个*的功能基本一致
+
+
+
+`:`：用来区分层级，redis中的键(`key`)是可以做成树形结构的，也就是分层的，创建时使用`:`区分就可以实现，一个冒号一个层级
+
+示例：创建`set a:b:c:d abcd`
+
+![01-Redis入门03](assets/01-Redis入门03.png)
