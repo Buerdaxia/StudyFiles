@@ -49,7 +49,29 @@ Spring Cache 提供了一层抽象，底层可以切换不同地缓存实现，�
 
 
 
+### `@EnableCaching`
+
+基本用法：
+
+```java
+@Slf4j
+@SpringBootApplication
+@EnableCaching // 在启动类上添加即可
+public class CacheDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(CacheDemoApplication.class,args);
+        log.info("项目启动成功...");
+    }
+}
+```
+
+
+
+
+
 ### `@CachePut`
+
+>使用的比较少
 
 基本用法：
 
@@ -76,6 +98,10 @@ public User save(@RequestBody User user){
 >注意点2：
 >
 >一定要注意cacheNames，相关业务的名字要保持一致，例如我们现在是user相关的取名为userCache，那么后续的操作也需要将cacheNames取名为userCache（和user业务相关的）
+
+>注意点3：
+>
+>这里框架帮我们存储的值，即使当前方法调用结束后的返回值
 
 
 
@@ -106,3 +132,53 @@ public User getById(Long id){
 >注意点：
 >
 >该注解会在方法执行前就去操作，本质使用代理对象
+
+>注意点2：
+>
+>这里框架帮我们存储的值，即使当前方法调用结束后的返回值
+
+
+
+使用地点：
+
+* 一般是获取相关接口使用
+
+
+
+### `@CacheEvict`
+
+基本用法：
+
+```java
+@DeleteMapping
+// 删除一条缓存记录
+@CacheEvict(cacheNames = "userCache", key = "#id") // 动态删除userCache::id
+public void deleteById(Long id){
+    userMapper.deleteById(id);
+}
+
+@DeleteMapping("/delAll")
+// 删除userCache下面所有缓存记录
+@CacheEvict(cacheNames = "userCache", allEntries = true)
+public void deleteAll(){
+    userMapper.deleteAll();
+}
+```
+
+>注意：
+>
+>删除指定一条记录，使用key参数，删除所有使用allEntries参数(常用)
+>
+>本质：
+>
+>任然使用代理对象方式，当方法指向完毕后，才会操作缓存
+
+
+
+使用位置：
+
+* 新增、插入、编辑：为了保证数据一致，防止新增的内容缓存中有
+* 删除、批量删除：保持数据一致，删除时要刷新缓存
+* 启用停用：及时刷新缓存
+
+**一般数据库有变化就要进行缓存删除，是删除单个还是全部，需要看复杂度，过于复杂直接全部删除**
