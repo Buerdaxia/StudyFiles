@@ -1638,7 +1638,15 @@ this.$nextTick(_ => {
 			<div>html结构2</div>
 		</template>
 	</Category>
-	
+
+老版写法（vue2仍然支持）:
+	<Category>
+    <!--注意这里还能简写v-solt可以简写为#  -->
+			<div slot="header">html结构1</div>
+			<div slot="footer">html结构2</div>
+	</Category>
+
+
 定义组件时：
 	<template>
 		//定义插槽加上name属性 上面的div结构会根据名称填到slot中
@@ -1655,8 +1663,6 @@ this.$nextTick(_ => {
 >无论是，默认插槽，还是具名插槽，他们的作用域都是父组件(既调用或使用组件的位置)，这意味着，他们是无法访问子组件数据的只能访问父组件的数据
 >
 >但是有些情况，我们想要在父组件中利用插槽来访问子组件数据，这里就需要下面的作用域插槽了
-
-
 
 
 
