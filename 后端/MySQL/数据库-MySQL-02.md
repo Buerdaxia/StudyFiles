@@ -1044,7 +1044,7 @@ add  constraint  fk_dept_id  foreign key (dept_id)  references  tb_dept(id);
 
 ![image-20221207105632634](assets/image-20221207105632634.png)
 
-> 一对一 ：在任意一方加入外键，关联另外一方的主键，并且设置外键为唯一的(UNIQUE)
+> 一对一 ：**在任意一方加入外键，关联另外一方的主键，并且设置外键为唯一的**(UNIQUE)
 
 
 

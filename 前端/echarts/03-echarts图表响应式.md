@@ -86,6 +86,7 @@ export default {
 		init() {
 			let dom = this.$refs.qChart; // 这里最好用this.$refs来获取dom，否则其他方式会有bug
 			let chart = echarts.init(dom);
+      chart.resize(); // 这个resize的目的是为了防止刷新时，渲染计算宽度有差误，将图表重新调整一下，具体看下面解释1
 			chart.setOption(this.options);
 			window.addEventListener('resize', () => {
 				chart.resize();
@@ -103,6 +104,12 @@ export default {
 </style>
 
 ```
+
+>解释1：
+>
+>为什么要调用一下`chart.resize();`，在一般的后台管理项目中，往往会有一个侧边栏，我们在刷新页面后，canvas的宽度计算是没有减去侧边栏宽度的，所以会导致图表比我们的容器大的情况出现。
+
+
 
 
 
